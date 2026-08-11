@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Icon } from "./Icon";
+import { IconButton } from "./components/IconButton";
 
 export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, cartCount }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -54,26 +55,9 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, cartCount }) => {
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <button onClick={onOpenSearch} aria-label="Buscar"
-            style={{ width: 40, height: 40, borderRadius: 999, border: 0, background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
-            <Icon name="search" size={18} />
-          </button>
-          <button aria-label="Cuenta" className="nav-user"
-            style={{ width: 40, height: 40, borderRadius: 999, border: 0, background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
-            <Icon name="user" size={18} />
-          </button>
-          <button onClick={onOpenCart} aria-label="Bolsa"
-            style={{ position: "relative", width: 40, height: 40, borderRadius: 999, border: 0, background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
-            <Icon name="cart" size={18} />
-            {cartCount > 0 && (
-              <span style={{
-                position: "absolute", top: 6, right: 4,
-                background: "var(--botanic-deep)", color: "#fff",
-                fontSize: 10, fontWeight: 600, lineHeight: 1,
-                padding: "3px 5px", borderRadius: 999, minWidth: 16, textAlign: "center"
-              }}>{cartCount}</span>
-            )}
-          </button>
+          <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" />
+          <IconButton icon="user" iconSize={18} aria-label="Cuenta" className="nav-user" />
+          <IconButton icon="cart" iconSize={18} onClick={onOpenCart} aria-label="Bolsa" badge={cartCount} />
         </div>
       </div>
 

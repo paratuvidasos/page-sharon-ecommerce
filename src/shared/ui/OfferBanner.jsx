@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
+import { Button } from "./components/Button";
 
 export const OfferBanner = () => {
   return (
@@ -44,8 +45,8 @@ export const OfferBanner = () => {
               </div>
 
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                <button className="btn btn-dark">Llevar el kit <Icon name="arrow" size={16} /></button>
-                <a href="#shop" className="btn btn-ghost">Ver qué incluye</a>
+                <Button>Llevar el kit <Icon name="arrow" size={16} /></Button>
+                <Button as="a" href="#shop" variant="ghost">Ver qué incluye</Button>
               </div>
 
               <div style={{ display: "flex", gap: 24, marginTop: 32, flexWrap: "wrap", color: "var(--ink-soft)", fontSize: 12 }}>
