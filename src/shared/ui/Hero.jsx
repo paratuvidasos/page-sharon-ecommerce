@@ -1,8 +1,9 @@
 import { Reveal } from "./Reveal";
 import { Icon, Stars } from "./Icon";
 import { ProductImage } from "./ProductImage";
-import { PRODUCTS } from "../data/products";
-import FotoModelo from "../assets/img/sharon_img_2_square.jpg"
+import { Button } from "./components/Button";
+import { PRODUCTS } from "@features/catalog/data/products";
+import FotoModelo from "@assets/img/sharon_img_2_square.jpg"
 
 export const Hero = ({ onShop }) => {
   return (
@@ -49,8 +50,8 @@ export const Hero = ({ onShop }) => {
 
             <Reveal delay={400}>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-                <button onClick={onShop} className="btn btn-dark">Comprar ahora <Icon name="arrow" size={16} /></button>
-                <a href="#beneficios" className="btn btn-ghost">Descubrir hábitos</a>
+                <Button onClick={onShop}>Comprar ahora <Icon name="arrow" size={16} /></Button>
+                <Button as="a" href="#beneficios" variant="ghost">Descubrir hábitos</Button>
               </div>
             </Reveal>
 

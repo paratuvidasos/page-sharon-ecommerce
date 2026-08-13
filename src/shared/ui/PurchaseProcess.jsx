@@ -1,5 +1,6 @@
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
+import { Button } from "./components/Button";
 
 const steps = [
   {
@@ -214,11 +215,11 @@ export const PurchaseProcess = () => {
                 <span style={{ fontSize: 14, color: "var(--ink-soft)" }}>
                   Envía todo a nuestro WhatsApp:
                 </span>
-                <a href={waBase + msgPaid} target="_blank" rel="noopener noreferrer"
-                  className="btn btn-rose btn-sm" style={{ gap: 8 }}>
+                <Button as="a" href={waBase + msgPaid} target="_blank" rel="noopener noreferrer"
+                  variant="rose" size="sm" style={{ gap: 8 }}>
                   <Icon name="wp" size={14} stroke={1.6} />
                   +57 310 3879555
-                </a>
+                </Button>
               </div>
 
               <div style={{
@@ -274,11 +275,11 @@ export const PurchaseProcess = () => {
                   Te asesoraremos sin compromiso.
                 </p>
               </div>
-              <a href={waBase + msgInquiry} target="_blank" rel="noopener noreferrer"
-                className="btn btn-dark" style={{ flexShrink: 0, gap: 8 }}>
+              <Button as="a" href={waBase + msgInquiry} target="_blank" rel="noopener noreferrer"
+                style={{ flexShrink: 0, gap: 8 }}>
                 <Icon name="wp" size={15} stroke={1.6} />
                 Escríbenos ahora
-              </a>
+              </Button>
             </div>
           </div>
         </Reveal>

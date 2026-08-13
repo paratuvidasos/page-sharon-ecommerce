@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Reveal } from "./Reveal";
-import { Icon } from "./Icon";
+import { Reveal } from "@ui/Reveal";
+import { Icon } from "@ui/Icon";
 import { ProductCard } from "./ProductCard";
 import { PRODUCTS, CATEGORIES } from "../data/products";
 

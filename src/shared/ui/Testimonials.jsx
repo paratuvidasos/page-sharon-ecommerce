@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Reveal } from "./Reveal";
 import { Icon, Stars } from "./Icon";
-import { TESTIMONIALS } from "../data/testimonials";
+import { TESTIMONIALS } from "./data/testimonials";
 
 export const Testimonials = () => {
   const [idx, setIdx] = useState(0);

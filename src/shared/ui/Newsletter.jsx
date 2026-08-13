@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
+import { Button } from "./components/Button";
 
 export const Newsletter = () => {
   const [name, setName] = useState("");
@@ -65,9 +66,9 @@ export const Newsletter = () => {
                   onFocus={e => e.target.style.borderColor = "var(--ink)"}
                   onBlur={e => e.target.style.borderColor = "var(--line)"} />
               </label>
-              <button type="submit" className="btn btn-dark" style={{ justifyContent: "center", marginTop: 6 }}>
+              <Button type="submit" style={{ justifyContent: "center", marginTop: 6 }}>
                 {sent ? "\u00a1Suscripción confirmada \u2726" : "Quiero mi -10%"} <Icon name="arrow" size={16} />
-              </button>
+              </Button>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", textAlign: "center", marginTop: 4 }}>
                 Al suscribirte aceptas nuestra política de privacidad.
               </div>

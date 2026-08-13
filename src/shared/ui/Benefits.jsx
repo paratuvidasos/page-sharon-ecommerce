@@ -1,6 +1,6 @@
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
-import { BENEFITS } from "../data/benefits";
+import { BENEFITS } from "./data/benefits";
 
 export const Benefits = () => {
   return (

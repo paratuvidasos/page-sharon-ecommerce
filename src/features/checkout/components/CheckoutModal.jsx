@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Icon } from "./Icon";
-import { ProductImage } from "./ProductImage";
+import { Icon } from "@ui/Icon";
+import { ProductImage } from "@ui/ProductImage";
+import { IconButton } from "@ui/components/IconButton";
+import { Button } from "@ui/components/Button";
 
 const WA_PHONE = "573103879555";
 
@@ -125,19 +127,7 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
               {items.length} {items.length === 1 ? "producto" : "productos"}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: 999,
-              border: 0,
-              background: "transparent",
-              cursor: "pointer",
-            }}
-          >
-            <Icon name="close" size={20} />
-          </button>
+          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar checkout" />
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -228,12 +218,11 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
             flexShrink: 0,
           }}
         >
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={
               sending || !form.name || !form.phone || !form.address || !form.neighborhood
             }
-            className="btn btn-dark"
             style={{
               width: "100%",
               justifyContent: "center",
@@ -254,7 +243,7 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
                 Enviar pedido por WhatsApp <Icon name="tt" size={16} />
               </>
             )}
-          </button>
+          </Button>
           <div
             style={{
               textAlign: "center",

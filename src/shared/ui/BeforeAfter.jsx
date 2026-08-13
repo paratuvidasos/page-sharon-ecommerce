@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Reveal } from "./Reveal";
-import FotoModeloAntes from "../assets/img/sharon_img_2.jpg";
+import FotoModeloAntes from "@assets/img/sharon_img_2.jpg";
 
 export const BeforeAfter = () => {
   const [pos, setPos] = useState(50);

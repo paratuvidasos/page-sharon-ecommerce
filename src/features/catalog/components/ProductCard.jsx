@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Icon, Stars } from "./Icon";
-import { ProductImage } from "./ProductImage";
+import { Icon, Stars } from "@ui/Icon";
+import { ProductImage } from "@ui/ProductImage";
+import { IconButton } from "@ui/components/IconButton";
 
 export const ProductCard = ({ product, onAdd, onWish }) => {
   const [hover, setHover] = useState(false);
@@ -43,7 +44,11 @@ export const ProductCard = ({ product, onAdd, onWish }) => {
           {product.badge}
         </span>
       )}
-      <button
+      <IconButton
+        icon="heart"
+        size={36}
+        iconSize={16}
+        color={wished ? "var(--botanic-deep)" : "var(--ink-soft)"}
         onClick={(e) => {
           e.stopPropagation();
           setWished((w) => !w);
@@ -55,23 +60,13 @@ export const ProductCard = ({ product, onAdd, onWish }) => {
           top: 12,
           right: 12,
           zIndex: 2,
-          width: 36,
-          height: 36,
-          borderRadius: 999,
-          border: 0,
           background: "rgba(255,255,255,.85)",
           backdropFilter: "blur(8px)",
-          color: wished ? "var(--botanic-deep)" : "var(--ink-soft)",
-          cursor: "pointer",
-          display: "grid",
-          placeItems: "center",
           boxShadow: "0 2px 8px rgba(27,24,21,.06)",
           transition: "color .2s ease, transform .2s ease",
           transform: wished ? "scale(1.05)" : "scale(1)",
         }}
-      >
-        <Icon name="heart" size={16} />
-      </button>
+      />
 
       <div
         style={{
