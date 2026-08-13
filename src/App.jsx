@@ -11,6 +11,7 @@ import { Newsletter } from "@ui/Newsletter";
 import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
+import { RegisterModal } from "@features/auth/components/RegisterModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -35,6 +36,7 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -69,6 +71,7 @@ function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
+        onOpenAccount={() => setAccountOpen(true)}
         cartCount={cartCount}
       />
 
@@ -88,6 +91,7 @@ function App() {
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <RegisterModal open={accountOpen} onClose={() => setAccountOpen(false)} />
 
       {toast && (
         <div style={{

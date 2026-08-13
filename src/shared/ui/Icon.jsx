@@ -24,6 +24,10 @@ export const Icon = ({ name, size = 22, stroke = 1.5, color = "currentColor" }) 
       return (<svg viewBox="0 0 24 24" style={s}><circle {...p} cx="12" cy="8" r="4"/><path {...p} d="M4 21c1-4.5 4.5-7 8-7s7 2.5 8 7"/></svg>);
     case "heart":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M12 20s-7-4.4-7-10a4.5 4.5 0 0 1 8-2.7A4.5 4.5 0 0 1 21 10c0 5.6-9 10-9 10Z"/></svg>);
+    case "eye":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle {...p} cx="12" cy="12" r="3"/></svg>);
+    case "eye-slash":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle {...p} cx="12" cy="12" r="3"/><path {...p} d="M4 4l16 16"/></svg>);
     case "menu":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 7h16M4 12h16M4 17h16"/></svg>);
     case "close":
