@@ -1,4 +1,4 @@
-import { Icon } from "./Icon";
+import { IconButton } from "./components/IconButton";
 
 export const MobileMenu = ({ open, onClose }) => {
   const links = [
@@ -21,9 +21,7 @@ export const MobileMenu = ({ open, onClose }) => {
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 40 }}>
           <span className="script" style={{ fontSize: 30 }}>Sharon</span>
-          <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 999, border: 0, background: "transparent", cursor: "pointer" }}>
-            <Icon name="close" size={20} />
-          </button>
+          <IconButton icon="close" size={36} iconSize={20} onClick={onClose} aria-label="Cerrar menú" />
         </div>
         <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {links.map(([l, h]) => (

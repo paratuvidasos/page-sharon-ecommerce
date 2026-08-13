@@ -1,5 +1,5 @@
-import imgTonico from "../assets/img/sharon_img_4.jpg"
-import imgMascarilla from "../assets/img/sharon_img_5.jpg"
+import imgTonico from "@assets/img/sharon_img_4.jpg"
+import imgMascarilla from "@assets/img/sharon_img_5.jpg"
 
 export const PRODUCTS = [
   {

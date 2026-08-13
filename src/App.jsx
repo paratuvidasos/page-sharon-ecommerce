@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { Nav } from "./components/Nav";
-import { Hero } from "./components/Hero";
-import { Products } from "./components/Products";
-import { Benefits } from "./components/Benefits";
-import { BeforeAfter } from "./components/BeforeAfter";
-import { Testimonials } from "./components/Testimonials";
-import { PurchaseProcess } from "./components/PurchaseProcess";
-import { OfferBanner } from "./components/OfferBanner";
-import { Newsletter } from "./components/Newsletter";
-import { Footer } from "./components/Footer";
-import { CartDrawer } from "./components/CartDrawer";
-import { SearchModal } from "./components/SearchModal";
-import { MobileMenu } from "./components/MobileMenu";
-import { AnnouncementBar } from "./components/AnnouncementBar";
-import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "./components/TweaksPanel";
-import { PRODUCTS } from "./data/products";
+import { Nav } from "@ui/Nav";
+import { Hero } from "@ui/Hero";
+import { Products } from "@features/catalog/components/Products";
+import { Benefits } from "@ui/Benefits";
+import { BeforeAfter } from "@ui/BeforeAfter";
+import { Testimonials } from "@ui/Testimonials";
+import { PurchaseProcess } from "@ui/PurchaseProcess";
+import { OfferBanner } from "@ui/OfferBanner";
+import { Newsletter } from "@ui/Newsletter";
+import { Footer } from "@ui/Footer";
+import { CartDrawer } from "@features/cart/components/CartDrawer";
+import { SearchModal } from "@features/catalog/components/SearchModal";
+import { MobileMenu } from "@ui/MobileMenu";
+import { AnnouncementBar } from "@ui/AnnouncementBar";
+import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
+import { PRODUCTS } from "@features/catalog/data/products";
 
 const ACCENT_PALETTES = {
   botanic: { deep: "#5E7860", soft: "#9CB29B", paper: "#D2DFD0" },

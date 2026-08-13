@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Icon } from "./Icon";
-import { ProductImage } from "./ProductImage";
+import { Icon } from "@ui/Icon";
+import { ProductImage } from "@ui/ProductImage";
 
 export const SearchModal = ({ open, onClose, products, onPick }) => {
   const [q, setQ] = useState("");

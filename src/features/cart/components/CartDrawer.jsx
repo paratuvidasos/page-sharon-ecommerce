@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Icon } from "./Icon";
-import { ProductImage } from "./ProductImage";
-import { CheckoutModal } from "./CheckoutModal";
+import { Icon } from "@ui/Icon";
+import { ProductImage } from "@ui/ProductImage";
+import { IconButton } from "@ui/components/IconButton";
+import { Button } from "@ui/components/Button";
+import { CheckoutModal } from "@features/checkout/components/CheckoutModal";
 
 export const CartDrawer = ({ open, onClose, items, setItems }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -32,9 +34,7 @@ export const CartDrawer = ({ open, onClose, items, setItems }) => {
             <div className="eyebrow">Tu bolsa</div>
             <div className="display" style={{ fontSize: 22 }}>{items.length} {items.length === 1 ? "artículo" : "artículos"}</div>
           </div>
-          <button onClick={onClose} style={{ width: 38, height: 38, borderRadius: 999, border: 0, background: "transparent", cursor: "pointer" }}>
-            <Icon name="close" size={20} />
-          </button>
+          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar bolsa" />
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "16px 26px" }}>
@@ -47,7 +47,7 @@ export const CartDrawer = ({ open, onClose, items, setItems }) => {
                 <div className="display" style={{ fontSize: 22 }}>Tu bolsa está vacía</div>
                 <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>Añade algún producto para empezar tu ritual.</div>
               </div>
-              <button onClick={onClose} className="btn btn-dark btn-sm" style={{ marginTop: 6 }}>Explorar productos</button>
+              <Button onClick={onClose} size="sm" style={{ marginTop: 6 }}>Explorar productos</Button>
             </div>
           )}
 
@@ -85,9 +85,9 @@ export const CartDrawer = ({ open, onClose, items, setItems }) => {
               <span className="display" style={{ fontSize: 22 }}>Total</span>
               <span className="display" style={{ fontSize: 28 }}>${(total + shipping)}</span>
             </div>
-            <button onClick={() => setCheckoutOpen(true)} className="btn btn-dark" style={{ width: "100%", justifyContent: "center" }}>
+            <Button onClick={() => setCheckoutOpen(true)} style={{ width: "100%", justifyContent: "center" }}>
               Finalizar compra <Icon name="arrow" size={16} />
-            </button>
+            </Button>
             <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
               {total < 40 && total > 0 ? `Te faltan $${(40 - total)} para envío gratis` : "Envío gratis aplicado \u2726"}
             </div>
