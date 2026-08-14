@@ -4,13 +4,25 @@ import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
 import { Modal, MODAL_CLOSE_MS } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
-import { RegisterForm } from "./RegisterForm";
-import { LoginForm } from "./LoginForm";
+import { RegisterForm } from "./register/RegisterForm";
+import { LoginForm } from "./login/LoginForm";
+import { ForgotPasswordForm } from "./forgot-password/ForgotPasswordForm";
 
 const DEMO_GOOGLE_ACCOUNT = { name: "Cuenta demo de Google", email: "demo.sharon@gmail.com" };
 
 function getSuccessCopy(info) {
   if (!info) return { title: "", body: null };
+  if (info.mode === "forgot") {
+    return {
+      title: "Revisa tu correo",
+      body: (
+        <>
+          Si <strong>{info.email}</strong> tiene una cuenta con nosotros, te enviamos un enlace para definir una
+          nueva contraseña. El enlace expira en 30 minutos.
+        </>
+      ),
+    };
+  }
   if (info.mode === "register") {
     if (info.method === "google") {
       return {
@@ -47,8 +59,8 @@ async function signInWithGoogle() {
   return { ...DEMO_GOOGLE_ACCOUNT };
 }
 
-export const AuthModal = ({ open, onClose }) => {
-  const [mode, setMode] = useState("register");
+export const AuthModal = ({ open, onClose, initialMode = "register" }) => {
+  const [mode, setMode] = useState(initialMode);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successInfo, setSuccessInfo] = useState(null);
@@ -63,9 +75,10 @@ export const AuthModal = ({ open, onClose }) => {
 
   const registerFormRef = useRef(null);
   const loginFormRef = useRef(null);
+  const forgotFormRef = useRef(null);
 
   const reset = () => {
-    setMode("register");
+    setMode(initialMode);
     setSubmitting(false);
     setSuccess(false);
     setSuccessInfo(null);
@@ -73,7 +86,7 @@ export const AuthModal = ({ open, onClose }) => {
     setGoogleDialogOpen(false);
     setGoogleLoading(false);
     setGoogleError("");
-    // RegisterForm/LoginForm se remontan limpios (su propio estado interno se descarta).
+    // RegisterForm/LoginForm/ForgotPasswordForm se remontan limpios (su propio estado interno se descarta).
     setFormKey((k) => k + 1);
   };
 
@@ -86,14 +99,20 @@ export const AuthModal = ({ open, onClose }) => {
     if (googleDialogOpen && googleDialogRef.current) googleDialogRef.current.focus();
   }, [googleDialogOpen]);
 
+  // El padre puede pedir un tab de arranque distinto (ej. volver del flujo de
+  // restablecimiento directo a "login"); esto sincroniza el tab cada vez que se abre.
+  useEffect(() => {
+    if (open) setMode(initialMode);
+  }, [open, initialMode]);
+
   const handleSubmit = async () => {
-    const formRef = mode === "register" ? registerFormRef : loginFormRef;
+    const formRef = mode === "register" ? registerFormRef : mode === "login" ? loginFormRef : forgotFormRef;
     if (!formRef.current) return;
     setSubmitting(true);
     const result = await formRef.current.submit();
     setSubmitting(false);
     if (result?.ok) {
-      setSuccessInfo(result.info);
+      setSuccessInfo({ ...result.info, mode });
       setSuccess(true);
     }
   };
@@ -160,25 +179,49 @@ export const AuthModal = ({ open, onClose }) => {
             <path fill="currentColor" d="M50 5C30 30 18 70 26 110c6 30 22 50 24 80 0-30 14-50 24-78 12-40 0-80-24-107z" />
           </svg>
           <div style={{ position: "relative" }}>
+            {mode === "forgot" && !success && (
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  background: "none",
+                  border: 0,
+                  padding: 0,
+                  marginBottom: 10,
+                  fontSize: 12.5,
+                  color: "var(--ink-soft)",
+                  cursor: "pointer",
+                }}
+              >
+                <Icon name="chev-l" size={14} /> Volver a iniciar sesión
+              </button>
+            )}
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }} />
               <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>
-                {mode === "register" ? "Crea tu cuenta" : "Inicia sesión"}
+                {mode === "register" ? "Crea tu cuenta" : mode === "login" ? "Inicia sesión" : "Recupera tu acceso"}
               </span>
             </div>
             <div id="auth-modal-title" className="display" style={{ fontSize: 26, lineHeight: 1.1 }}>
               {mode === "register" ? (
                 <>Empieza tus <span className="script" style={{ color: "var(--botanic-deep)" }}>hábitos</span></>
-              ) : (
+              ) : mode === "login" ? (
                 <>Vuelve a tus <span className="script" style={{ color: "var(--botanic-deep)" }}>hábitos</span></>
+              ) : (
+                <>Recupera tu <span className="script" style={{ color: "var(--botanic-deep)" }}>acceso</span></>
               )}
             </div>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 380 }}>
               {mode === "register"
                 ? "Guarda tus datos, direcciones y el historial de tus pedidos en un solo lugar."
-                : "Ingresa con tu correo o continúa con Google."}
+                : mode === "login"
+                  ? "Ingresa con tu correo o continúa con Google."
+                  : "Escribe tu correo y te enviaremos un enlace para definir una nueva contraseña. Expira en 30 minutos."}
             </p>
-            {!success && (
+            {!success && mode !== "forgot" && (
               <div style={{ display: "inline-flex", gap: 8, marginTop: 16 }} role="group" aria-label="Elige registrarte o iniciar sesión">
                 <Button type="button" size="sm" variant={mode === "register" ? "dark" : "ghost"} aria-pressed={mode === "register"} disabled={submitting} onClick={() => setMode("register")}>
                   Crear cuenta
@@ -222,7 +265,15 @@ export const AuthModal = ({ open, onClose }) => {
                 <RegisterForm key={`register-${formKey}`} ref={registerFormRef} />
               </div>
               <div style={{ display: mode === "login" ? "block" : "none" }}>
-                <LoginForm key={`login-${formKey}`} ref={loginFormRef} onLockChange={setLoginLocked} />
+                <LoginForm
+                  key={`login-${formKey}`}
+                  ref={loginFormRef}
+                  onLockChange={setLoginLocked}
+                  onForgotPassword={() => setMode("forgot")}
+                />
+              </div>
+              <div style={{ display: mode === "forgot" ? "block" : "none" }}>
+                <ForgotPasswordForm key={`forgot-${formKey}`} ref={forgotFormRef} />
               </div>
             </>
           )}
@@ -248,43 +299,51 @@ export const AuthModal = ({ open, onClose }) => {
               }}
             >
               {submitting
-                ? mode === "register" ? "Creando cuenta…" : "Iniciando sesión…"
-                : <>{mode === "register" ? "Crear cuenta" : "Iniciar sesión"} <Icon name="arrow" size={16} /></>}
+                ? mode === "register" ? "Creando cuenta…" : mode === "login" ? "Iniciando sesión…" : "Enviando enlace…"
+                : mode === "forgot"
+                  ? <>Enviar enlace <Icon name="arrow" size={16} /></>
+                  : <>{mode === "register" ? "Crear cuenta" : "Iniciar sesión"} <Icon name="arrow" size={16} /></>}
             </Button>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0" }}>
-              <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
-              <span className="eyebrow" style={{ fontSize: 10 }}>o</span>
-              <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
-            </div>
+            {mode !== "forgot" && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0" }}>
+                  <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
+                  <span className="eyebrow" style={{ fontSize: 10 }}>o</span>
+                  <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
+                </div>
 
-            {googleError && (
-              <div role="alert" style={{ fontSize: 12, color: "#7A3535", marginBottom: 10, textAlign: "center" }}>
-                {googleError}
-              </div>
+                {googleError && (
+                  <div role="alert" style={{ fontSize: 12, color: "#7A3535", marginBottom: 10, textAlign: "center" }}>
+                    {googleError}
+                  </div>
+                )}
+
+                <Button
+                  ref={googleButtonRef}
+                  type="button"
+                  variant="ghost"
+                  disabled={busy}
+                  onClick={() => setGoogleDialogOpen(true)}
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    gap: 10,
+                    opacity: busy ? 0.6 : 1,
+                    cursor: busy ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <Icon name="google" size={18} /> {googleLoading ? "Conectando con Google…" : "Continuar con Google"}
+                </Button>
+              </>
             )}
-
-            <Button
-              ref={googleButtonRef}
-              type="button"
-              variant="ghost"
-              disabled={busy}
-              onClick={() => setGoogleDialogOpen(true)}
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                gap: 10,
-                opacity: busy ? 0.6 : 1,
-                cursor: busy ? "not-allowed" : "pointer",
-              }}
-            >
-              <Icon name="google" size={18} /> {googleLoading ? "Conectando con Google…" : "Continuar con Google"}
-            </Button>
 
             <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
               {mode === "register"
                 ? "Al crear tu cuenta aceptas nuestros términos y condiciones."
-                : "Al iniciar sesión aceptas nuestros términos y condiciones."}
+                : mode === "login"
+                  ? "Al iniciar sesión aceptas nuestros términos y condiciones."
+                  : "Te enviaremos un correo con las instrucciones para continuar."}
             </div>
           </div>
         )}
