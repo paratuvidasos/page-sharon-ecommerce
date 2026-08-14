@@ -12,7 +12,9 @@ const FIELDS = [
 
 // Sin base de datos real: esta es la única cuenta que "existe" para poder demostrar
 // tanto el login exitoso como el mensaje genérico de credenciales inválidas.
-const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com", password: "Ritual2024" };
+// Exportada para que App.jsx pueda usar el mismo correo al sembrar datos de demo
+// (ej. direcciones guardadas) sin duplicar el string.
+export const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com", password: "Ritual2024" };
 const REMEMBERED_EMAIL_KEY = "sharon:rememberedEmail";
 // Umbral y ventana de bloqueo son solo para demostrar la UX en cliente — la protección
 // real contra fuerza bruta debe vivir en el backend.
