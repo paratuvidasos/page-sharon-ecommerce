@@ -4,6 +4,7 @@ import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
 import { CheckoutModal } from "@features/checkout/components/CheckoutModal";
+import { Z } from "@ui/zIndex";
 
 export const CartDrawer = ({ open, onClose, items, setItems }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -19,11 +20,11 @@ export const CartDrawer = ({ open, onClose, items, setItems }) => {
       <div onClick={onClose} style={{
         position: "fixed", inset: 0, background: "rgba(27,24,21,.4)",
         opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
-        transition: "opacity .35s ease", zIndex: 80, backdropFilter: "blur(2px)"
+        transition: "opacity .35s ease", zIndex: Z.cart, backdropFilter: "blur(2px)"
       }} />
       <aside style={{
         position: "fixed", top: 0, right: 0, height: "100vh", width: "min(460px, 100vw)",
-        background: "var(--cream)", zIndex: 81,
+        background: "var(--cream)", zIndex: Z.cart + 1,
         transform: open ? "translateX(0)" : "translateX(100%)",
         transition: "transform .45s cubic-bezier(.2,.7,.2,1)",
         display: "flex", flexDirection: "column",
