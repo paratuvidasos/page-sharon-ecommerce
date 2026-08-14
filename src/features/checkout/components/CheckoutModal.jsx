@@ -3,6 +3,7 @@ import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
+import { Z } from "@ui/zIndex";
 
 const WA_PHONE = "573103879555";
 
@@ -86,7 +87,7 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
           transition: "opacity .35s ease",
-          zIndex: 100,
+          zIndex: Z.checkout,
           backdropFilter: "blur(6px)",
         }}
       />
@@ -100,7 +101,7 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
           maxHeight: "90vh",
           background: "var(--cream)",
           borderRadius: 24,
-          zIndex: 101,
+          zIndex: Z.checkout + 1,
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
           transition: "opacity .3s ease, transform .35s cubic-bezier(.2,.7,.2,1)",

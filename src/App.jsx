@@ -11,11 +11,12 @@ import { Newsletter } from "@ui/Newsletter";
 import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
-import { RegisterModal } from "@features/auth/components/RegisterModal";
+import { AuthModal } from "@features/auth/components/AuthModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
 import { PRODUCTS } from "@features/catalog/data/products";
+import { Z } from "@ui/zIndex";
 
 const ACCENT_PALETTES = {
   botanic: { deep: "#5E7860", soft: "#9CB29B", paper: "#D2DFD0" },
@@ -91,14 +92,14 @@ function App() {
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <RegisterModal open={accountOpen} onClose={() => setAccountOpen(false)} />
+      <AuthModal open={accountOpen} onClose={() => setAccountOpen(false)} />
 
       {toast && (
         <div style={{
           position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",
           background: "var(--ink)", color: "var(--cream)",
           padding: "14px 22px", borderRadius: 999,
-          fontSize: 13, fontWeight: 500, zIndex: 70,
+          fontSize: 13, fontWeight: 500, zIndex: Z.toast,
           boxShadow: "var(--shadow-lg)",
           display: "flex", alignItems: "center", gap: 10,
           animation: "scaleIn .25s ease-out"

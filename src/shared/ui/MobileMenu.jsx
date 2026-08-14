@@ -1,4 +1,5 @@
 import { IconButton } from "./components/IconButton";
+import { Z } from "./zIndex";
 
 export const MobileMenu = ({ open, onClose }) => {
   const links = [
@@ -10,11 +11,11 @@ export const MobileMenu = ({ open, onClose }) => {
       <div onClick={onClose} style={{
         position: "fixed", inset: 0, background: "rgba(27,24,21,.5)",
         opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
-        transition: "opacity .3s", zIndex: 95
+        transition: "opacity .3s", zIndex: Z.mobileMenu
       }} />
       <aside style={{
         position: "fixed", top: 0, left: 0, height: "100vh", width: "min(360px, 90vw)",
-        background: "var(--cream)", zIndex: 96,
+        background: "var(--cream)", zIndex: Z.mobileMenu + 1,
         transform: open ? "translateX(0)" : "translateX(-100%)",
         transition: "transform .4s cubic-bezier(.2,.7,.2,1)",
         padding: "28px 28px"
