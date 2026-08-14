@@ -20,6 +20,7 @@ export const ICONS = {
   GOOGLE: "google",
   MENU: "menu",
   CLOSE: "close",
+  CAMERA: "camera",
   ARROW: "arrow",
   CHEV_LEFT: "chev-l",
   CHEV_RIGHT: "chev-r",
@@ -76,6 +77,8 @@ export const Icon = ({ name, size = 22, stroke = 1.5, color = "currentColor" }) 
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 7h16M4 12h16M4 17h16"/></svg>);
     case "close":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M6 6l12 12M18 6 6 18"/></svg>);
+    case "camera":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle {...p} cx="12" cy="13" r="3.5"/></svg>);
     case "arrow":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M5 12h14M13 6l6 6-6 6"/></svg>);
     case "chev-l":

@@ -13,6 +13,7 @@ import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
+import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -42,6 +43,8 @@ function App() {
   const [authInitialMode, setAuthInitialMode] = useState("register");
   const [resetToken] = useState(() => new URLSearchParams(window.location.search).get("resetToken"));
   const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
+  const [user, setUser] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -81,6 +84,18 @@ function App() {
     window.history.replaceState({}, "", url);
   };
 
+  // Sin backend/sesión real todavía: el "usuario logueado" es estado local que se
+  // llena al completar registro/login/Google en AuthModal, y persiste solo en memoria.
+  const handleAuthSuccess = ({ name, email }) => {
+    setUser((prev) => ({
+      name: name || prev?.name || "",
+      email,
+      phone: prev?.phone || "",
+      countryCode: prev?.countryCode || "CO",
+      avatarUrl: prev?.avatarUrl || null,
+    }));
+  };
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -88,8 +103,9 @@ function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
-        onOpenAccount={() => openAuth("register")}
+        onOpenAccount={() => (user ? setProfileOpen(true) : openAuth("register"))}
         cartCount={cartCount}
+        loggedIn={Boolean(user)}
       />
 
       <main>
@@ -108,13 +124,24 @@ function App() {
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <AuthModal open={accountOpen} onClose={() => setAccountOpen(false)} initialMode={authInitialMode} />
+      <AuthModal
+        open={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        initialMode={authInitialMode}
+        onAuthSuccess={handleAuthSuccess}
+      />
       <ResetPasswordModal
         open={resetModalOpen}
         onClose={closeResetModal}
         token={resetToken}
         onRequestNewLink={() => { closeResetModal(); openAuth("forgot"); }}
         onGoToLogin={() => { closeResetModal(); openAuth("login"); }}
+      />
+      <ProfileModal
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        user={user}
+        onSave={(profile) => setUser((prev) => ({ ...prev, ...profile }))}
       />
 
       {toast && (

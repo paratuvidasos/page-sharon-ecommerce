@@ -12,7 +12,7 @@ const FIELDS = [
 
 // Sin base de datos real: esta es la única cuenta que "existe" para poder demostrar
 // tanto el login exitoso como el mensaje genérico de credenciales inválidas.
-const DEMO_ACCOUNT = { email: "demo.sharon@gmail.com", password: "Ritual2024" };
+const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com", password: "Ritual2024" };
 const REMEMBERED_EMAIL_KEY = "sharon:rememberedEmail";
 // Umbral y ventana de bloqueo son solo para demostrar la UX en cliente — la protección
 // real contra fuerza bruta debe vivir en el backend.
@@ -40,7 +40,7 @@ async function loginUser(data) {
   const matches =
     data.email.trim().toLowerCase() === DEMO_ACCOUNT.email && data.password === DEMO_ACCOUNT.password;
   if (!matches) throw new Error("invalid_credentials");
-  return { ok: true, email: data.email };
+  return { ok: true, email: data.email, name: DEMO_ACCOUNT.name };
 }
 
 // Formulario de login autocontenido: campos, validación, "recordarme" y el bloqueo
@@ -121,7 +121,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
         } else {
           localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
-        return { ok: true, info: { method: "email", mode: "login", email: form.email } };
+        return { ok: true, info: { method: "email", mode: "login", email: form.email, name: DEMO_ACCOUNT.name } };
       } catch (e) {
         if (e.message === "invalid_credentials") {
           const attempts = failedAttempts + 1;
