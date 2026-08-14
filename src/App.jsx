@@ -12,6 +12,7 @@ import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
+import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -38,6 +39,9 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [authInitialMode, setAuthInitialMode] = useState("register");
+  const [resetToken] = useState(() => new URLSearchParams(window.location.search).get("resetToken"));
+  const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -65,6 +69,18 @@ function App() {
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
+  const openAuth = (mode = "register") => {
+    setAuthInitialMode(mode);
+    setAccountOpen(true);
+  };
+
+  const closeResetModal = () => {
+    setResetModalOpen(false);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("resetToken");
+    window.history.replaceState({}, "", url);
+  };
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -72,7 +88,7 @@ function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
-        onOpenAccount={() => setAccountOpen(true)}
+        onOpenAccount={() => openAuth("register")}
         cartCount={cartCount}
       />
 
@@ -92,7 +108,14 @@ function App() {
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <AuthModal open={accountOpen} onClose={() => setAccountOpen(false)} />
+      <AuthModal open={accountOpen} onClose={() => setAccountOpen(false)} initialMode={authInitialMode} />
+      <ResetPasswordModal
+        open={resetModalOpen}
+        onClose={closeResetModal}
+        token={resetToken}
+        onRequestNewLink={() => { closeResetModal(); openAuth("forgot"); }}
+        onGoToLogin={() => { closeResetModal(); openAuth("login"); }}
+      />
 
       {toast && (
         <div style={{

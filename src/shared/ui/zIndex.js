@@ -6,6 +6,7 @@ export const Z = {
   cart: 80, // CartDrawer
   search: 90, // SearchModal
   auth: 92, // AuthModal
+  resetPassword: 93, // ResetPasswordModal (aterrizaje del enlace de recuperación)
   mobileMenu: 95, // MobileMenu
   checkout: 100, // CheckoutModal (anidado dentro de CartDrawer)
   googleDialog: 110, // diálogo simulado de Google, anidado dentro de AuthModal
