@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { PhoneField } from "./PhoneField";
 import { PhotoField } from "./PhotoField";
-import { COUNTRIES } from "../data/countries";
+import { COUNTRIES } from "@shared/data/countries";
 
 const FIELD_LABELS = { name: "Nombre completo", phone: "Teléfono" };
 
@@ -14,7 +14,7 @@ function validateName(value) {
 function validatePhone(value, countryCode) {
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
   if (!value) return "Ingresa tu número de teléfono.";
-  if (value.length !== country.digits) return `Debe tener ${country.digits} dígitos para ${country.name}.`;
+  if (value.length !== country.phoneDigits) return `Debe tener ${country.phoneDigits} dígitos para ${country.name}.`;
   return "";
 }
 

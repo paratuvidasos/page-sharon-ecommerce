@@ -1,4 +1,4 @@
-import { COUNTRIES } from "../data/countries";
+import { COUNTRIES } from "@shared/data/countries";
 
 const selectStyle = {
   width: 132,
@@ -40,11 +40,11 @@ export const PhoneField = ({ countryCode, phone, error, touched, onCountryChange
         <input
           id="profile-phone"
           value={phone}
-          onChange={(e) => onPhoneChange(e.target.value.replace(/\D/g, "").slice(0, country.digits))}
+          onChange={(e) => onPhoneChange(e.target.value.replace(/\D/g, "").slice(0, country.phoneDigits))}
           onBlur={onBlur}
           type="tel"
           inputMode="numeric"
-          placeholder={"9".repeat(country.digits)}
+          placeholder={"9".repeat(country.phoneDigits)}
           aria-describedby={hasError ? "profile-phone-error" : undefined}
           aria-invalid={hasError ? "true" : undefined}
           style={{
@@ -67,7 +67,7 @@ export const PhoneField = ({ countryCode, phone, error, touched, onCountryChange
           </span>
         ) : (
           <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-            Formato: {country.dialCode} + {country.digits} dígitos.
+            Formato: {country.dialCode} + {country.phoneDigits} dígitos.
           </span>
         )}
       </div>

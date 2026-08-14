@@ -14,6 +14,7 @@ import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
+import { DEMO_ACCOUNT } from "@features/auth/components/login/LoginForm";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -26,6 +27,16 @@ const ACCENT_PALETTES = {
   garnet:  { deep: "#9C4A4A", soft: "#D8A6A0", paper: "#EBD0CB" },
   ink:     { deep: "#1B1815", soft: "#7A6F66", paper: "#E5DED4" },
 };
+
+// Direcciones de ejemplo para la cuenta demo (ver DEMO_ACCOUNT en LoginForm), solo para
+// poder probar en cliente la regla "no se puede eliminar la única dirección si tiene
+// un pedido en curso" sin tener todavía una feature de pedidos real. "Casa" simula estar
+// referenciada por un pedido en curso: intenta borrar "Oficina" primero y luego "Casa"
+// para ver el bloqueo y la opción de archivar.
+const DEMO_ADDRESSES = [
+  { id: "addr_demo_casa", alias: "Casa", countryCode: "CO", line1: "Calle 10 # 43-12", line2: "Apto 502", city: "Medellín", postalCode: "050021", isDefault: true, archived: false, hasActiveOrder: true },
+  { id: "addr_demo_oficina", alias: "Oficina", countryCode: "CO", line1: "Carrera 43A # 1-50", line2: "Piso 8", city: "Medellín", postalCode: "050021", isDefault: false, archived: false, hasActiveOrder: false },
+];
 
 function applyTweaks(t) {
   const root = document.documentElement;
@@ -45,6 +56,7 @@ function App() {
   const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
   const [user, setUser] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [addresses, setAddresses] = useState([]);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -94,6 +106,10 @@ function App() {
       countryCode: prev?.countryCode || "CO",
       avatarUrl: prev?.avatarUrl || null,
     }));
+    setAddresses((prev) => {
+      if (prev.length > 0) return prev; // ya hay direcciones cargadas en esta sesión, no las pisamos
+      return email === DEMO_ACCOUNT.email ? DEMO_ADDRESSES.map((a) => ({ ...a })) : [];
+    });
   };
 
   return (
@@ -142,6 +158,8 @@ function App() {
         onClose={() => setProfileOpen(false)}
         user={user}
         onSave={(profile) => setUser((prev) => ({ ...prev, ...profile }))}
+        addresses={addresses}
+        setAddresses={setAddresses}
       />
 
       {toast && (
