@@ -108,7 +108,7 @@ export const RegisterForm = forwardRef((_props, ref) => {
       setServerError("");
       try {
         await registerUser(form);
-        return { ok: true, info: { method: "email", mode: "register", email: form.email } };
+        return { ok: true, info: { method: "email", mode: "register", email: form.email, name: form.name } };
       } catch {
         setServerError("No pudimos crear tu cuenta. Intenta de nuevo en unos segundos.");
         return { ok: false };

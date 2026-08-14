@@ -59,7 +59,7 @@ async function signInWithGoogle() {
   return { ...DEMO_GOOGLE_ACCOUNT };
 }
 
-export const AuthModal = ({ open, onClose, initialMode = "register" }) => {
+export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSuccess }) => {
   const [mode, setMode] = useState(initialMode);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -114,6 +114,7 @@ export const AuthModal = ({ open, onClose, initialMode = "register" }) => {
     if (result?.ok) {
       setSuccessInfo({ ...result.info, mode });
       setSuccess(true);
+      if (mode !== "forgot") onAuthSuccess?.({ name: result.info.name, email: result.info.email });
     }
   };
 
@@ -128,8 +129,9 @@ export const AuthModal = ({ open, onClose, initialMode = "register" }) => {
     setGoogleLoading(true);
     try {
       const profile = await signInWithGoogle();
-      setSuccessInfo({ method: "google", mode, email: profile.email });
+      setSuccessInfo({ method: "google", mode, email: profile.email, name: profile.name });
       setSuccess(true);
+      onAuthSuccess?.({ name: profile.name, email: profile.email });
     } catch {
       setGoogleError("No pudimos conectar con Google. Intenta de nuevo.");
     } finally {
