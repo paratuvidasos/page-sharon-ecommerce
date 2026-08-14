@@ -38,6 +38,53 @@ const DEMO_ADDRESSES = [
   { id: "addr_demo_oficina", alias: "Oficina", countryCode: "CO", line1: "Carrera 43A # 1-50", line2: "Piso 8", city: "Medellín", postalCode: "050021", isDefault: false, archived: false, hasActiveOrder: false },
 ];
 
+// Snapshot de "Casa" (arriba) tal como quedaría guardado en un pedido — independiente
+// del array de direcciones en sí, porque una dirección real puede editarse/archivarse
+// después de comprar y el pedido debe conservar la dirección tal como era ese día.
+const DEMO_SHIPPING_ADDRESS = { alias: "Casa", countryCode: "CO", line1: "Calle 10 # 43-12", line2: "Apto 502", city: "Medellín", postalCode: "050021" };
+
+// Pedidos de ejemplo para la cuenta demo. Nota: esto es independiente del flag
+// hasActiveOrder en DEMO_ADDRESSES — todavía no hay una feature de orders real que
+// los conecte (ver CLAUDE.md > Pendiente de definir).
+const DEMO_ORDERS = [
+  {
+    id: "SH-10231",
+    placedAt: "2026-06-02T15:10:00-05:00",
+    status: "delivered",
+    items: [{ productId: "p1", name: "Tónico Capilar", qty: 1, price: 49900 }, { productId: "p4", name: "Cepíllo", qty: 1, price: 18000 }],
+    total: 67900,
+    shippingAddress: DEMO_SHIPPING_ADDRESS,
+    paymentMethod: { type: "whatsapp", label: "Coordinado por WhatsApp" },
+  },
+  {
+    id: "SH-10255",
+    placedAt: "2026-07-10T11:45:00-05:00",
+    status: "shipped",
+    items: [{ productId: "p2", name: "Mascarilla Hidratante", qty: 2, price: 39900 }],
+    total: 79800,
+    shippingAddress: DEMO_SHIPPING_ADDRESS,
+    paymentMethod: { type: "cod", label: "Pago contraentrega" },
+  },
+  {
+    id: "SH-10298",
+    placedAt: "2026-07-30T09:20:00-05:00",
+    status: "processing",
+    items: [{ productId: "p3", name: "Shampoo", qty: 1, price: 49900 }, { productId: "p1", name: "Tónico Capilar", qty: 1, price: 49900 }],
+    total: 99800,
+    shippingAddress: DEMO_SHIPPING_ADDRESS,
+    paymentMethod: { type: "transfer", label: "Transferencia bancaria" },
+  },
+  {
+    id: "SH-10310",
+    placedAt: "2026-08-05T18:05:00-05:00",
+    status: "cancelled",
+    items: [{ productId: "p4", name: "Cepíllo", qty: 2, price: 18000 }],
+    total: 36000,
+    shippingAddress: DEMO_SHIPPING_ADDRESS,
+    paymentMethod: { type: "whatsapp", label: "Coordinado por WhatsApp" },
+  },
+];
+
 function applyTweaks(t) {
   const root = document.documentElement;
   const a = ACCENT_PALETTES[t.accent] || ACCENT_PALETTES.botanic;
@@ -57,6 +104,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -110,6 +158,10 @@ function App() {
       if (prev.length > 0) return prev; // ya hay direcciones cargadas en esta sesión, no las pisamos
       return email === DEMO_ACCOUNT.email ? DEMO_ADDRESSES.map((a) => ({ ...a })) : [];
     });
+    setOrders((prev) => {
+      if (prev.length > 0) return prev; // idem: no pisar pedidos ya cargados en esta sesión
+      return email === DEMO_ACCOUNT.email ? DEMO_ORDERS.map((o) => ({ ...o })) : [];
+    });
   };
 
   return (
@@ -160,6 +212,7 @@ function App() {
         onSave={(profile) => setUser((prev) => ({ ...prev, ...profile }))}
         addresses={addresses}
         setAddresses={setAddresses}
+        orders={orders}
       />
 
       {toast && (
