@@ -10,7 +10,9 @@ export const Z = {
   profile: 94, // ProfileModal (editar perfil)
   addressBook: 96, // AddressBookModal, anidado dentro de ProfileModal
   addressForm: 98, // AddressFormModal, anidado dentro de AddressBookModal
-  mobileMenu: 101, // MobileMenu
-  checkout: 106, // CheckoutModal (anidado dentro de CartDrawer)
-  googleDialog: 116, // diálogo simulado de Google, anidado dentro de AuthModal
+  orderHistory: 100, // OrderHistoryModal, anidado dentro de ProfileModal
+  orderDetail: 102, // OrderDetailModal, anidado dentro de OrderHistoryModal
+  mobileMenu: 104, // MobileMenu
+  checkout: 109, // CheckoutModal (anidado dentro de CartDrawer)
+  googleDialog: 119, // diálogo simulado de Google, anidado dentro de AuthModal
 };
