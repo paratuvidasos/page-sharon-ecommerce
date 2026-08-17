@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AuthField } from "../AuthField";
+import { resetPassword, ApiError } from "@shared/api-client";
 
 const PASSWORD_RE = /(?=.*[A-Za-z])(?=.*\d).{8,}/;
 
@@ -23,13 +24,6 @@ function validateField(field, value, form) {
     default:
       return "";
   }
-}
-
-async function resetPassword(token, password) {
-  // No hay backend todavía: simula el restablecimiento contra el token del enlace.
-  // La API real también debe cerrar ahí todas las sesiones activas del usuario.
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  return { ok: true };
 }
 
 // Formulario de restablecimiento: nueva contraseña + confirmación, con la misma
@@ -93,9 +87,12 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
       setShowSummary(false);
       setServerError("");
       try {
-        await resetPassword(token, form.password);
+        await resetPassword({ token, newPassword: form.password, confirmPassword: form.confirmPassword });
         return { ok: true };
-      } catch {
+      } catch (e) {
+        if (e instanceof ApiError && e.code === "PASSWORD_RESET_TOKEN_INVALID") {
+          return { ok: false, tokenInvalid: true };
+        }
         setServerError("No pudimos actualizar tu contraseña. Intenta de nuevo en unos segundos.");
         return { ok: false };
       }

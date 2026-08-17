@@ -9,9 +9,10 @@ export function validatePhotoFile(file) {
   return "";
 }
 
-// Selector de foto de perfil con previsualización inmediata (object URL local —
-// sin backend todavía no hay adónde subir el archivo). El padre es dueño del
-// valor (url o null) y del error, para poder incluir ambos en la validación del formulario.
+// Selector de foto de perfil con previsualización inmediata (object URL local
+// mientras no se guarde). El padre es dueño del valor (preview url o null) y del
+// error; onChange recibe { file, previewUrl } — file es el File original a mandar
+// como parte del FormData al guardar (null si no se cambió o se quitó la foto).
 export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) => {
   const inputRef = useRef(null);
 
@@ -26,12 +27,12 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
     }
     onErrorChange("");
     if (value) URL.revokeObjectURL(value);
-    onChange(URL.createObjectURL(file));
+    onChange({ file, previewUrl: URL.createObjectURL(file) });
   };
 
   const handleRemove = () => {
     if (value) URL.revokeObjectURL(value);
-    onChange(null);
+    onChange({ file: null, previewUrl: null });
     onErrorChange("");
   };
 

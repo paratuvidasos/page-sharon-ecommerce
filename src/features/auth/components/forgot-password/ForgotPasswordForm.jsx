@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AuthField } from "../AuthField";
+import { requestPasswordReset } from "@shared/api-client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -18,13 +19,6 @@ function validateField(field, value) {
     default:
       return "";
   }
-}
-
-async function requestPasswordReset(email) {
-  // No hay backend todavía: simula el envío del enlace. Responde "ok" exista o no la cuenta,
-  // para no filtrar qué correos están registrados. Reemplazar por la API real cuando exista.
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  return { ok: true, email };
 }
 
 // Formulario de "olvidé mi contraseña": un único campo de correo, autocontenido
@@ -75,8 +69,8 @@ export const ForgotPasswordForm = forwardRef((_props, ref) => {
       setShowSummary(false);
       setServerError("");
       try {
-        const result = await requestPasswordReset(form.email);
-        return { ok: true, info: { email: result.email } };
+        await requestPasswordReset(form.email);
+        return { ok: true, info: { email: form.email } };
       } catch {
         setServerError("No pudimos enviar el enlace. Intenta de nuevo en unos segundos.");
         return { ok: false };
