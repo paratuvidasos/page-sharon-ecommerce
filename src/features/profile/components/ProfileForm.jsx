@@ -2,12 +2,25 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { PhoneField } from "./PhoneField";
 import { PhotoField } from "./PhotoField";
 import { COUNTRIES } from "@shared/data/countries";
+import { updateProfile as updateProfileRequest, ApiError } from "@shared/api-client";
+import { useAuth } from "@shared/auth/AuthContext";
 
-const FIELD_LABELS = { name: "Nombre completo", phone: "Teléfono" };
+const FIELD_LABELS = { firstName: "Nombre", lastName: "Apellido", phone: "Teléfono" };
 
-function validateName(value) {
+function splitName(fullName) {
+  const trimmed = (fullName || "").trim();
+  if (!trimmed) return { firstName: "", lastName: "" };
+  const [firstName, ...rest] = trimmed.split(/\s+/);
+  return { firstName, lastName: rest.join(" ") };
+}
+
+function validateFirstName(value) {
   if (!value.trim()) return "Necesitamos tu nombre.";
-  if (value.trim().length < 2) return "Cuéntanos tu nombre completo.";
+  return "";
+}
+
+function validateLastName(value) {
+  if (!value.trim()) return "Necesitamos tu apellido.";
   return "";
 }
 
@@ -18,23 +31,27 @@ function validatePhone(value, countryCode) {
   return "";
 }
 
-async function updateProfile(data) {
-  // No hay backend todavía: simula el guardado del perfil. La foto en producción se subiría
-  // a un storage y se guardaría la URL resultante, no el object URL local que usamos aquí.
-  // Reemplazar por la API real cuando exista.
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  return { ok: true };
+// El backend devuelve el teléfono normalizado en E.164 (ej. "+573001234567"); la UI
+// solo maneja dígitos nacionales + el selector de país, así que hay que despojar el
+// dial code de vuelta antes de guardarlo en el estado local.
+function stripDialCode(e164Phone, countryCode) {
+  const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
+  return e164Phone?.startsWith(country.dialCode) ? e164Phone.slice(country.dialCode.length) : e164Phone || "";
 }
 
-// Formulario de edición de perfil: nombre, foto (con preview) y teléfono con
-// selector de país, autocontenido igual que los formularios de auth (validación
+// Formulario de edición de perfil: nombre, apellido, foto (con preview) y teléfono
+// con selector de país, autocontenido igual que los formularios de auth (validación
 // + submit() imperativo). El correo se muestra de solo lectura: cambiarlo requiere
 // reverificación, un flujo que todavía no existe.
 export const ProfileForm = forwardRef(({ initialValues }, ref) => {
-  const [name, setName] = useState(initialValues.name || "");
+  const { getAccessToken } = useAuth();
+  const initialSplitName = splitName(initialValues.name);
+  const [firstName, setFirstName] = useState(initialSplitName.firstName);
+  const [lastName, setLastName] = useState(initialSplitName.lastName);
   const [countryCode, setCountryCode] = useState(initialValues.countryCode || COUNTRIES[0].code);
   const [phone, setPhone] = useState(initialValues.phone || "");
   const [avatarUrl, setAvatarUrl] = useState(initialValues.avatarUrl || null);
+  const [avatarFile, setAvatarFile] = useState(null);
   const [photoError, setPhotoError] = useState("");
 
   const [errors, setErrors] = useState({});
@@ -53,14 +70,29 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
     if (serverError && serverErrorRef.current) serverErrorRef.current.focus();
   }, [serverError]);
 
-  const handleNameChange = (e) => {
+  const handleFirstNameChange = (e) => {
     const value = e.target.value;
-    setName(value);
-    setErrors((prev) => (touched.name ? { ...prev, name: validateName(value) } : prev));
+    setFirstName(value);
+    setErrors((prev) => (touched.firstName ? { ...prev, firstName: validateFirstName(value) } : prev));
   };
-  const handleNameBlur = () => {
-    setTouched((prev) => ({ ...prev, name: true }));
-    setErrors((prev) => ({ ...prev, name: validateName(name) }));
+  const handleFirstNameBlur = () => {
+    setTouched((prev) => ({ ...prev, firstName: true }));
+    setErrors((prev) => ({ ...prev, firstName: validateFirstName(firstName) }));
+  };
+
+  const handleLastNameChange = (e) => {
+    const value = e.target.value;
+    setLastName(value);
+    setErrors((prev) => (touched.lastName ? { ...prev, lastName: validateLastName(value) } : prev));
+  };
+  const handleLastNameBlur = () => {
+    setTouched((prev) => ({ ...prev, lastName: true }));
+    setErrors((prev) => ({ ...prev, lastName: validateLastName(lastName) }));
+  };
+
+  const handlePhotoChange = ({ file, previewUrl }) => {
+    setAvatarFile(file);
+    setAvatarUrl(previewUrl);
   };
 
   const handleCountryChange = (nextCode) => {
@@ -85,11 +117,12 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
   useImperativeHandle(ref, () => ({
     submit: async () => {
       const nextErrors = {
-        name: validateName(name),
+        firstName: validateFirstName(firstName),
+        lastName: validateLastName(lastName),
         phone: validatePhone(phone, countryCode),
       };
       setErrors(nextErrors);
-      setTouched({ name: true, phone: true });
+      setTouched({ firstName: true, lastName: true, phone: true });
 
       const hasErrors = Object.values(nextErrors).some(Boolean) || Boolean(photoError);
       if (hasErrors) {
@@ -101,16 +134,35 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
       setShowSummary(false);
       setServerError("");
       try {
-        await updateProfile({ name, countryCode, phone, avatarUrl });
-        return { ok: true, profile: { name: name.trim(), countryCode, phone, avatarUrl } };
-      } catch {
-        setServerError("No pudimos guardar tus cambios. Intenta de nuevo en unos segundos.");
+        const apiUser = await updateProfileRequest({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone,
+          phoneCountryCode: countryCode,
+          avatarFile,
+          accessToken: getAccessToken(),
+        });
+        return {
+          ok: true,
+          profile: {
+            name: `${apiUser.firstName} ${apiUser.lastName}`,
+            countryCode,
+            phone: stripDialCode(apiUser.phone, countryCode),
+            avatarUrl: apiUser.avatarUrl,
+          },
+        };
+      } catch (e) {
+        if (e instanceof ApiError && e.message) {
+          setServerError(e.message);
+        } else {
+          setServerError("No pudimos guardar tus cambios. Intenta de nuevo en unos segundos.");
+        }
         return { ok: false };
       }
     },
   }));
 
-  const initials = (name.trim()[0] || initialValues.email?.[0] || "?").toUpperCase();
+  const initials = (firstName.trim()[0] || initialValues.email?.[0] || "?").toUpperCase();
 
   return (
     <div>
@@ -166,43 +218,79 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
 
       <PhotoField
         value={avatarUrl}
-        onChange={setAvatarUrl}
+        onChange={handlePhotoChange}
         error={photoError}
         onErrorChange={setPhotoError}
         initials={initials}
       />
 
-      <div style={{ marginTop: 20 }}>
-        <label htmlFor="profile-name" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Nombre completo
-        </label>
-        <input
-          id="profile-name"
-          value={name}
-          onChange={handleNameChange}
-          onBlur={handleNameBlur}
-          type="text"
-          placeholder="Tu nombre completo"
-          autoComplete="name"
-          aria-describedby={touched.name && errors.name ? "profile-name-error" : undefined}
-          aria-invalid={touched.name && errors.name ? "true" : undefined}
-          style={{
-            width: "100%",
-            padding: "14px 18px",
-            border: `.5px solid ${touched.name && errors.name ? "#9C4A4A" : "var(--line)"}`,
-            borderRadius: 999,
-            background: "#fff",
-            fontSize: 14,
-            fontFamily: "var(--sans)",
-            outline: 0,
-          }}
-        />
-        <div style={{ minHeight: 18, marginTop: 4 }}>
-          {touched.name && errors.name && (
-            <span id="profile-name-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
-              {errors.name}
-            </span>
-          )}
+      <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div>
+          <label htmlFor="profile-firstName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+            Nombre
+          </label>
+          <input
+            id="profile-firstName"
+            value={firstName}
+            onChange={handleFirstNameChange}
+            onBlur={handleFirstNameBlur}
+            type="text"
+            placeholder="Tu nombre"
+            autoComplete="given-name"
+            aria-describedby={touched.firstName && errors.firstName ? "profile-firstName-error" : undefined}
+            aria-invalid={touched.firstName && errors.firstName ? "true" : undefined}
+            style={{
+              width: "100%",
+              padding: "14px 18px",
+              border: `.5px solid ${touched.firstName && errors.firstName ? "#9C4A4A" : "var(--line)"}`,
+              borderRadius: 999,
+              background: "#fff",
+              fontSize: 14,
+              fontFamily: "var(--sans)",
+              outline: 0,
+            }}
+          />
+          <div style={{ minHeight: 18, marginTop: 4 }}>
+            {touched.firstName && errors.firstName && (
+              <span id="profile-firstName-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
+                {errors.firstName}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="profile-lastName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+            Apellido
+          </label>
+          <input
+            id="profile-lastName"
+            value={lastName}
+            onChange={handleLastNameChange}
+            onBlur={handleLastNameBlur}
+            type="text"
+            placeholder="Tu apellido"
+            autoComplete="family-name"
+            aria-describedby={touched.lastName && errors.lastName ? "profile-lastName-error" : undefined}
+            aria-invalid={touched.lastName && errors.lastName ? "true" : undefined}
+            style={{
+              width: "100%",
+              padding: "14px 18px",
+              border: `.5px solid ${touched.lastName && errors.lastName ? "#9C4A4A" : "var(--line)"}`,
+              borderRadius: 999,
+              background: "#fff",
+              fontSize: 14,
+              fontFamily: "var(--sans)",
+              outline: 0,
+            }}
+          />
+          <div style={{ minHeight: 18, marginTop: 4 }}>
+            {touched.lastName && errors.lastName && (
+              <span id="profile-lastName-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
+                {errors.lastName}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

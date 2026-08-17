@@ -28,3 +28,32 @@ export function loginAccount({ email, password, rememberMe }) {
 export function refreshToken() {
   return request("/accounts/refresh-token", { method: "POST" });
 }
+
+export function requestPasswordReset(email) {
+  return request("/accounts/forgot-password", {
+    method: "POST",
+    body: { email },
+  });
+}
+
+export function resetPassword({ token, newPassword, confirmPassword }) {
+  return request("/accounts/reset-password", {
+    method: "POST",
+    body: { token, newPassword, confirmPassword },
+  });
+}
+
+export function updateProfile({ firstName, lastName, phone, phoneCountryCode, avatarFile, accessToken }) {
+  const formData = new FormData();
+  formData.append("firstName", firstName);
+  formData.append("lastName", lastName);
+  formData.append("phone", phone);
+  formData.append("phoneCountryCode", phoneCountryCode);
+  if (avatarFile) formData.append("avatar", avatarFile);
+
+  return request("/accounts/me", {
+    method: "PATCH",
+    body: formData,
+    token: accessToken,
+  });
+}

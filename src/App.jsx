@@ -101,10 +101,17 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState("register");
-  const [resetToken] = useState(() => new URLSearchParams(window.location.search).get("resetToken"));
-  const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
+  // El backend genera ambos enlaces con el mismo nombre de query param (?token=...),
+  // distinguibles solo por el pathname (/reset-password vs /verify-email) — no hay
+  // routing todavía, así que App.jsx los desambigua a mano antes de decidir qué modal abrir.
+  const [resetToken] = useState(() => new URLSearchParams(window.location.search).get("token"));
+  const [resetModalOpen, setResetModalOpen] = useState(
+    () => window.location.pathname === "/reset-password" && new URLSearchParams(window.location.search).has("token")
+  );
   const [verifyToken] = useState(() => new URLSearchParams(window.location.search).get("token"));
-  const [verifyModalOpen, setVerifyModalOpen] = useState(() => new URLSearchParams(window.location.search).has("token"));
+  const [verifyModalOpen, setVerifyModalOpen] = useState(
+    () => window.location.pathname === "/verify-email" && new URLSearchParams(window.location.search).has("token")
+  );
   const { user, login: authLogin, updateUser } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
@@ -144,7 +151,7 @@ function App() {
   const closeResetModal = () => {
     setResetModalOpen(false);
     const url = new URL(window.location.href);
-    url.searchParams.delete("resetToken");
+    url.searchParams.delete("token");
     window.history.replaceState({}, "", url);
   };
 

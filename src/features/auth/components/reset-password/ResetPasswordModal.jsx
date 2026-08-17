@@ -6,31 +6,18 @@ import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
-const CHECK_DELAY_MS = 500;
-
-// No hay backend todavía: simula la verificación del token del enlace de recuperación.
-// Sin token → enlace incompleto/inválido. token "expired" → demuestra el estado de
-// enlace vencido (los reales expiran a los 30 min). Cualquier otro token → válido.
-// Reemplazar por la verificación real del token contra la API cuando exista.
-function checkResetToken(token) {
-  if (!token) return "invalid";
-  if (token.trim().toLowerCase() === "expired") return "expired";
-  return "ready";
-}
-
 const STATUS_COPY = {
-  checking: { eyebrow: "Verificando", title: "Un momento…", subtitle: "Estamos validando tu enlace de recuperación." },
-  invalid: { eyebrow: "Enlace no válido", title: "Este enlace no es válido", subtitle: "Puede estar incompleto o ya haberse usado." },
-  expired: { eyebrow: "Enlace vencido", title: "Este enlace venció", subtitle: "Por seguridad, los enlaces de recuperación expiran a los 30 minutos." },
+  invalid: { eyebrow: "Enlace no válido", title: "Este enlace no es válido", subtitle: "Puede estar incompleto, vencido o ya haberse usado." },
   ready: { eyebrow: "Nueva contraseña", title: "Define tu nueva contraseña", subtitle: "Elige una contraseña segura para tu cuenta." },
 };
 
-// Modal de aterrizaje del enlace de recuperación (ej. sharon.com/?resetToken=...).
-// Independiente de AuthModal: se abre directo desde App.jsx según la URL, valida
-// el token, muestra ResetPasswordForm si es utilizable, y ofrece salidas hacia
-// AuthModal (pedir nuevo enlace / iniciar sesión) vía las props de callback.
+// Modal de aterrizaje del enlace de recuperación (sharon.com/reset-password?token=...).
+// Independiente de AuthModal: se abre directo desde App.jsx según la URL. El backend
+// no expone forma de "pre-chequear" el token sin consumirlo (es de un solo uso), así
+// que se muestra el formulario directamente si hay token en la URL; si el POST real
+// responde PASSWORD_RESET_TOKEN_INVALID, ahí sí se cae al estado de enlace inválido/vencido.
 export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onGoToLogin }) => {
-  const [status, setStatus] = useState("checking");
+  const [status, setStatus] = useState("ready");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formKey, setFormKey] = useState(0);
@@ -38,11 +25,9 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
 
   useEffect(() => {
     if (!open) return;
-    setStatus("checking");
+    setStatus(token ? "ready" : "invalid");
     setSuccess(false);
     setFormKey((k) => k + 1);
-    const timeout = setTimeout(() => setStatus(checkResetToken(token)), CHECK_DELAY_MS);
-    return () => clearTimeout(timeout);
   }, [open, token]);
 
   const handleSubmit = async () => {
@@ -51,6 +36,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
     const result = await formRef.current.submit();
     setSubmitting(false);
     if (result?.ok) setSuccess(true);
+    else if (result?.tokenInvalid) setStatus("invalid");
   };
 
   const copy = success
@@ -123,11 +109,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
               Iniciar sesión
             </Button>
           </div>
-        ) : status === "checking" ? (
-          <div style={{ textAlign: "center", padding: "32px 8px", fontSize: 13, color: "var(--ink-soft)" }}>
-            Verificando tu enlace…
-          </div>
-        ) : status === "invalid" || status === "expired" ? (
+        ) : status === "invalid" ? (
           <div style={{ textAlign: "center", padding: "12px 8px 24px" }}>
             <div
               style={{
