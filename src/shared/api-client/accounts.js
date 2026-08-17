@@ -17,3 +17,14 @@ export function resendVerificationEmail(email) {
     body: { email },
   });
 }
+
+export function loginAccount({ email, password, rememberMe }) {
+  return request("/accounts/login", {
+    method: "POST",
+    body: { email, password, rememberMe },
+  });
+}
+
+export function refreshToken() {
+  return request("/accounts/refresh-token", { method: "POST" });
+}

@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AuthField } from "../AuthField";
+import { loginAccount, ApiError } from "@shared/api-client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -10,16 +11,11 @@ const FIELDS = [
   { name: "password", label: "Contraseña", type: "password", placeholder: "Tu contraseña", autoComplete: "current-password", full: true },
 ];
 
-// Sin base de datos real: esta es la única cuenta que "existe" para poder demostrar
-// tanto el login exitoso como el mensaje genérico de credenciales inválidas.
-// Exportada para que App.jsx pueda usar el mismo correo al sembrar datos de demo
-// (ej. direcciones guardadas) sin duplicar el string.
-export const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com", password: "Ritual2024" };
+// Ya no hay una cuenta simulada de login (ver loginAccount() más abajo), pero App.jsx
+// sigue sembrando datos de demo (direcciones, pedidos) contra este correo, así que se
+// mantiene exportada para no duplicar el string en dos archivos.
+export const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com" };
 const REMEMBERED_EMAIL_KEY = "sharon:rememberedEmail";
-// Umbral y ventana de bloqueo son solo para demostrar la UX en cliente — la protección
-// real contra fuerza bruta debe vivir en el backend.
-const LOCKOUT_THRESHOLD = 5;
-const LOCKOUT_MS = 60_000;
 
 function validateField(field, value) {
   switch (field) {
@@ -35,19 +31,11 @@ function validateField(field, value) {
   }
 }
 
-async function loginUser(data) {
-  // No hay backend todavía: simula la llamada contra la única cuenta de prueba que existe.
-  // Reemplazar por la API real (y su propia validación) cuando exista.
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  const matches =
-    data.email.trim().toLowerCase() === DEMO_ACCOUNT.email && data.password === DEMO_ACCOUNT.password;
-  if (!matches) throw new Error("invalid_credentials");
-  return { ok: true, email: data.email, name: DEMO_ACCOUNT.name };
-}
-
-// Formulario de login autocontenido: campos, validación, "recordarme" y el bloqueo
-// simulado por intentos fallidos. Notifica a AuthModal solo cuando el bloqueo cambia
-// (onLockChange), para que el botón compartido del footer también refleje el estado.
+// Formulario de login autocontenido: campos, validación y "recordarme". Notifica a
+// AuthModal solo cuando el backend responde ACCOUNT_LOCKED (onLockChange), para que el
+// botón compartido del footer también refleje el estado — sin timer propio: la duración
+// real del bloqueo la controla el backend, el cliente solo se desbloquea si el usuario
+// vuelve a editar el formulario para reintentar.
 export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) => {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
@@ -58,9 +46,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
   const [serverError, setServerError] = useState("");
   const serverErrorRef = useRef(null);
   const [rememberMe, setRememberMe] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
-  const lockoutTimeoutRef = useRef(null);
+  const [accountLocked, setAccountLocked] = useState(false);
 
   useEffect(() => {
     const remembered = localStorage.getItem(REMEMBERED_EMAIL_KEY);
@@ -68,9 +54,6 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
       setForm((prev) => ({ ...prev, email: remembered }));
       setRememberMe(true);
     }
-    return () => {
-      if (lockoutTimeoutRef.current) clearTimeout(lockoutTimeoutRef.current);
-    };
   }, []);
 
   useEffect(() => {
@@ -86,6 +69,10 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
     const nextForm = { ...form, [field]: value };
     setForm(nextForm);
     setErrors((prev) => (touched[field] ? { ...prev, [field]: validateField(field, value) } : prev));
+    if (accountLocked) {
+      setAccountLocked(false);
+      onLockChange?.(false);
+    }
   };
 
   const handleBlur = (field) => () => {
@@ -97,7 +84,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
-      if (isLocked) return { ok: false };
+      if (accountLocked) return { ok: false };
 
       const nextErrors = {};
       FIELDS.forEach(({ name }) => {
@@ -116,31 +103,30 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
       setShowSummary(false);
       setServerError("");
       try {
-        await loginUser(form);
-        setFailedAttempts(0);
+        const { user, accessToken } = await loginAccount(form);
         if (rememberMe) {
           localStorage.setItem(REMEMBERED_EMAIL_KEY, form.email);
         } else {
           localStorage.removeItem(REMEMBERED_EMAIL_KEY);
         }
-        return { ok: true, info: { method: "email", mode: "login", email: form.email, name: DEMO_ACCOUNT.name } };
+        return {
+          ok: true,
+          info: {
+            method: "email",
+            mode: "login",
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            apiUser: user,
+            accessToken,
+          },
+        };
       } catch (e) {
-        if (e.message === "invalid_credentials") {
-          const attempts = failedAttempts + 1;
-          setFailedAttempts(attempts);
-          if (attempts >= LOCKOUT_THRESHOLD) {
-            setIsLocked(true);
-            onLockChange?.(true);
-            setServerError("Demasiados intentos. Tu cuenta quedó bloqueada temporalmente, intenta de nuevo en 1 minuto.");
-            lockoutTimeoutRef.current = setTimeout(() => {
-              setIsLocked(false);
-              setFailedAttempts(0);
-              onLockChange?.(false);
-            }, LOCKOUT_MS);
-          } else {
-            // Mensaje genérico a propósito: no se indica si falló el correo o la contraseña.
-            setServerError("Correo o contraseña incorrectos.");
-          }
+        if (e instanceof ApiError && e.code === "ACCOUNT_LOCKED") {
+          setAccountLocked(true);
+          onLockChange?.(true);
+          setServerError(e.message);
+        } else if (e instanceof ApiError && (e.code === "INVALID_CREDENTIALS" || e.code === "ACCOUNT_INACTIVE")) {
+          setServerError(e.message);
         } else {
           setServerError("No pudimos iniciar tu sesión. Intenta de nuevo en unos segundos.");
         }
@@ -211,7 +197,6 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
             touched={touched[f.name]}
             onChange={handleChange(f.name)}
             onBlur={handleBlur(f.name)}
-            disabled={isLocked}
           />
         ))}
       </div>
@@ -224,13 +209,11 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
             gap: 8,
             fontSize: 13,
             color: "var(--ink-soft)",
-            opacity: isLocked ? 0.6 : 1,
           }}
         >
           <input
             type="checkbox"
             checked={rememberMe}
-            disabled={isLocked}
             onChange={(e) => setRememberMe(e.target.checked)}
             style={{ accentColor: "var(--botanic-deep)", width: 16, height: 16 }}
           />
@@ -240,7 +223,6 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
         <button
           type="button"
           onClick={onForgotPassword}
-          disabled={isLocked}
           style={{
             background: "none",
             border: 0,
@@ -248,8 +230,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
             fontSize: 12.5,
             color: "var(--ink-soft)",
             textDecoration: "underline",
-            cursor: isLocked ? "not-allowed" : "pointer",
-            opacity: isLocked ? 0.6 : 1,
+            cursor: "pointer",
           }}
         >
           ¿Olvidaste tu contraseña?
