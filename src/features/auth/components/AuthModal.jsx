@@ -133,7 +133,14 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
       // El registro por correo ya no loguea automáticamente: el backend solo crea la
       // cuenta y envía el correo de verificación, sin devolver sesión (no hay endpoint
       // de login todavía). Login y Google sí siguen abriendo sesión localmente.
-      if (mode === "login") onAuthSuccess?.({ name: result.info.name, email: result.info.email });
+      if (mode === "login") {
+        onAuthSuccess?.({
+          name: result.info.name,
+          email: result.info.email,
+          apiUser: result.info.apiUser,
+          accessToken: result.info.accessToken,
+        });
+      }
     }
   };
 

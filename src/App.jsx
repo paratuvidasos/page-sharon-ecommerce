@@ -16,6 +16,7 @@ import { ResetPasswordModal } from "@features/auth/components/reset-password/Res
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DEMO_ACCOUNT } from "@features/auth/components/login/LoginForm";
+import { useAuth } from "@shared/auth/AuthContext";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -104,7 +105,7 @@ function App() {
   const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
   const [verifyToken] = useState(() => new URLSearchParams(window.location.search).get("token"));
   const [verifyModalOpen, setVerifyModalOpen] = useState(() => new URLSearchParams(window.location.search).has("token"));
-  const [user, setUser] = useState(null);
+  const { user, login: authLogin, updateUser } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -154,16 +155,22 @@ function App() {
     window.history.replaceState({}, "", url);
   };
 
-  // Sin backend/sesión real todavía: el "usuario logueado" es estado local que se
-  // llena al completar registro/login/Google en AuthModal, y persiste solo en memoria.
-  const handleAuthSuccess = ({ name, email }) => {
-    setUser((prev) => ({
-      name: name || prev?.name || "",
-      email,
-      phone: prev?.phone || "",
-      countryCode: prev?.countryCode || "CO",
-      avatarUrl: prev?.avatarUrl || null,
-    }));
+  // El "usuario logueado" y su accessToken viven en AuthContext (ver src/shared/auth),
+  // en memoria únicamente. Login por correo trae accessToken real (sesión de verdad);
+  // Google sigue simulado y no trae token. Solo se conserva phone/countryCode/avatarUrl
+  // previos si es la misma cuenta ya editada en esta sesión (ProfileModal los llena).
+  const handleAuthSuccess = ({ name, email, accessToken }) => {
+    const samePrevAccount = user?.email === email;
+    authLogin(
+      {
+        name: name || user?.name || "",
+        email,
+        phone: samePrevAccount ? user?.phone || "" : "",
+        countryCode: samePrevAccount ? user?.countryCode || "CO" : "CO",
+        avatarUrl: samePrevAccount ? user?.avatarUrl || null : null,
+      },
+      accessToken
+    );
     setAddresses((prev) => {
       if (prev.length > 0) return prev; // ya hay direcciones cargadas en esta sesión, no las pisamos
       return email === DEMO_ACCOUNT.email ? DEMO_ADDRESSES.map((a) => ({ ...a })) : [];
@@ -225,7 +232,7 @@ function App() {
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
         user={user}
-        onSave={(profile) => setUser((prev) => ({ ...prev, ...profile }))}
+        onSave={(profile) => updateUser(profile)}
         addresses={addresses}
         setAddresses={setAddresses}
         orders={orders}
