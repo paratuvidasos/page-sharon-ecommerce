@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Nav } from "@ui/Nav";
 import { Hero } from "@ui/Hero";
 import { Products } from "@features/catalog/components/Products";
@@ -17,6 +17,7 @@ import { EmailVerificationModal } from "@features/auth/components/verify-email/E
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DEMO_ACCOUNT } from "@features/auth/components/login/LoginForm";
 import { useAuth } from "@shared/auth/AuthContext";
+import { listAddresses } from "@shared/api-client";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -30,17 +31,7 @@ const ACCENT_PALETTES = {
   ink:     { deep: "#1B1815", soft: "#7A6F66", paper: "#E5DED4" },
 };
 
-// Direcciones de ejemplo para la cuenta demo (ver DEMO_ACCOUNT en LoginForm), solo para
-// poder probar en cliente la regla "no se puede eliminar la única dirección si tiene
-// un pedido en curso" sin tener todavía una feature de pedidos real. "Casa" simula estar
-// referenciada por un pedido en curso: intenta borrar "Oficina" primero y luego "Casa"
-// para ver el bloqueo y la opción de archivar.
-const DEMO_ADDRESSES = [
-  { id: "addr_demo_casa", alias: "Casa", countryCode: "CO", line1: "Calle 10 # 43-12", line2: "Apto 502", city: "Medellín", postalCode: "050021", isDefault: true, archived: false, hasActiveOrder: true },
-  { id: "addr_demo_oficina", alias: "Oficina", countryCode: "CO", line1: "Carrera 43A # 1-50", line2: "Piso 8", city: "Medellín", postalCode: "050021", isDefault: false, archived: false, hasActiveOrder: false },
-];
-
-// Snapshot de "Casa" (arriba) tal como quedaría guardado en un pedido — independiente
+// Snapshot de "Casa" tal como quedaría guardado en un pedido — independiente
 // del array de direcciones en sí, porque una dirección real puede editarse/archivarse
 // después de comprar y el pedido debe conservar la dirección tal como era ese día.
 const DEMO_SHIPPING_ADDRESS = { alias: "Casa", countryCode: "CO", line1: "Calle 10 # 43-12", line2: "Apto 502", city: "Medellín", postalCode: "050021" };
@@ -112,7 +103,7 @@ function App() {
   const [verifyModalOpen, setVerifyModalOpen] = useState(
     () => window.location.pathname === "/verify-email" && new URLSearchParams(window.location.search).has("token")
   );
-  const { user, login: authLogin, updateUser } = useAuth();
+  const { user, login: authLogin, updateUser, getAccessToken } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -178,15 +169,33 @@ function App() {
       },
       accessToken
     );
-    setAddresses((prev) => {
-      if (prev.length > 0) return prev; // ya hay direcciones cargadas en esta sesión, no las pisamos
-      return email === DEMO_ACCOUNT.email ? DEMO_ADDRESSES.map((a) => ({ ...a })) : [];
-    });
     setOrders((prev) => {
-      if (prev.length > 0) return prev; // idem: no pisar pedidos ya cargados en esta sesión
+      if (prev.length > 0) return prev; // no pisar pedidos ya cargados en esta sesión
       return email === DEMO_ACCOUNT.email ? DEMO_ORDERS.map((o) => ({ ...o })) : [];
     });
   };
+
+  // Direcciones sí son reales desde [0007][BE]: se cargan contra la API apenas hay
+  // sesión (login por correo o el refresh-token automático al montar la app en
+  // AuthContext), y se limpian al cerrar sesión. hasActiveOrder es un campo que solo
+  // existe en el cliente (ver AddressBookModal) — el backend de direcciones no lo devuelve.
+  useEffect(() => {
+    if (!user) {
+      setAddresses([]);
+      return;
+    }
+    let cancelled = false;
+    listAddresses(getAccessToken())
+      .then((list) => {
+        if (!cancelled) setAddresses(list.map((a) => ({ ...a, hasActiveOrder: false })));
+      })
+      .catch(() => {
+        if (!cancelled) setAddresses([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email]);
 
   return (
     <>

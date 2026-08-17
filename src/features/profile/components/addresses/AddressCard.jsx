@@ -25,7 +25,9 @@ const badgeStyle = (bg, color) => ({
 // Una dirección guardada + sus acciones. blockedByActiveOrder llega ya calculado
 // por AddressBookModal (es la única no archivada y tiene un pedido en curso) — acá
 // solo se decide qué mostrar: el bloqueo con la opción de archivar, o las acciones normales.
-export const AddressCard = ({ address, country, blockedByActiveOrder, onEdit, onSetDefault, onArchive, onRestore, onDelete }) => {
+// pending llega true mientras una acción (default/archive/restore/delete) está en
+// vuelo contra el backend, para no dejar hacer doble click sobre la misma tarjeta.
+export const AddressCard = ({ address, country, blockedByActiveOrder, pending, onEdit, onSetDefault, onArchive, onRestore, onDelete }) => {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -45,10 +47,12 @@ export const AddressCard = ({ address, country, blockedByActiveOrder, onEdit, on
       </div>
 
       <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.5 }}>
+        {address.recipientName} · {address.phone}
+        <br />
         {address.line1}
         {address.line2 ? `, ${address.line2}` : ""}
         <br />
-        {address.city}, {address.postalCode} · {country?.name}
+        {address.city}, {address.stateProvince}, {address.postalCode} · {country?.name}
       </p>
 
       {confirmingDelete ? (
@@ -63,8 +67,12 @@ export const AddressCard = ({ address, country, blockedByActiveOrder, onEdit, on
         >
           <p style={{ fontSize: 12.5, color: "#7A3535" }}>¿Eliminar esta dirección? No se puede deshacer.</p>
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <Button type="button" size="sm" onClick={onDelete}>Sí, eliminar</Button>
-            <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingDelete(false)}>Cancelar</Button>
+            <Button type="button" size="sm" onClick={onDelete} disabled={pending}>
+              {pending ? "Eliminando…" : "Sí, eliminar"}
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingDelete(false)} disabled={pending}>
+              Cancelar
+            </Button>
           </div>
         </div>
       ) : blockedByActiveOrder ? (
@@ -72,21 +80,30 @@ export const AddressCard = ({ address, country, blockedByActiveOrder, onEdit, on
           <p style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
             No se puede eliminar: tiene un pedido en curso que la referencia. Puedes archivarla en su lugar.
           </p>
-          <Button type="button" size="sm" variant="ghost" onClick={onArchive} style={{ marginTop: 8 }}>
-            Archivar esta dirección
+          <Button type="button" size="sm" variant="ghost" onClick={onArchive} disabled={pending} style={{ marginTop: 8 }}>
+            {pending ? "Archivando…" : "Archivar esta dirección"}
           </Button>
         </div>
       ) : (
         <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
           {address.archived ? (
-            <button type="button" onClick={onRestore} style={linkBtnStyle}>Restaurar</button>
+            <button type="button" onClick={onRestore} disabled={pending} style={linkBtnStyle}>
+              {pending ? "Restaurando…" : "Restaurar"}
+            </button>
           ) : (
             <>
-              <button type="button" onClick={onEdit} style={linkBtnStyle}>Editar</button>
+              <button type="button" onClick={onEdit} disabled={pending} style={linkBtnStyle}>Editar</button>
               {!address.isDefault && (
-                <button type="button" onClick={onSetDefault} style={linkBtnStyle}>Marcar predeterminada</button>
+                <button type="button" onClick={onSetDefault} disabled={pending} style={linkBtnStyle}>
+                  {pending ? "Marcando…" : "Marcar predeterminada"}
+                </button>
               )}
-              <button type="button" onClick={() => setConfirmingDelete(true)} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(true)}
+                disabled={pending}
+                style={{ ...linkBtnStyle, color: "#9C4A4A" }}
+              >
                 Eliminar
               </button>
             </>

@@ -1,7 +1,17 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { COUNTRIES } from "@shared/data/countries";
+import { COUNTRIES, stripDialCode } from "@shared/data/countries";
+import { createAddress, updateAddress, ApiError } from "@shared/api-client";
+import { useAuth } from "@shared/auth/AuthContext";
 
-const FIELD_LABELS = { alias: "Alias", line1: "Dirección", city: "Ciudad", postalCode: "Código postal" };
+const FIELD_LABELS = {
+  alias: "Alias",
+  recipientName: "Nombre de quien recibe",
+  phone: "Teléfono de contacto",
+  line1: "Dirección",
+  stateProvince: "Departamento / estado",
+  city: "Ciudad",
+  postalCode: "Código postal",
+};
 
 const selectStyle = {
   width: "100%",
@@ -32,9 +42,23 @@ function validateAlias(value) {
   if (!value.trim()) return "Ponle un alias para identificarla (ej. Casa, Oficina).";
   return "";
 }
+function validateRecipientName(value) {
+  if (!value.trim()) return "Necesitamos el nombre de quien recibe.";
+  return "";
+}
+function validatePhone(value, countryCode) {
+  const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
+  if (!value) return "Ingresa un teléfono de contacto.";
+  if (value.length !== country.phoneDigits) return `Debe tener ${country.phoneDigits} dígitos para ${country.name}.`;
+  return "";
+}
 function validateLine1(value) {
   if (!value.trim()) return "Necesitamos la dirección.";
   if (value.trim().length < 5) return "Agrega un poco más de detalle a la dirección.";
+  return "";
+}
+function validateStateProvince(value) {
+  if (!value.trim()) return "Necesitamos el departamento o estado.";
   return "";
 }
 function validateCity(value) {
@@ -50,21 +74,23 @@ function validatePostalCode(value, countryCode) {
   return "";
 }
 
-async function saveAddress(data) {
-  // No hay backend todavía: simula el guardado. La validación real del código postal
-  // (contra un servicio postal) también debería vivir ahí. Reemplazar cuando exista la API.
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return { ok: true };
-}
-
 // Formulario de dirección (agregar/editar), autocontenido igual que el resto de
-// formularios del repo: validación + submit() imperativo. No incluye "predeterminada"
-// ni "archivada": esas son acciones de la lista (AddressCard), no campos del formulario.
+// formularios del repo: validación + submit() imperativo, llamando directo a
+// createAddress/updateAddress (mismo patrón que ProfileForm con updateProfile). No
+// incluye "predeterminada" ni "archivada": esas son acciones de la lista (AddressCard),
+// no campos del formulario — las decide el backend (primera activa = predeterminada).
 export const AddressForm = forwardRef(({ initialValues }, ref) => {
+  const { getAccessToken } = useAuth();
+  const isEditing = Boolean(initialValues?.id);
   const [alias, setAlias] = useState(initialValues?.alias || "");
+  const [recipientName, setRecipientName] = useState(initialValues?.recipientName || "");
   const [countryCode, setCountryCode] = useState(initialValues?.countryCode || COUNTRIES[0].code);
+  const [phone, setPhone] = useState(
+    initialValues?.phone ? stripDialCode(initialValues.phone, initialValues.countryCode || COUNTRIES[0].code) : ""
+  );
   const [line1, setLine1] = useState(initialValues?.line1 || "");
   const [line2, setLine2] = useState(initialValues?.line2 || "");
+  const [stateProvince, setStateProvince] = useState(initialValues?.stateProvince || "");
   const [city, setCity] = useState(initialValues?.city || "");
   const [postalCode, setPostalCode] = useState(initialValues?.postalCode || "");
 
@@ -96,10 +122,45 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
     setErrors((prev) => ({ ...prev, alias: validateAlias(alias) }));
   };
 
+  const handleRecipientNameChange = (e) => {
+    const v = e.target.value;
+    setRecipientName(v);
+    setErrors((prev) => (touched.recipientName ? { ...prev, recipientName: validateRecipientName(v) } : prev));
+  };
+  const handleRecipientNameBlur = () => {
+    setTouched((prev) => ({ ...prev, recipientName: true }));
+    setErrors((prev) => ({ ...prev, recipientName: validateRecipientName(recipientName) }));
+  };
+
+  const handlePhoneChange = (value) => {
+    setPhone(value);
+    setErrors((prev) => (touched.phone ? { ...prev, phone: validatePhone(value, countryCode) } : prev));
+  };
+  const handlePhoneBlur = () => {
+    setTouched((prev) => ({ ...prev, phone: true }));
+    setErrors((prev) => ({ ...prev, phone: validatePhone(phone, countryCode) }));
+  };
+
+  const handleStateProvinceChange = (e) => {
+    const v = e.target.value;
+    setStateProvince(v);
+    setErrors((prev) => (touched.stateProvince ? { ...prev, stateProvince: validateStateProvince(v) } : prev));
+  };
+  const handleStateProvinceBlur = () => {
+    setTouched((prev) => ({ ...prev, stateProvince: true }));
+    setErrors((prev) => ({ ...prev, stateProvince: validateStateProvince(stateProvince) }));
+  };
+
   const handleCountryChange = (e) => {
     const nextCode = e.target.value;
     setCountryCode(nextCode);
-    setErrors((prev) => (touched.postalCode ? { ...prev, postalCode: validatePostalCode(postalCode, nextCode) } : prev));
+    // El formato de dígitos cambia con el país: mejor limpiar que dejar un número a medias.
+    setPhone("");
+    setErrors((prev) => ({
+      ...prev,
+      phone: undefined,
+      postalCode: touched.postalCode ? validatePostalCode(postalCode, nextCode) : prev.postalCode,
+    }));
   };
 
   const handleLine1Change = (e) => {
@@ -140,12 +201,23 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
     submit: async () => {
       const nextErrors = {
         alias: validateAlias(alias),
+        recipientName: validateRecipientName(recipientName),
+        phone: validatePhone(phone, countryCode),
         line1: validateLine1(line1),
+        stateProvince: validateStateProvince(stateProvince),
         city: validateCity(city),
         postalCode: validatePostalCode(postalCode, countryCode),
       };
       setErrors(nextErrors);
-      setTouched({ alias: true, line1: true, city: true, postalCode: true });
+      setTouched({
+        alias: true,
+        recipientName: true,
+        phone: true,
+        line1: true,
+        stateProvince: true,
+        city: true,
+        postalCode: true,
+      });
 
       const hasErrors = Object.values(nextErrors).some(Boolean);
       if (hasErrors) {
@@ -159,16 +231,25 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
       try {
         const fields = {
           alias: alias.trim(),
+          recipientName: recipientName.trim(),
+          phone,
           countryCode,
+          stateProvince: stateProvince.trim(),
           line1: line1.trim(),
           line2: line2.trim(),
           city: city.trim(),
           postalCode: postalCode.trim(),
         };
-        await saveAddress(fields);
-        return { ok: true, address: fields };
-      } catch {
-        setServerError("No pudimos guardar la dirección. Intenta de nuevo en unos segundos.");
+        const apiAddress = isEditing
+          ? await updateAddress(initialValues.id, fields, getAccessToken())
+          : await createAddress(fields, getAccessToken());
+        return { ok: true, address: apiAddress };
+      } catch (e) {
+        if (e instanceof ApiError && e.message) {
+          setServerError(e.message);
+        } else {
+          setServerError("No pudimos guardar la dirección. Intenta de nuevo en unos segundos.");
+        }
         return { ok: false };
       }
     },
@@ -250,6 +331,31 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
       </div>
 
       <div style={{ marginTop: 14 }}>
+        <label htmlFor="address-recipientName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+          Nombre de quien recibe
+        </label>
+        <input
+          id="address-recipientName"
+          value={recipientName}
+          onChange={handleRecipientNameChange}
+          onBlur={handleRecipientNameBlur}
+          type="text"
+          placeholder="Quién recibe el pedido"
+          autoComplete="name"
+          aria-describedby={touched.recipientName && errors.recipientName ? "address-recipientName-error" : undefined}
+          aria-invalid={touched.recipientName && errors.recipientName ? "true" : undefined}
+          style={inputStyle(touched.recipientName && errors.recipientName)}
+        />
+        <div style={{ minHeight: 18, marginTop: 4 }}>
+          {touched.recipientName && errors.recipientName && (
+            <span id="address-recipientName-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
+              {errors.recipientName}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 14 }}>
         <label htmlFor="address-country" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
           País
         </label>
@@ -260,6 +366,35 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
             </option>
           ))}
         </select>
+      </div>
+
+      <div style={{ marginTop: 14 }}>
+        <label htmlFor="address-phone" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+          Teléfono de contacto
+        </label>
+        <input
+          id="address-phone"
+          value={phone}
+          onChange={(e) => handlePhoneChange(e.target.value.replace(/\D/g, "").slice(0, country.phoneDigits))}
+          onBlur={handlePhoneBlur}
+          type="tel"
+          inputMode="numeric"
+          placeholder={"9".repeat(country.phoneDigits)}
+          aria-describedby={touched.phone && errors.phone ? "address-phone-error" : undefined}
+          aria-invalid={touched.phone && errors.phone ? "true" : undefined}
+          style={inputStyle(touched.phone && errors.phone)}
+        />
+        <div style={{ minHeight: 18, marginTop: 4 }}>
+          {touched.phone && errors.phone ? (
+            <span id="address-phone-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
+              {errors.phone}
+            </span>
+          ) : (
+            <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
+              Formato: {country.dialCode} + {country.phoneDigits} dígitos.
+            </span>
+          )}
+        </div>
       </div>
 
       <div style={{ marginTop: 14 }}>
@@ -300,6 +435,31 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
           autoComplete="address-line2"
           style={inputStyle(false)}
         />
+      </div>
+
+      <div style={{ marginTop: 14 }}>
+        <label htmlFor="address-stateProvince" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+          Departamento / estado
+        </label>
+        <input
+          id="address-stateProvince"
+          value={stateProvince}
+          onChange={handleStateProvinceChange}
+          onBlur={handleStateProvinceBlur}
+          type="text"
+          placeholder="Tu departamento o estado"
+          autoComplete="address-level1"
+          aria-describedby={touched.stateProvince && errors.stateProvince ? "address-stateProvince-error" : undefined}
+          aria-invalid={touched.stateProvince && errors.stateProvince ? "true" : undefined}
+          style={inputStyle(touched.stateProvince && errors.stateProvince)}
+        />
+        <div style={{ minHeight: 18, marginTop: 4 }}>
+          {touched.stateProvince && errors.stateProvince && (
+            <span id="address-stateProvince-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
+              {errors.stateProvince}
+            </span>
+          )}
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>

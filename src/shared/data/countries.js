@@ -15,3 +15,12 @@ export const COUNTRIES = [
   { code: "ES", name: "España", dialCode: "+34", phoneDigits: 9, postalCodeRegex: /^\d{5}$/, postalCodeExample: "28001" },
   { code: "US", name: "Estados Unidos", dialCode: "+1", phoneDigits: 10, postalCodeRegex: /^\d{5}(-\d{4})?$/, postalCodeExample: "10001" },
 ];
+
+// El backend devuelve los teléfonos normalizados en E.164 (ej. "+573001234567"); la UI
+// solo maneja dígitos nacionales + un selector de país aparte, así que hace falta
+// despojar el dial code de vuelta antes de guardarlo en el estado local de un formulario
+// (usado por profile y por addresses, cada uno contra su propio countryCode).
+export function stripDialCode(e164Phone, countryCode) {
+  const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
+  return e164Phone?.startsWith(country.dialCode) ? e164Phone.slice(country.dialCode.length) : e164Phone || "";
+}
