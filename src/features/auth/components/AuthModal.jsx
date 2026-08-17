@@ -7,6 +7,9 @@ import { Z } from "@ui/zIndex";
 import { RegisterForm } from "./register/RegisterForm";
 import { LoginForm } from "./login/LoginForm";
 import { ForgotPasswordForm } from "./forgot-password/ForgotPasswordForm";
+import { resendVerificationEmail } from "@shared/api-client";
+
+const RESEND_COOLDOWN_S = 45;
 
 const DEMO_GOOGLE_ACCOUNT = { name: "Cuenta demo de Google", email: "demo.sharon@gmail.com" };
 
@@ -31,11 +34,11 @@ function getSuccessCopy(info) {
       };
     }
     return {
-      title: "¡Bienvenida a Sharon!",
+      title: "Revisa tu correo",
       body: (
         <>
-          Te enviamos un correo de verificación a <strong>{info.email}</strong>. Ya puedes usar tu cuenta,
-          con acceso limitado hasta que la verifiques.
+          Si <strong>{info.email}</strong> es válido, te enviamos un correo para verificar tu cuenta antes de
+          poder iniciar sesión.
         </>
       ),
     };
@@ -67,6 +70,10 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
   const [loginLocked, setLoginLocked] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
+  const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent | error
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const resendTimerRef = useRef(null);
+
   const [googleDialogOpen, setGoogleDialogOpen] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState("");
@@ -86,6 +93,9 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
     setGoogleDialogOpen(false);
     setGoogleLoading(false);
     setGoogleError("");
+    setResendStatus("idle");
+    setResendCooldown(0);
+    if (resendTimerRef.current) clearInterval(resendTimerRef.current);
     // RegisterForm/LoginForm/ForgotPasswordForm se remontan limpios (su propio estado interno se descarta).
     setFormKey((k) => k + 1);
   };
@@ -98,6 +108,12 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
   useEffect(() => {
     if (googleDialogOpen && googleDialogRef.current) googleDialogRef.current.focus();
   }, [googleDialogOpen]);
+
+  useEffect(() => () => clearInterval(resendTimerRef.current), []);
+
+  useEffect(() => {
+    if (resendStatus === "sent" && resendCooldown === 0) setResendStatus("idle");
+  }, [resendStatus, resendCooldown]);
 
   // El padre puede pedir un tab de arranque distinto (ej. volver del flujo de
   // restablecimiento directo a "login"); esto sincroniza el tab cada vez que se abre.
@@ -114,7 +130,36 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
     if (result?.ok) {
       setSuccessInfo({ ...result.info, mode });
       setSuccess(true);
-      if (mode !== "forgot") onAuthSuccess?.({ name: result.info.name, email: result.info.email });
+      // El registro por correo ya no loguea automáticamente: el backend solo crea la
+      // cuenta y envía el correo de verificación, sin devolver sesión (no hay endpoint
+      // de login todavía). Login y Google sí siguen abriendo sesión localmente.
+      if (mode === "login") onAuthSuccess?.({ name: result.info.name, email: result.info.email });
+    }
+  };
+
+  const startResendCooldown = () => {
+    setResendCooldown(RESEND_COOLDOWN_S);
+    clearInterval(resendTimerRef.current);
+    resendTimerRef.current = setInterval(() => {
+      setResendCooldown((s) => {
+        if (s <= 1) {
+          clearInterval(resendTimerRef.current);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  };
+
+  const handleResendVerification = async () => {
+    if (!successInfo?.email || resendStatus === "sending" || resendCooldown > 0) return;
+    setResendStatus("sending");
+    try {
+      await resendVerificationEmail(successInfo.email);
+      setResendStatus("sent");
+      startResendCooldown();
+    } catch {
+      setResendStatus("error");
     }
   };
 
@@ -257,6 +302,50 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
               <p style={{ fontSize: 14, color: "var(--ink-soft)", marginTop: 12, lineHeight: 1.6 }}>
                 {successCopy.body}
               </p>
+
+              {successInfo?.mode === "register" && successInfo.method !== "google" && (
+                <div style={{ marginTop: 14 }}>
+                  {resendStatus === "sent" ? (
+                    <p style={{ fontSize: 12.5, color: "var(--botanic-deep)" }}>
+                      Correo reenviado, revisa tu bandeja de entrada.
+                      {resendCooldown > 0 && ` Puedes volver a intentarlo en ${resendCooldown}s.`}
+                    </p>
+                  ) : (
+                    <>
+                      {resendStatus === "error" && (
+                        <p role="alert" style={{ fontSize: 12.5, color: "#7A3535", marginBottom: 6 }}>
+                          No pudimos reenviar el correo. Intenta de nuevo.
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resendStatus === "sending" || resendCooldown > 0}
+                        style={{
+                          background: "none",
+                          border: 0,
+                          padding: 0,
+                          fontSize: 12.5,
+                          color: "var(--ink-soft)",
+                          textDecoration: "underline",
+                          cursor: resendStatus === "sending" || resendCooldown > 0 ? "not-allowed" : "pointer",
+                          opacity: resendStatus === "sending" || resendCooldown > 0 ? 0.6 : 1,
+                        }}
+                      >
+                        {resendStatus === "sending"
+                          ? "Reenviando…"
+                          : resendCooldown > 0
+                            ? `¿No te llegó el correo? Reenviar (${resendCooldown}s)`
+                            : "¿No te llegó el correo? Reenviar"}
+                      </button>
+                    </>
+                  )}
+                  <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>
+                    El enlace vence en 24 horas.
+                  </p>
+                </div>
+              )}
+
               <Button onClick={close} style={{ marginTop: 22 }}>
                 Listo
               </Button>

@@ -15,4 +15,5 @@ export const Z = {
   mobileMenu: 104, // MobileMenu
   checkout: 109, // CheckoutModal (anidado dentro de CartDrawer)
   googleDialog: 119, // diálogo simulado de Google, anidado dentro de AuthModal
+  verifyEmail: 121, // EmailVerificationModal (aterrizaje del enlace de verificación de correo)
 };

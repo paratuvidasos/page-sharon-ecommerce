@@ -13,6 +13,7 @@ import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
+import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DEMO_ACCOUNT } from "@features/auth/components/login/LoginForm";
 import { MobileMenu } from "@ui/MobileMenu";
@@ -101,6 +102,8 @@ function App() {
   const [authInitialMode, setAuthInitialMode] = useState("register");
   const [resetToken] = useState(() => new URLSearchParams(window.location.search).get("resetToken"));
   const [resetModalOpen, setResetModalOpen] = useState(() => new URLSearchParams(window.location.search).has("resetToken"));
+  const [verifyToken] = useState(() => new URLSearchParams(window.location.search).get("token"));
+  const [verifyModalOpen, setVerifyModalOpen] = useState(() => new URLSearchParams(window.location.search).has("token"));
   const [user, setUser] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
@@ -141,6 +144,13 @@ function App() {
     setResetModalOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.delete("resetToken");
+    window.history.replaceState({}, "", url);
+  };
+
+  const closeVerifyModal = () => {
+    setVerifyModalOpen(false);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("token");
     window.history.replaceState({}, "", url);
   };
 
@@ -204,6 +214,12 @@ function App() {
         token={resetToken}
         onRequestNewLink={() => { closeResetModal(); openAuth("forgot"); }}
         onGoToLogin={() => { closeResetModal(); openAuth("login"); }}
+      />
+      <EmailVerificationModal
+        open={verifyModalOpen}
+        onClose={closeVerifyModal}
+        token={verifyToken}
+        onGoToLogin={() => { closeVerifyModal(); openAuth("login"); }}
       />
       <ProfileModal
         open={profileOpen}
