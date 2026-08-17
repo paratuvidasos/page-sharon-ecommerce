@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { PhoneField } from "./PhoneField";
 import { PhotoField } from "./PhotoField";
-import { COUNTRIES } from "@shared/data/countries";
+import { COUNTRIES, stripDialCode } from "@shared/data/countries";
 import { updateProfile as updateProfileRequest, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
 
@@ -29,14 +29,6 @@ function validatePhone(value, countryCode) {
   if (!value) return "Ingresa tu número de teléfono.";
   if (value.length !== country.phoneDigits) return `Debe tener ${country.phoneDigits} dígitos para ${country.name}.`;
   return "";
-}
-
-// El backend devuelve el teléfono normalizado en E.164 (ej. "+573001234567"); la UI
-// solo maneja dígitos nacionales + el selector de país, así que hay que despojar el
-// dial code de vuelta antes de guardarlo en el estado local.
-function stripDialCode(e164Phone, countryCode) {
-  const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
-  return e164Phone?.startsWith(country.dialCode) ? e164Phone.slice(country.dialCode.length) : e164Phone || "";
 }
 
 // Formulario de edición de perfil: nombre, apellido, foto (con preview) y teléfono

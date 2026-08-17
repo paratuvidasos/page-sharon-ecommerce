@@ -26,7 +26,7 @@ export const AddressFormModal = ({ open, onClose, address, onSave }) => {
     const result = await formRef.current.submit();
     setSubmitting(false);
     if (result?.ok) {
-      onSave(isEditing ? { ...address, ...result.address } : result.address);
+      await onSave();
       close();
     }
   };

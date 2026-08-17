@@ -9,3 +9,12 @@ export {
   resetPassword,
   updateProfile,
 } from "./accounts";
+export {
+  listAddresses,
+  createAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
+  archiveAddress,
+  restoreAddress,
+} from "./addresses";
