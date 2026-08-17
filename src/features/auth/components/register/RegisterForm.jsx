@@ -1,24 +1,27 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { AuthField } from "../AuthField";
+import { registerAccount, ApiError } from "@shared/api-client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_RE = /(?=.*[A-Za-z])(?=.*\d).{8,}/;
 
-const INITIAL_FORM = { name: "", email: "", password: "", confirmPassword: "", address: "" };
+const INITIAL_FORM = { firstName: "", lastName: "", email: "", password: "", confirmPassword: "" };
 
 const FIELDS = [
-  { name: "name", label: "Nombre completo", type: "text", placeholder: "Tu nombre completo", autoComplete: "name" },
-  { name: "email", label: "Correo electrónico", type: "email", placeholder: "tucorreo@ejemplo.com", autoComplete: "email" },
+  { name: "firstName", label: "Nombre", type: "text", placeholder: "Tu nombre", autoComplete: "given-name" },
+  { name: "lastName", label: "Apellido", type: "text", placeholder: "Tu apellido", autoComplete: "family-name" },
+  { name: "email", label: "Correo electrónico", type: "email", placeholder: "tucorreo@ejemplo.com", autoComplete: "email", full: true },
   { name: "password", label: "Contraseña", type: "password", placeholder: "Mínimo 8 caracteres", autoComplete: "new-password", helper: "Mínimo 8 caracteres, con una letra y un número." },
   { name: "confirmPassword", label: "Confirmar contraseña", type: "password", placeholder: "Repite tu contraseña", autoComplete: "new-password" },
-  { name: "address", label: "Dirección", type: "text", placeholder: "Dirección de entrega", autoComplete: "street-address", full: true },
 ];
 
 function validateField(field, value, form) {
   switch (field) {
-    case "name":
+    case "firstName":
       if (!value.trim()) return "Necesitamos tu nombre para crear la cuenta.";
-      if (value.trim().length < 2) return "Cuéntanos tu nombre completo.";
+      return "";
+    case "lastName":
+      if (!value.trim()) return "Necesitamos tu apellido para crear la cuenta.";
       return "";
     case "email":
       if (!value.trim()) return "Necesitamos tu correo para crear la cuenta.";
@@ -32,19 +35,19 @@ function validateField(field, value, form) {
       if (!value) return "Confirma tu contraseña.";
       if (value !== form.password) return "Las contraseñas no coinciden todavía.";
       return "";
-    case "address":
-      if (!value.trim()) return "Necesitamos una dirección para tus envíos.";
-      if (value.trim().length < 5) return "Agrega un poco más de detalle a la dirección.";
-      return "";
     default:
       return "";
   }
 }
 
 async function registerUser(data) {
-  // No hay backend todavía: simula la llamada. Reemplazar por la API real cuando exista.
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  return { ok: true, email: data.email };
+  return registerAccount({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    password: data.password,
+    confirmPassword: data.confirmPassword,
+  });
 }
 
 // Formulario de registro autocontenido: dueño de sus propios campos, validación
@@ -108,9 +111,16 @@ export const RegisterForm = forwardRef((_props, ref) => {
       setServerError("");
       try {
         await registerUser(form);
-        return { ok: true, info: { method: "email", mode: "register", email: form.email, name: form.name } };
-      } catch {
-        setServerError("No pudimos crear tu cuenta. Intenta de nuevo en unos segundos.");
+        return {
+          ok: true,
+          info: { method: "email", mode: "register", email: form.email, name: `${form.firstName} ${form.lastName}`.trim(), loggedIn: false },
+        };
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 400) {
+          setServerError(err.message || "Revisa los datos ingresados e intenta de nuevo.");
+        } else {
+          setServerError("No pudimos crear tu cuenta. Intenta de nuevo en unos segundos.");
+        }
         return { ok: false };
       }
     },
