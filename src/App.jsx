@@ -55,7 +55,7 @@ function App() {
   const [verifyModalOpen, setVerifyModalOpen] = useState(
     () => window.location.pathname === "/verify-email" && new URLSearchParams(window.location.search).has("token")
   );
-  const { user, login: authLogin, updateUser, getAccessToken } = useAuth();
+  const { user, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -167,6 +167,20 @@ function App() {
     };
   }, [user?.email]);
 
+  // [0009][BE] Cerrar sesión: addresses/orders ya se limpian solos vía los efectos de
+  // arriba en cuanto `user` pasa a null (mismo `user?.email` como dependencia). El
+  // carrito en cambio es independiente de la cuenta (invitado también puede comprar),
+  // así que cerrar sesión no lo toca.
+  const handleLogout = async () => {
+    setProfileOpen(false);
+    await authLogout();
+  };
+
+  const handleLogoutAll = async () => {
+    setProfileOpen(false);
+    await authLogoutAll();
+  };
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -218,10 +232,13 @@ function App() {
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
         user={user}
+        profileReady={profileReady}
         onSave={(profile) => updateUser(profile)}
         addresses={addresses}
         setAddresses={setAddresses}
         orders={orders}
+        onLogout={handleLogout}
+        onLogoutAll={handleLogoutAll}
       />
 
       {toast && (

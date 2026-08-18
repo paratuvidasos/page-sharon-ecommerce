@@ -8,6 +8,9 @@ export {
   requestPasswordReset,
   resetPassword,
   updateProfile,
+  getMyProfile,
+  logoutAccount,
+  logoutAllAccounts,
 } from "./accounts";
 export {
   listAddresses,

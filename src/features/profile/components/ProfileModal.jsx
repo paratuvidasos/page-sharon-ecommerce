@@ -10,6 +10,16 @@ import { OrderHistoryModal } from "@features/orders/components/OrderHistoryModal
 
 const SAVED_BANNER_MS = 3000;
 
+const linkBtnStyle = {
+  background: "none",
+  border: 0,
+  padding: 0,
+  fontSize: 12.5,
+  color: "var(--ink)",
+  textDecoration: "underline",
+  cursor: "pointer",
+};
+
 // Modal de "editar perfil": envuelve ProfileForm con el shell (header, cuerpo con
 // scroll, footer con el botón de guardar), igual que AuthModal/ResetPasswordModal.
 // Al guardar, avisa al padre vía onSave para que el estado de sesión (App.jsx) se
@@ -18,14 +28,41 @@ const SAVED_BANNER_MS = 3000;
 // (pedidos), ambos anidados como hermanos del Modal principal (mismo patrón que el
 // diálogo de Google dentro de AuthModal) para que su propio overlay/panel no queden
 // atrapados por el `transform` del panel de este Modal.
-export const ProfileModal = ({ open, onClose, user, onSave, addresses, setAddresses, orders }) => {
+export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, orders, onLogout, onLogoutAll }) => {
   const [submitting, setSubmitting] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
   const [formKey, setFormKey] = useState(0);
   const [addressBookOpen, setAddressBookOpen] = useState(false);
   const [orderHistoryOpen, setOrderHistoryOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
+  const [confirmingLogoutAll, setConfirmingLogoutAll] = useState(false);
   const formRef = useRef(null);
   const savedTimeoutRef = useRef(null);
+
+  // `if (!user) return null` más abajo hace que este componente nunca se desmonte de
+  // verdad al cerrar sesión (React conserva el mismo fiber, solo deja de renderizar
+  // hijos) — así que loggingOut/loggingOutAll/confirmingLogoutAll sobreviven al
+  // logout y reaparecen tal cual en el próximo login si no se resetean acá mismo,
+  // sin depender de que el modal siga "vivo" cuando la llamada resuelve.
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await onLogout();
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    setLoggingOutAll(true);
+    try {
+      await onLogoutAll();
+    } finally {
+      setLoggingOutAll(false);
+      setConfirmingLogoutAll(false);
+    }
+  };
 
   const close = () => {
     onClose();
@@ -113,7 +150,13 @@ export const ProfileModal = ({ open, onClose, user, onSave, addresses, setAddres
               Cambios guardados.
             </div>
           )}
-          <ProfileForm key={`profile-${formKey}`} ref={formRef} initialValues={user} />
+          {profileReady ? (
+            <ProfileForm key={`profile-${formKey}`} ref={formRef} initialValues={user} />
+          ) : (
+            <div style={{ padding: "30px 0", textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
+              Cargando tu perfil…
+            </div>
+          )}
 
           <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
@@ -146,17 +189,63 @@ export const ProfileModal = ({ open, onClose, user, onSave, addresses, setAddres
               </Button>
             </div>
           </div>
+
+          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Sesión</span>
+            {confirmingLogoutAll ? (
+              <div
+                style={{
+                  padding: "10px 12px",
+                  background: "rgba(156,74,74,.08)",
+                  border: "1px solid rgba(156,74,74,.3)",
+                  borderRadius: 12,
+                }}
+              >
+                <p style={{ fontSize: 12.5, color: "#7A3535" }}>
+                  ¿Cerrar sesión en todos tus dispositivos? Tendrás que iniciar sesión de nuevo en cada uno.
+                </p>
+                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                  <Button type="button" size="sm" onClick={handleLogoutAll} disabled={loggingOutAll}>
+                    {loggingOutAll ? "Cerrando…" : "Sí, cerrar todas"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setConfirmingLogoutAll(false)}
+                    disabled={loggingOutAll}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                <button type="button" onClick={handleLogout} disabled={loggingOut} style={linkBtnStyle}>
+                  {loggingOut ? "Cerrando…" : "Cerrar sesión"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingLogoutAll(true)}
+                  disabled={loggingOut}
+                  style={{ ...linkBtnStyle, color: "#9C4A4A" }}
+                >
+                  Cerrar sesión en todos los dispositivos
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={{ padding: "18px 26px 24px", borderTop: "1px solid var(--line)", background: "#fff", flexShrink: 0 }}>
           <Button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting || !profileReady}
             style={{
               width: "100%",
               justifyContent: "center",
-              opacity: submitting ? 0.6 : 1,
-              cursor: submitting ? "not-allowed" : "pointer",
+              opacity: submitting || !profileReady ? 0.6 : 1,
+              cursor: submitting || !profileReady ? "not-allowed" : "pointer",
             }}
           >
             {submitting ? "Guardando…" : <>Guardar cambios <Icon name="arrow" size={16} /></>}
