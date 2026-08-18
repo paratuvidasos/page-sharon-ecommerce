@@ -1,4 +1,3 @@
-import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { ProductImage } from "@ui/ProductImage";
 import { Modal } from "@ui/components/Modal";
@@ -51,7 +50,7 @@ export const OrderDetailModal = ({ order, onClose }) => {
         }}
       >
         <div>
-          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Pedido {order.id}</span>
+          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Pedido {order.orderNumber}</span>
           <div id="order-detail-title" className="display" style={{ fontSize: 22, marginTop: 6 }}>
             {formatDate(order.placedAt)}
           </div>
@@ -82,13 +81,13 @@ export const OrderDetailModal = ({ order, onClose }) => {
           return (
             <div key={item.productId} style={{ display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 12, alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
               <div style={{ width: 56, height: 56, borderRadius: 10, overflow: "hidden" }}>
-                <ProductImage image={product?.image} thumbnail={product?.thumbnail} name={item.name} type={product?.type} accent={product?.accent} category={product?.category} />
+                <ProductImage image={product?.image} thumbnail={product?.thumbnail} name={item.productName} type={product?.type} accent={product?.accent} category={product?.category} />
               </div>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 500 }}>{item.name}</div>
-                <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Cantidad: {item.qty}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 500 }}>{item.productName}</div>
+                <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Cantidad: {item.quantity}</div>
               </div>
-              <div style={{ fontSize: 13.5, textAlign: "right" }}>{formatCurrency(item.price * item.qty)}</div>
+              <div style={{ fontSize: 13.5, textAlign: "right" }}>{formatCurrency(item.lineTotal)}</div>
             </div>
           );
         })}
@@ -101,21 +100,18 @@ export const OrderDetailModal = ({ order, onClose }) => {
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
           <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Dirección de envío</span>
           <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-            <strong>{order.shippingAddress.alias}</strong>
+            <strong>{order.shippingAddress.recipientName}</strong>
             <br />
-            {order.shippingAddress.line1}
-            {order.shippingAddress.line2 ? `, ${order.shippingAddress.line2}` : ""}
+            {order.shippingAddress.streetLine1}
+            {order.shippingAddress.streetLine2 ? `, ${order.shippingAddress.streetLine2}` : ""}
             <br />
-            {order.shippingAddress.city}, {order.shippingAddress.postalCode} · {country?.name}
+            {order.shippingAddress.city}, {order.shippingAddress.stateProvince} {order.shippingAddress.postalCode} · {country?.name}
           </p>
         </div>
 
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
           <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Método de pago</span>
-          <p style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
-            {order.paymentMethod.type === "whatsapp" && <Icon name="wp" size={16} />}
-            {order.paymentMethod.label}
-          </p>
+          <p style={{ fontSize: 13 }}>{order.paymentMethodLabel}</p>
         </div>
       </div>
     </Modal>

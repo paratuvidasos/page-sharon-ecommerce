@@ -6,7 +6,7 @@ import { Button } from "@ui/components/Button";
 import { CheckoutModal } from "@features/checkout/components/CheckoutModal";
 import { Z } from "@ui/zIndex";
 
-export const CartDrawer = ({ open, onClose, items, setItems }) => {
+export const CartDrawer = ({ open, onClose, items, setItems, user, addresses }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const total = items.reduce((s, it) => s + it.price * it.qty, 0);
   const shipping = total > 40 || total === 0 ? 0 : 4.95;
@@ -101,6 +101,8 @@ export const CartDrawer = ({ open, onClose, items, setItems }) => {
         onClose={() => setCheckoutOpen(false)}
         items={items}
         onClearCart={() => setItems([])}
+        user={user}
+        addresses={addresses}
       />
     </>
   );

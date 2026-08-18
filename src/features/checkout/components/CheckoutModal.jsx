@@ -1,11 +1,28 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
 import { Z } from "@ui/zIndex";
+import { COUNTRIES } from "@shared/data/countries";
 
 const WA_PHONE = "573103879555";
+
+const MANUAL_ADDRESS = "manual";
+
+// Une dirección + complemento (apto, torre…) en un solo texto para el input libre
+// de "Dirección" del checkout. No existe un campo "Barrio" en el modelo de dirección
+// del backend (ver aviso de page-sharon-api), así que ese campo se deja siempre en
+// blanco para completar a mano, aunque el resto sí se autocomplete.
+function addressToLine(address) {
+  return address.line1 + (address.line2 ? `, ${address.line2}` : "");
+}
+
+function phoneWithDialCode(user) {
+  if (!user?.phone) return "";
+  const country = COUNTRIES.find((c) => c.code === user.countryCode) || COUNTRIES[0];
+  return `${country.dialCode} ${user.phone}`;
+}
 
 function buildWhatsAppMessage(items, { name, phone, address, neighborhood }) {
   const lines = [
@@ -24,11 +41,46 @@ function buildWhatsAppMessage(items, { name, phone, address, neighborhood }) {
   return lines.join("\n");
 }
 
-export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
+export const CheckoutModal = ({ open, onClose, items, onClearCart, user, addresses }) => {
   const [form, setForm] = useState({ name: "", phone: "", address: "", neighborhood: "" });
   const [sending, setSending] = useState(false);
 
+  const savedAddresses = useMemo(() => (addresses || []).filter((a) => !a.archived), [addresses]);
+  const defaultAddress = useMemo(
+    () => savedAddresses.find((a) => a.isDefault) || savedAddresses[0] || null,
+    [savedAddresses]
+  );
+  const [selectedAddressId, setSelectedAddressId] = useState(MANUAL_ADDRESS);
+
+  // Al abrir el checkout con sesión iniciada, precargar nombre/teléfono desde la
+  // cuenta y la dirección (de envío ya guardada, marcada por defecto si hay varias)
+  // en vez de mostrar los inputs vacíos — el usuario igual puede editarlos después.
+  useEffect(() => {
+    if (!open) return;
+    setSelectedAddressId(defaultAddress?.id || MANUAL_ADDRESS);
+    setForm({
+      name: user?.name || "",
+      phone: (defaultAddress?.phone) || phoneWithDialCode(user),
+      address: defaultAddress ? addressToLine(defaultAddress) : "",
+      neighborhood: "",
+    });
+  }, [open, user, defaultAddress]);
+
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const selectAddress = (e) => {
+    const id = e.target.value;
+    setSelectedAddressId(id);
+    if (id === MANUAL_ADDRESS) return;
+    const address = savedAddresses.find((a) => a.id === id);
+    if (!address) return;
+    setForm((prev) => ({
+      ...prev,
+      name: address.recipientName || prev.name,
+      phone: address.phone || prev.phone,
+      address: addressToLine(address),
+    }));
+  };
 
   const total = items.reduce((s, it) => s + it.price * it.qty, 0);
 
@@ -196,6 +248,36 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart }) => {
           <div className="eyebrow" style={{ marginBottom: 14, fontSize: 10 }}>
             Tus datos
           </div>
+
+          {savedAddresses.length > 0 && (
+            <label style={{ display: "block", marginBottom: 12 }}>
+              <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
+                Entregar en
+              </span>
+              <select
+                value={selectedAddressId}
+                onChange={selectAddress}
+                style={{
+                  width: "100%",
+                  padding: "14px 18px",
+                  border: ".5px solid var(--line)",
+                  borderRadius: 999,
+                  background: "#fff",
+                  fontSize: 14,
+                  fontFamily: "var(--sans)",
+                  outline: 0,
+                }}
+              >
+                {savedAddresses.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.alias}{a.isDefault ? " (predeterminada)" : ""}
+                  </option>
+                ))}
+                <option value={MANUAL_ADDRESS}>Escribir otra dirección</option>
+              </select>
+            </label>
+          )}
+
           <div
             style={{
               display: "grid",
