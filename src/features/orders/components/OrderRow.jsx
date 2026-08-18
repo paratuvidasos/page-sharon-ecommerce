@@ -23,7 +23,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
     >
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 600, fontSize: 13.5 }}>{order.id}</span>
+          <span style={{ fontWeight: 600, fontSize: 13.5 }}>{order.orderNumber}</span>
           <span
             style={{
               fontSize: 10,

@@ -11,10 +11,6 @@ const FIELDS = [
   { name: "password", label: "Contraseña", type: "password", placeholder: "Tu contraseña", autoComplete: "current-password", full: true },
 ];
 
-// Ya no hay una cuenta simulada de login (ver loginAccount() más abajo), pero App.jsx
-// sigue sembrando datos de demo (direcciones, pedidos) contra este correo, así que se
-// mantiene exportada para no duplicar el string en dos archivos.
-export const DEMO_ACCOUNT = { name: "Valentina Ríos", email: "demo.sharon@gmail.com" };
 const REMEMBERED_EMAIL_KEY = "sharon:rememberedEmail";
 
 function validateField(field, value) {

@@ -15,9 +15,8 @@ import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
-import { DEMO_ACCOUNT } from "@features/auth/components/login/LoginForm";
 import { useAuth } from "@shared/auth/AuthContext";
-import { listAddresses } from "@shared/api-client";
+import { listAddresses, listOrders } from "@shared/api-client";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -30,53 +29,6 @@ const ACCENT_PALETTES = {
   garnet:  { deep: "#9C4A4A", soft: "#D8A6A0", paper: "#EBD0CB" },
   ink:     { deep: "#1B1815", soft: "#7A6F66", paper: "#E5DED4" },
 };
-
-// Snapshot de "Casa" tal como quedaría guardado en un pedido — independiente
-// del array de direcciones en sí, porque una dirección real puede editarse/archivarse
-// después de comprar y el pedido debe conservar la dirección tal como era ese día.
-const DEMO_SHIPPING_ADDRESS = { alias: "Casa", countryCode: "CO", line1: "Calle 10 # 43-12", line2: "Apto 502", city: "Medellín", postalCode: "050021" };
-
-// Pedidos de ejemplo para la cuenta demo. Nota: esto es independiente del flag
-// hasActiveOrder en DEMO_ADDRESSES — todavía no hay una feature de orders real que
-// los conecte (ver CLAUDE.md > Pendiente de definir).
-const DEMO_ORDERS = [
-  {
-    id: "SH-10231",
-    placedAt: "2026-06-02T15:10:00-05:00",
-    status: "delivered",
-    items: [{ productId: "p1", name: "Tónico Capilar", qty: 1, price: 49900 }, { productId: "p4", name: "Cepíllo", qty: 1, price: 18000 }],
-    total: 67900,
-    shippingAddress: DEMO_SHIPPING_ADDRESS,
-    paymentMethod: { type: "whatsapp", label: "Coordinado por WhatsApp" },
-  },
-  {
-    id: "SH-10255",
-    placedAt: "2026-07-10T11:45:00-05:00",
-    status: "shipped",
-    items: [{ productId: "p2", name: "Mascarilla Hidratante", qty: 2, price: 39900 }],
-    total: 79800,
-    shippingAddress: DEMO_SHIPPING_ADDRESS,
-    paymentMethod: { type: "cod", label: "Pago contraentrega" },
-  },
-  {
-    id: "SH-10298",
-    placedAt: "2026-07-30T09:20:00-05:00",
-    status: "processing",
-    items: [{ productId: "p3", name: "Shampoo", qty: 1, price: 49900 }, { productId: "p1", name: "Tónico Capilar", qty: 1, price: 49900 }],
-    total: 99800,
-    shippingAddress: DEMO_SHIPPING_ADDRESS,
-    paymentMethod: { type: "transfer", label: "Transferencia bancaria" },
-  },
-  {
-    id: "SH-10310",
-    placedAt: "2026-08-05T18:05:00-05:00",
-    status: "cancelled",
-    items: [{ productId: "p4", name: "Cepíllo", qty: 2, price: 18000 }],
-    total: 36000,
-    shippingAddress: DEMO_SHIPPING_ADDRESS,
-    paymentMethod: { type: "whatsapp", label: "Coordinado por WhatsApp" },
-  },
-];
 
 function applyTweaks(t) {
   const root = document.documentElement;
@@ -169,10 +121,6 @@ function App() {
       },
       accessToken
     );
-    setOrders((prev) => {
-      if (prev.length > 0) return prev; // no pisar pedidos ya cargados en esta sesión
-      return email === DEMO_ACCOUNT.email ? DEMO_ORDERS.map((o) => ({ ...o })) : [];
-    });
   };
 
   // Direcciones sí son reales desde [0007][BE]: se cargan contra la API apenas hay
@@ -191,6 +139,28 @@ function App() {
       })
       .catch(() => {
         if (!cancelled) setAddresses([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email]);
+
+  // Pedidos reales desde [0008][BE]: se cargan contra GET /orders apenas hay sesión
+  // (mismo patrón que direcciones arriba) y se limpian al cerrar sesión. El backend
+  // pagina, pero hoy no hay UI de paginación — se pide una sola página grande y basta,
+  // porque mientras no exista creación real de pedidos ([checkout]) el historial es corto.
+  useEffect(() => {
+    if (!user) {
+      setOrders([]);
+      return;
+    }
+    let cancelled = false;
+    listOrders({ limit: 100 }, getAccessToken())
+      .then((res) => {
+        if (!cancelled) setOrders(res.items);
+      })
+      .catch(() => {
+        if (!cancelled) setOrders([]);
       });
     return () => {
       cancelled = true;
@@ -222,7 +192,7 @@ function App() {
 
       <Footer />
 
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} user={user} addresses={addresses} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <AuthModal
