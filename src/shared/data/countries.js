@@ -24,3 +24,14 @@ export function stripDialCode(e164Phone, countryCode) {
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
   return e164Phone?.startsWith(country.dialCode) ? e164Phone.slice(country.dialCode.length) : e164Phone || "";
 }
+
+// A diferencia de las direcciones (que ya guardan countryCode aparte), GET /accounts/me
+// solo devuelve el teléfono en E.164 sin el país — hay que inferirlo del propio dial
+// code. Se ordena por longitud de dialCode descendente por si en el futuro se agregan
+// países cuyo código sea prefijo de otro (ej. "+1" vs "+123"); hoy ningún par de la
+// lista se solapa, pero así queda a prueba de eso.
+export function matchCountryByE164(e164Phone) {
+  if (!e164Phone) return COUNTRIES[0];
+  const sorted = [...COUNTRIES].sort((a, b) => b.dialCode.length - a.dialCode.length);
+  return sorted.find((c) => e164Phone.startsWith(c.dialCode)) || COUNTRIES[0];
+}

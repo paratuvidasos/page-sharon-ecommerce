@@ -43,6 +43,18 @@ export function resetPassword({ token, newPassword, confirmPassword }) {
   });
 }
 
+export function getMyProfile(accessToken) {
+  return request("/accounts/me", { token: accessToken });
+}
+
+export function logoutAccount() {
+  return request("/accounts/logout", { method: "POST" });
+}
+
+export function logoutAllAccounts(accessToken) {
+  return request("/accounts/logout-all", { method: "POST", token: accessToken });
+}
+
 export function updateProfile({ firstName, lastName, phone, phoneCountryCode, avatarFile, accessToken }) {
   const formData = new FormData();
   formData.append("firstName", firstName);
