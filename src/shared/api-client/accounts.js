@@ -55,6 +55,14 @@ export function logoutAllAccounts(accessToken) {
   return request("/accounts/logout-all", { method: "POST", token: accessToken });
 }
 
+export function deleteAccount({ password, reason, accessToken }) {
+  return request("/accounts/me", {
+    method: "DELETE",
+    body: reason ? { password, reason } : { password },
+    token: accessToken,
+  });
+}
+
 export function updateProfile({ firstName, lastName, phone, phoneCountryCode, avatarFile, accessToken }) {
   const formData = new FormData();
   formData.append("firstName", firstName);

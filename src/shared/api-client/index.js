@@ -11,6 +11,7 @@ export {
   getMyProfile,
   logoutAccount,
   logoutAllAccounts,
+  deleteAccount,
 } from "./accounts";
 export {
   listAddresses,

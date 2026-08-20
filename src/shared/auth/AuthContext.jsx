@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { refreshToken as refreshTokenRequest, getMyProfile, logoutAccount, logoutAllAccounts } from "@shared/api-client";
+import { refreshToken as refreshTokenRequest, getMyProfile, logoutAccount, logoutAllAccounts, deleteAccount as deleteAccountRequest } from "@shared/api-client";
 import { matchCountryByE164, stripDialCode } from "@shared/data/countries";
 
 const AuthContext = createContext(null);
@@ -97,6 +97,18 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // A diferencia de logout/logoutAll, acá NO se limpia la sesión en un finally: si el
+  // backend rechaza la contraseña (401 INVALID_CREDENTIALS) el usuario sigue autenticado
+  // y debe poder reintentar sin perder su sesión actual. Solo se limpia tras un 200 real.
+  const deleteAccount = useCallback(async ({ password, reason }) => {
+    const result = await deleteAccountRequest({ password, reason, accessToken: accessTokenRef.current });
+    accessTokenRef.current = null;
+    setUser(null);
+    setStatus("guest");
+    setProfileReady(false);
+    return result;
+  }, []);
+
   const updateUser = useCallback((patch) => {
     setUser((prev) => (prev ? { ...prev, ...(typeof patch === "function" ? patch(prev) : patch) } : prev));
   }, []);
@@ -128,6 +140,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     logoutAll,
+    deleteAccount,
     updateUser,
   };
 

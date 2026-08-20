@@ -15,6 +15,7 @@ import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
+import { DeleteAccountModal } from "@features/profile/components/delete-account/DeleteAccountModal";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAddresses, listOrders } from "@shared/api-client";
 import { MobileMenu } from "@ui/MobileMenu";
@@ -57,6 +58,7 @@ function App() {
   );
   const { user, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
@@ -181,6 +183,14 @@ function App() {
     await authLogoutAll();
   };
 
+  // [0010][BE] Eliminar cuenta: DeleteAccountModal ya hizo el DELETE real y limpió la
+  // sesión en AuthContext antes de llamar acá — este handler solo oculta ProfileModal por
+  // detrás (ver el comentario de Z.deleteAccount en shared/ui/zIndex.js sobre por qué el
+  // modal de éxito vive fuera del árbol de ProfileModal).
+  const handleAccountDeleted = () => {
+    setProfileOpen(false);
+  };
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -239,6 +249,12 @@ function App() {
         orders={orders}
         onLogout={handleLogout}
         onLogoutAll={handleLogoutAll}
+        onOpenDeleteAccount={() => setDeleteAccountOpen(true)}
+      />
+      <DeleteAccountModal
+        open={deleteAccountOpen}
+        onClose={() => setDeleteAccountOpen(false)}
+        onDeleted={handleAccountDeleted}
       />
 
       {toast && (

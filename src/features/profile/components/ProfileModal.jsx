@@ -28,7 +28,7 @@ const linkBtnStyle = {
 // (pedidos), ambos anidados como hermanos del Modal principal (mismo patrón que el
 // diálogo de Google dentro de AuthModal) para que su propio overlay/panel no queden
 // atrapados por el `transform` del panel de este Modal.
-export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, orders, onLogout, onLogoutAll }) => {
+export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, orders, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
   const [submitting, setSubmitting] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
   const [formKey, setFormKey] = useState(0);
@@ -234,6 +234,15 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
                 </button>
               </div>
             )}
+          </div>
+
+          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10, color: "#9C4A4A" }}>
+              Zona de peligro
+            </span>
+            <button type="button" onClick={onOpenDeleteAccount} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
+              Eliminar mi cuenta
+            </button>
           </div>
         </div>
 

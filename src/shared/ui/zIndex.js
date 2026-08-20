@@ -12,6 +12,10 @@ export const Z = {
   addressForm: 98, // AddressFormModal, anidado dentro de AddressBookModal
   orderHistory: 100, // OrderHistoryModal, anidado dentro de ProfileModal
   orderDetail: 102, // OrderDetailModal, anidado dentro de OrderHistoryModal
+  deleteAccount: 103, // DeleteAccountModal — se abre desde ProfileModal pero se renderiza
+  // como hermano top-level en App.jsx (no anidado dentro de ProfileModal), porque
+  // ProfileModal se auto-oculta (`if (!user) return null`) apenas la cuenta se elimina
+  // y perdería la pantalla de éxito si viviera dentro de su árbol.
   mobileMenu: 104, // MobileMenu
   checkout: 109, // CheckoutModal (anidado dentro de CartDrawer)
   googleDialog: 119, // diálogo simulado de Google, anidado dentro de AuthModal
