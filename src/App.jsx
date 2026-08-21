@@ -216,7 +216,15 @@ function App() {
 
       <Footer />
 
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cart} setItems={setCart} user={user} addresses={addresses} />
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={cart}
+        setItems={setCart}
+        user={user}
+        addresses={addresses}
+        onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
+      />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <AuthModal

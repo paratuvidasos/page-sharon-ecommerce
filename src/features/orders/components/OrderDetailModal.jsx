@@ -77,7 +77,7 @@ export const OrderDetailModal = ({ order, onClose }) => {
       <div style={{ flex: 1, overflowY: "auto", padding: "18px 26px" }}>
         <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Productos</span>
         {order.items.map((item) => {
-          const product = PRODUCTS.find((p) => p.id === item.productId);
+          const product = PRODUCTS.find((p) => p.productId === item.productId);
           return (
             <div key={item.productId} style={{ display: "grid", gridTemplateColumns: "56px 1fr auto", gap: 12, alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
               <div style={{ width: 56, height: 56, borderRadius: 10, overflow: "hidden" }}>
