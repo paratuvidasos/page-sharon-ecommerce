@@ -4,6 +4,7 @@
 export const Z = {
   toast: 70, // App.jsx, notificación "agregado a la bolsa"
   cart: 80, // CartDrawer
+  wishlist: 82, // WishlistModal
   search: 90, // SearchModal
   auth: 92, // AuthModal
   resetPassword: 93, // ResetPasswordModal (aterrizaje del enlace de recuperación)

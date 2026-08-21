@@ -4,7 +4,7 @@ import { Icon } from "@ui/Icon";
 import { ProductCard } from "./ProductCard";
 import { PRODUCTS, CATEGORIES } from "../data/products";
 
-export const Products = ({ onAdd, onWish }) => {
+export const Products = ({ onAdd, onWish, wishlistIds }) => {
   const [cat, setCat] = useState("Todo");
   const list = cat === "Todo" ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
 
@@ -51,7 +51,7 @@ export const Products = ({ onAdd, onWish }) => {
         }}>
           {list.map((p, i) => (
             <Reveal key={p.id} delay={i * 60}>
-              <ProductCard product={p} onAdd={onAdd} onWish={onWish} />
+              <ProductCard product={p} onAdd={onAdd} onWish={onWish} wished={wishlistIds?.has(p.productId)} />
             </Reveal>
           ))}
         </div>

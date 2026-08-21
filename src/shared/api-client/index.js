@@ -23,3 +23,4 @@ export {
   restoreAddress,
 } from "./addresses";
 export { listOrders, checkout } from "./orders";
+export { listWishlist, addToWishlist, removeFromWishlist } from "./wishlist";
