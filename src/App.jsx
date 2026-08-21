@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Nav } from "@ui/Nav";
 import { Hero } from "@ui/Hero";
 import { Products } from "@features/catalog/components/Products";
@@ -17,7 +17,8 @@ import { EmailVerificationModal } from "@features/auth/components/verify-email/E
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DeleteAccountModal } from "@features/profile/components/delete-account/DeleteAccountModal";
 import { useAuth } from "@shared/auth/AuthContext";
-import { listAddresses, listOrders } from "@shared/api-client";
+import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
+import { WishlistModal } from "@features/wishlist/components/WishlistModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -61,6 +62,8 @@ function App() {
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -92,6 +95,32 @@ function App() {
     setAuthInitialMode(mode);
     setAccountOpen(true);
   };
+
+  const wishlistIds = useMemo(() => new Set(wishlist.map((w) => w.productId)), [wishlist]);
+
+  // Favoritos requiere sesión (el backend exige Bearer token en toda ruta de
+  // wishlist) — sin usuario, el corazón abre login en vez de guardar nada.
+  // Optimista: actualiza el estado local de una vez y revierte si la llamada falla.
+  const handleWish = (product) => {
+    if (!user) {
+      openAuth("login");
+      return;
+    }
+    const accessToken = getAccessToken();
+    if (wishlistIds.has(product.productId)) {
+      setWishlist((prev) => prev.filter((w) => w.productId !== product.productId));
+      removeFromWishlist(product.productId, accessToken).catch(() => {
+        setWishlist((prev) => [...prev, { productId: product.productId, addedAt: new Date().toISOString() }]);
+      });
+    } else {
+      setWishlist((prev) => [...prev, { productId: product.productId, addedAt: new Date().toISOString() }]);
+      addToWishlist(product.productId, accessToken).catch(() => {
+        setWishlist((prev) => prev.filter((w) => w.productId !== product.productId));
+      });
+    }
+  };
+
+  const openWishlist = () => (user ? setWishlistOpen(true) : openAuth("login"));
 
   const closeResetModal = () => {
     setResetModalOpen(false);
@@ -169,6 +198,27 @@ function App() {
     };
   }, [user?.email]);
 
+  // [0012][BE] Favoritos reales: mismo patrón que addresses/orders arriba, se cargan
+  // contra GET /wishlist apenas hay sesión y se limpian al cerrar sesión. El backend
+  // pagina pero el catálogo es chico, así que basta una sola página grande.
+  useEffect(() => {
+    if (!user) {
+      setWishlist([]);
+      return;
+    }
+    let cancelled = false;
+    listWishlist({ limit: 100 }, getAccessToken())
+      .then((res) => {
+        if (!cancelled) setWishlist(res.items);
+      })
+      .catch(() => {
+        if (!cancelled) setWishlist([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.email]);
+
   // [0009][BE] Cerrar sesión: addresses/orders ya se limpian solos vía los efectos de
   // arriba en cuanto `user` pasa a null (mismo `user?.email` como dependencia). El
   // carrito en cambio es independiente de la cuenta (invitado también puede comprar),
@@ -199,13 +249,15 @@ function App() {
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
         onOpenAccount={() => (user ? setProfileOpen(true) : openAuth("register"))}
+        onOpenWishlist={openWishlist}
         cartCount={cartCount}
+        wishlistCount={wishlist.length}
         loggedIn={Boolean(user)}
       />
 
       <main>
         <Hero onShop={() => document.getElementById("shop").scrollIntoView({ behavior: "smooth", block: "start" })} />
-        <Products onAdd={onAdd} />
+        <Products onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} />
         <Benefits />
         <BeforeAfter />
         <PurchaseProcess />
@@ -226,6 +278,13 @@ function App() {
         onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
       />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
+      <WishlistModal
+        open={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
+        items={wishlist}
+        onAdd={onAdd}
+        onRemove={handleWish}
+      />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <AuthModal
         open={accountOpen}
