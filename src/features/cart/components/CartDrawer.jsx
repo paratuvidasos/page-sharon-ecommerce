@@ -5,11 +5,15 @@ import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
 import { CheckoutModal } from "@features/checkout/components/CheckoutModal";
 import { Z } from "@ui/zIndex";
+import { formatCurrency } from "@shared/i18n/currency";
 
-export const CartDrawer = ({ open, onClose, items, setItems, user, addresses }) => {
+const FREE_SHIPPING_THRESHOLD = 150000;
+const SHIPPING_COST = 9900;
+
+export const CartDrawer = ({ open, onClose, items, setItems, user, addresses, onOrderPlaced }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const total = items.reduce((s, it) => s + it.price * it.qty, 0);
-  const shipping = total > 40 || total === 0 ? 0 : 4.95;
+  const shipping = total === 0 || total >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
 
   const inc = (id) => setItems(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i));
   const dec = (id) => setItems(prev => prev.flatMap(i => i.id === id ? (i.qty - 1 <= 0 ? [] : [{ ...i, qty: i.qty - 1 }]) : [i]));
@@ -67,7 +71,7 @@ export const CartDrawer = ({ open, onClose, items, setItems, user, addresses }) 
                 </div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div className="display" style={{ fontSize: 18 }}>${(it.price * it.qty)}</div>
+                <div className="display" style={{ fontSize: 18 }}>{formatCurrency(it.price * it.qty)}</div>
                 <button onClick={() => rm(it.id)} style={{ background: "transparent", border: 0, color: "var(--ink-soft)", fontSize: 11, cursor: "pointer", marginTop: 6, textDecoration: "underline" }}>Quitar</button>
               </div>
             </div>
@@ -77,20 +81,22 @@ export const CartDrawer = ({ open, onClose, items, setItems, user, addresses }) 
         {items.length > 0 && (
           <div style={{ padding: "20px 26px 28px", borderTop: "1px solid var(--line)", background: "#fff" }}>
             <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13, marginBottom: 4 }}>
-              <span>Subtotal</span><span>${total}</span>
+              <span>Subtotal</span><span>{formatCurrency(total)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13, marginBottom: 12 }}>
-              <span>Envío</span><span>{shipping === 0 ? "Gratis" : "$" + shipping}</span>
+              <span>Envío</span><span>{shipping === 0 ? "Gratis" : formatCurrency(shipping)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingTop: 12, borderTop: "1px solid var(--line)", marginBottom: 14 }}>
               <span className="display" style={{ fontSize: 22 }}>Total</span>
-              <span className="display" style={{ fontSize: 28 }}>${(total + shipping)}</span>
+              <span className="display" style={{ fontSize: 28 }}>{formatCurrency(total + shipping)}</span>
             </div>
             <Button onClick={() => setCheckoutOpen(true)} style={{ width: "100%", justifyContent: "center" }}>
               Finalizar compra <Icon name="arrow" size={16} />
             </Button>
             <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
-              {total < 40 && total > 0 ? `Te faltan $${(40 - total)} para envío gratis` : "Envío gratis aplicado \u2726"}
+              {total < FREE_SHIPPING_THRESHOLD && total > 0
+                ? `Te faltan ${formatCurrency(FREE_SHIPPING_THRESHOLD - total)} para envío gratis`
+                : "Envío gratis aplicado \u2726"}
             </div>
           </div>
         )}
@@ -101,6 +107,7 @@ export const CartDrawer = ({ open, onClose, items, setItems, user, addresses }) 
         onClose={() => setCheckoutOpen(false)}
         items={items}
         onClearCart={() => setItems([])}
+        onOrderPlaced={onOrderPlaced}
         user={user}
         addresses={addresses}
       />

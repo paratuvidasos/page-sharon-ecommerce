@@ -22,4 +22,4 @@ export {
   archiveAddress,
   restoreAddress,
 } from "./addresses";
-export { listOrders } from "./orders";
+export { listOrders, checkout } from "./orders";
