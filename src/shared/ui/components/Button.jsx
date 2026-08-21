@@ -1,11 +1,13 @@
-export const Button = ({
+import { forwardRef } from "react";
+
+export const Button = forwardRef(({
   as = "button",
   variant = "dark",
   size = "default",
   className = "",
   children,
   ...rest
-}) => {
+}, ref) => {
   const classes = [
     "btn",
     `btn-${variant}`,
@@ -15,8 +17,10 @@ export const Button = ({
 
   const Tag = as;
   return (
-    <Tag className={classes} {...rest}>
+    <Tag ref={ref} className={classes} {...rest}>
       {children}
     </Tag>
   );
-};
+});
+
+Button.displayName = "Button";

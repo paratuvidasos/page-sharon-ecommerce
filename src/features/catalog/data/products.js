@@ -4,6 +4,11 @@ import imgMascarilla from "@assets/img/sharon_img_5.jpg"
 export const PRODUCTS = [
   {
     id: "p1",
+    // productId/sku identifican el producto ante el backend real de checkout
+    // ([0011][BE], POST /orders/checkout exige `items[].productId` como uuid válido,
+    // a diferencia de `id`, que es solo la key local usada por carrito/catálogo).
+    productId: "4676d9c0-eebb-46ee-b50c-afe5e8dbfb17",
+    sku: "SH-TON-400",
     name: "Tónico Capilar",
     sub: "Anti-caída · 400ml",
     price: 49900,
@@ -20,6 +25,8 @@ export const PRODUCTS = [
   },
   {
     id: "p2",
+    productId: "2020aebb-ef42-495a-80db-144de8ab8312",
+    sku: "SH-MAS-300",
     name: "Mascarilla Hidratante",
     sub: "Reparación profunda · 300ml",
     price: 39900,
@@ -35,6 +42,8 @@ export const PRODUCTS = [
   },
   {
     id: "p3",
+    productId: "54319f07-3881-42f2-8c06-98f996845ae2",
+    sku: "SH-SHA-500",
     name: "Shampoo",
     sub: "Para todo tipo de cabello · 500ml",
     price: 49900,
@@ -51,6 +60,8 @@ export const PRODUCTS = [
   },
   {
     id: "p4",
+    productId: "1b8ac5ac-3c88-49c8-b0c3-71e2a08c2967",
+    sku: "SH-CEP-100",
     name: "Cepíllo",
     sub: "Estimulador capilar · 100ml",
     price: 18000,
