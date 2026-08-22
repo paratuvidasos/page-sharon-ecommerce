@@ -6,6 +6,9 @@ export const Z = {
   cart: 80, // CartDrawer
   wishlist: 82, // WishlistModal
   search: 90, // SearchModal
+  productDetail: 91, // ProductDetailModal — se abre tanto desde ProductCard/Products
+  // como desde dentro de SearchModal (resultado de búsqueda), por eso va arriba de
+  // Z.search: si se abre desde la búsqueda, tiene que quedar encima del propio modal.
   auth: 92, // AuthModal
   resetPassword: 93, // ResetPasswordModal (aterrizaje del enlace de recuperación)
   profile: 94, // ProfileModal (editar perfil)
