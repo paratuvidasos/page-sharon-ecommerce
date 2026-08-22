@@ -24,3 +24,16 @@ export {
 } from "./addresses";
 export { listOrders, checkout } from "./orders";
 export { listWishlist, addToWishlist, removeFromWishlist } from "./wishlist";
+export {
+  listProducts,
+  getProductFilters,
+  getProduct,
+  getRelatedProducts,
+  getFeaturedProducts,
+  searchProducts,
+  getSearchSuggestions,
+  listCategories,
+  listReviews,
+  createReview,
+  setProductFeatured,
+} from "./catalog";
