@@ -1,11 +1,18 @@
+import { Link, useLocation } from "react-router-dom";
 import { IconButton } from "./components/IconButton";
 import { Z } from "./zIndex";
 
+const SECTION_LINKS = [
+  ["Hábitos", "#beneficios"],
+  ["Resultados", "#antes-despues"],
+  ["Historia", "#testimonios"],
+];
+
 export const MobileMenu = ({ open, onClose }) => {
-  const links = [
-    ["Shop", "#shop"], ["Hábitos", "#beneficios"],
-    ["Resultados", "#antes-despues"], ["Historia", "#testimonios"]
-  ];
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+  const itemStyle = { fontSize: 32, padding: "10px 0", borderBottom: "1px solid var(--line)", textDecoration: "none", color: "var(--ink)" };
+
   return (
     <>
       <div onClick={onClose} style={{
@@ -25,11 +32,11 @@ export const MobileMenu = ({ open, onClose }) => {
           <IconButton icon="close" size={36} iconSize={20} onClick={onClose} aria-label="Cerrar menú" />
         </div>
         <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {links.map(([l, h]) => (
-            <a key={l} href={h} onClick={onClose} className="display"
-               style={{ fontSize: 32, padding: "10px 0", borderBottom: "1px solid var(--line)" }}>
-              {l}
-            </a>
+          <Link to="/tienda" onClick={onClose} className="display" style={itemStyle}>Shop</Link>
+          {SECTION_LINKS.map(([l, hash]) => (
+            isHome
+              ? <a key={l} href={hash} onClick={onClose} className="display" style={itemStyle}>{l}</a>
+              : <Link key={l} to={`/${hash}`} onClick={onClose} className="display" style={itemStyle}>{l}</Link>
           ))}
         </nav>
         <div style={{ marginTop: 36, color: "var(--ink-soft)", fontSize: 12, letterSpacing: ".08em" }}>

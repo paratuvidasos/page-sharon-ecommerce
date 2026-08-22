@@ -1,9 +1,27 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Icon } from "./Icon";
 import { IconButton } from "./components/IconButton";
 
+// Los links de "hábitos/resultados/proceso/historia" son anchors a secciones que
+// solo existen en Home ("/") — en Home siguen siendo <a href="#..."> (scroll suave
+// en la misma página, sin recargar); en cualquier otra ruta (ej. /tienda) se
+// convierten en <Link to="/#..."> para volver a Home primero (HomePage hace el
+// scroll al hash una vez montada). "Shop" en cambio ya no es un anchor — es una
+// página real (/tienda, ver CatalogPage) desde que el catálogo dejó de vivir
+// embebido en la landing.
+const SECTION_LINKS = [
+  { label: "Hábitos", hash: "#beneficios" },
+  { label: "Resultados", hash: "#antes-despues" },
+  { label: "Proceso de compra", hash: "#proceso-compra" },
+  { label: "Historia", hash: "#testimonios" },
+];
+
 export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpenWishlist, cartCount, wishlistCount, loggedIn }) => {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
     on();
@@ -11,13 +29,14 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpe
     return () => window.removeEventListener("scroll", on);
   }, []);
 
-  const links = [
-    { label: "Shop", href: "#shop" },
-    { label: "Hábitos", href: "#beneficios" },
-    { label: "Resultados", href: "#antes-despues" },
-    { label: "Proceso de compra", href: "#proceso-compra" },
-    { label: "Historia", href: "#testimonios" },
-  ];
+  const linkStyle = {
+    fontSize: 13, fontWeight: 500, letterSpacing: ".06em", textTransform: "uppercase",
+    color: "var(--ink)", position: "relative", padding: "6px 0", textDecoration: "none",
+  };
+  const linkHover = {
+    onMouseEnter: (e) => (e.currentTarget.style.color = "var(--botanic-deep)"),
+    onMouseLeave: (e) => (e.currentTarget.style.color = "var(--ink)"),
+  };
 
   return (
     <header style={{
@@ -34,23 +53,19 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpe
           <Icon name="menu" size={22} />
         </button>
 
-        <a href="#" className="script" style={{ fontSize: 34, lineHeight: 1, color: "var(--ink)", letterSpacing: "-.01em" }}>
+        <Link to="/" className="script" style={{ fontSize: 34, lineHeight: 1, color: "var(--ink)", letterSpacing: "-.01em", textDecoration: "none" }}>
           <span style={{ position: "relative" }}>
             Sharon
             <span style={{ position: "absolute", right: -10, top: -2, width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }}></span>
           </span>
-        </a>
+        </Link>
 
         <nav className="nav-links" style={{ display: "flex", gap: 36, alignItems: "center" }}>
-          {links.map(l => (
-            <a key={l.label} href={l.href} style={{
-              fontSize: 13, fontWeight: 500, letterSpacing: ".06em", textTransform: "uppercase",
-              color: "var(--ink)", position: "relative", padding: "6px 0"
-            }}
-              onMouseEnter={e => e.currentTarget.style.color = "var(--botanic-deep)"}
-              onMouseLeave={e => e.currentTarget.style.color = "var(--ink)"}>
-              {l.label}
-            </a>
+          <Link to="/tienda" style={linkStyle} {...linkHover}>Shop</Link>
+          {SECTION_LINKS.map(l => (
+            isHome
+              ? <a key={l.label} href={l.hash} style={linkStyle} {...linkHover}>{l.label}</a>
+              : <Link key={l.label} to={`/${l.hash}`} style={linkStyle} {...linkHover}>{l.label}</Link>
           ))}
         </nav>
 
