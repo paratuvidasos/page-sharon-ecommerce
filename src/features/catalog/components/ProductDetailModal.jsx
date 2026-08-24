@@ -6,6 +6,7 @@ import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { formatCurrency } from "@shared/i18n/currency";
 import { getProduct } from "@shared/api-client";
+import { useCart } from "@shared/cart/CartContext";
 import { ProductRelated } from "./ProductRelated";
 import { ProductReviews } from "./ProductReviews";
 
@@ -21,16 +22,20 @@ const variantLabel = (v) => [v.size, v.scent, v.color].filter(Boolean).join(" ·
 // tarjeta, fuera de los botones de favorito/añadir). [0015][BE] Selección de
 // variante: vive sobre la misma respuesta de GET /products/:slug, sin otra llamada
 // — cambiar de variante solo actualiza precio/stock/imagen mostrados localmente.
-export const ProductDetailModal = ({ slug, onClose, onAdd, onWish, wishlistIds, orders, onSlugChange }) => {
+export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders, onSlugChange, onViewCart }) => {
+  const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error | not-found
   const [variantId, setVariantId] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [addState, setAddState] = useState(null); // null | "adding" | {ok:true} | {ok:false,...}
 
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
     setStatus("loading");
     setProduct(null);
+    setAddState(null);
     getProduct(slug)
       .then((data) => {
         if (cancelled) return;
@@ -47,6 +52,13 @@ export const ProductDetailModal = ({ slug, onClose, onAdd, onWish, wishlistIds, 
     };
   }, [slug]);
 
+  // Cambiar de variante resetea cantidad + cualquier mensaje de la variante anterior
+  // (ej. un 409 de stock insuficiente que ya no aplica a la variante nueva).
+  useEffect(() => {
+    setQuantity(1);
+    setAddState(null);
+  }, [variantId]);
+
   const variant = product?.variants?.find((v) => v.id === variantId) || null;
   const price = variant?.price ?? product?.basePrice;
   const stockStatus = variant?.stockStatus;
@@ -57,21 +69,11 @@ export const ProductDetailModal = ({ slug, onClose, onAdd, onWish, wishlistIds, 
     product && orders?.some((o) => o.items?.some((it) => it.productId === product.id))
   );
 
-  const handleAdd = () => {
-    if (!product || outOfStock) return;
-    onAdd({
-      id: product.id,
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      price,
-      oldPrice: product.compareAtPrice || null,
-      image,
-      thumbnail: image,
-      stockStatus,
-      ratingAverage: product.rating?.average ?? null,
-      ratingCount: product.rating?.count ?? 0,
-    });
+  const handleAdd = async (qty = quantity) => {
+    if (!variantId || outOfStock) return;
+    setAddState("adding");
+    const result = await addItem(variantId, qty);
+    setAddState(result);
   };
 
   return (
@@ -210,28 +212,84 @@ export const ProductDetailModal = ({ slug, onClose, onAdd, onWish, wishlistIds, 
                 </div>
               )}
 
-              <button
-                onClick={handleAdd}
-                disabled={outOfStock}
-                style={{
-                  border: 0,
-                  cursor: outOfStock ? "not-allowed" : "pointer",
-                  padding: "13px 22px",
-                  borderRadius: 999,
-                  background: outOfStock ? "var(--cream-2)" : "var(--ink)",
-                  color: outOfStock ? "var(--ink-soft)" : "var(--cream)",
-                  opacity: outOfStock ? 0.6 : 1,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  letterSpacing: ".04em",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <Icon name="plus" size={15} />
-                Añadir a la bolsa
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid var(--line)", borderRadius: 999, padding: "4px" }}>
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    disabled={outOfStock}
+                    style={{ width: 30, height: 30, borderRadius: 999, border: 0, background: "transparent", cursor: outOfStock ? "not-allowed" : "pointer", display: "grid", placeItems: "center" }}
+                  >
+                    <Icon name="minus" size={13} />
+                  </button>
+                  <span className="mono" style={{ minWidth: 20, textAlign: "center" }}>{quantity}</span>
+                  <button
+                    onClick={() => setQuantity((q) => q + 1)}
+                    disabled={outOfStock}
+                    style={{ width: 30, height: 30, borderRadius: 999, border: 0, background: "transparent", cursor: outOfStock ? "not-allowed" : "pointer", display: "grid", placeItems: "center" }}
+                  >
+                    <Icon name="plus" size={13} />
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => handleAdd()}
+                  disabled={outOfStock || addState === "adding"}
+                  style={{
+                    border: 0,
+                    cursor: outOfStock || addState === "adding" ? "not-allowed" : "pointer",
+                    padding: "13px 22px",
+                    borderRadius: 999,
+                    background: outOfStock ? "var(--cream-2)" : "var(--ink)",
+                    color: outOfStock ? "var(--ink-soft)" : "var(--cream)",
+                    opacity: outOfStock || addState === "adding" ? 0.6 : 1,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: ".04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Icon name="plus" size={15} />
+                  {addState === "adding" ? "Añadiendo…" : "Añadir a la bolsa"}
+                </button>
+              </div>
+
+              {addState?.ok && (
+                <div role="status" style={{ marginTop: 12, fontSize: 12.5, color: "var(--botanic-deep)" }}>
+                  Añadido a tu bolsa.{" "}
+                  <button
+                    type="button"
+                    onClick={() => onViewCart && onViewCart()}
+                    style={{ background: "none", border: 0, padding: 0, color: "inherit", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}
+                  >
+                    Ver bolsa
+                  </button>
+                </div>
+              )}
+
+              {addState && addState.ok === false && (
+                <div role="alert" style={{ marginTop: 12, fontSize: 12.5, color: "#9C4A4A" }}>
+                  {addState.code === "INSUFFICIENT_STOCK"
+                    ? `Solo quedan ${addState.availableQuantity} disponibles.`
+                    : addState.message || "No pudimos agregar el producto."}
+                  {addState.code === "INSUFFICIENT_STOCK" && addState.availableQuantity > 0 && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuantity(addState.availableQuantity);
+                          handleAdd(addState.availableQuantity);
+                        }}
+                        style={{ background: "none", border: 0, padding: 0, color: "inherit", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}
+                      >
+                        Añadir las {addState.availableQuantity} disponibles
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -241,7 +299,6 @@ export const ProductDetailModal = ({ slug, onClose, onAdd, onWish, wishlistIds, 
             <ProductReviews productId={product.id} canReview={canReview} />
             <ProductRelated
               slug={product.slug}
-              onAdd={onAdd}
               onWish={onWish}
               wishlistIds={wishlistIds}
               onSelect={onSlugChange}

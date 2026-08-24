@@ -13,7 +13,7 @@ import { FeaturedProducts } from "@features/catalog/components/FeaturedProducts"
 // ver CatalogPage) — el "Comprar ahora" del Hero y el listado de FeaturedProducts
 // son la puerta de entrada a la tienda real, no un scroll-anchor dentro de esta
 // misma página como antes.
-export const HomePage = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => {
+export const HomePage = ({ onWish, wishlistIds, onOpenProduct }) => {
   const navigate = useNavigate();
 
   // Cuando se llega a Home con un hash en la URL (ej. Nav en /tienda mandando a
@@ -33,7 +33,7 @@ export const HomePage = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => {
       <BeforeAfter />
       <PurchaseProcess />
       <Testimonials />
-      <FeaturedProducts onAdd={onAdd} onWish={onWish} wishlistIds={wishlistIds} onOpenProduct={onOpenProduct} />
+      <FeaturedProducts onWish={onWish} wishlistIds={wishlistIds} onOpenProduct={onOpenProduct} />
       <OfferBanner />
       <Newsletter />
     </>

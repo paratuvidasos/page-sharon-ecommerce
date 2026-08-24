@@ -24,7 +24,7 @@ const SORT_OPTIONS = [
 // (referencia: layouts de e-commerce tipo Undergold — sidebar vertical con
 // checkboxes y conteos, header minimalista, grid limpio) en vez del carrusel de
 // "selección destacada" que tenía cuando esto vivía embebido en la landing.
-export const Products = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => {
+export const Products = ({ onWish, wishlistIds, onOpenProduct }) => {
   const [categories, setCategories] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
   const [facets, setFacets] = useState(null);
@@ -152,7 +152,7 @@ export const Products = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => {
           }}>
             {(status === "loading" ? [] : products).map((p, i) => (
               <Reveal key={p.id} delay={i * 40}>
-                <ProductCard product={p} onAdd={onAdd} onWish={onWish} onViewDetail={onOpenProduct} wished={wishlistIds?.has(p.productId)} />
+                <ProductCard product={p} onWish={onWish} onViewDetail={onOpenProduct} wished={wishlistIds?.has(p.productId)} />
               </Reveal>
             ))}
           </div>

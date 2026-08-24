@@ -13,7 +13,7 @@ import { WishlistRow } from "./WishlistRow";
 // el catálogo real ([0013][BE]) para mostrar nombre/precio/imagen — se pide una sola
 // página grande al abrir el modal en vez de una llamada por producto (ver comentario
 // en WishlistRow).
-export const WishlistModal = ({ open, onClose, items, onAdd, onRemove }) => {
+export const WishlistModal = ({ open, onClose, items, onOpenProduct, onRemove }) => {
   const [catalogById, setCatalogById] = useState(new Map());
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export const WishlistModal = ({ open, onClose, items, onAdd, onRemove }) => {
           </div>
         ) : (
           rows.map(({ item, product }) => (
-            <WishlistRow key={item.productId} product={product} onAdd={onAdd} onRemove={() => onRemove(product)} />
+            <WishlistRow key={item.productId} product={product} onOpenProduct={onOpenProduct} onRemove={() => onRemove(product)} />
           ))
         )}
       </div>
