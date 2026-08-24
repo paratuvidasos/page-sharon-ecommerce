@@ -12,7 +12,7 @@ import { CheckoutForm } from "./CheckoutForm";
 // de pago, correo de invitado y "crear cuenta" cuando no hay sesión), y una pantalla de
 // éxito propia con el número de pedido real que devuelve el backend. Reemplaza al flujo
 // anterior de "enviar por WhatsApp" — ya existe un endpoint real para colocar pedidos.
-export const CheckoutModal = ({ open, onClose, items, onClearCart, onOrderPlaced, user, addresses }) => {
+export const CheckoutModal = ({ open, onClose, cart, onClearCart, onOrderPlaced, user, addresses }) => {
   const [submitting, setSubmitting] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
   const [formKey, setFormKey] = useState(0);
@@ -25,9 +25,10 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart, onOrderPlaced
     }
   }, [open]);
 
-  const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
+  const items = cart.items;
+  const subtotal = cart.subtotal;
   const shippingCost = subtotal === 0 || subtotal >= 150000 ? 0 : 9900;
-  const total = subtotal + shippingCost;
+  const total = cart.total + shippingCost;
 
   const handleSubmit = async () => {
     if (!formRef.current) return;
@@ -117,7 +118,7 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart, onOrderPlaced
               </div>
               {items.map((it) => (
                 <div
-                  key={it.id}
+                  key={it.itemId}
                   style={{
                     display: "grid",
                     gridTemplateColumns: "56px 1fr auto",
@@ -128,21 +129,14 @@ export const CheckoutModal = ({ open, onClose, items, onClearCart, onOrderPlaced
                   }}
                 >
                   <div style={{ width: 56, height: 56, borderRadius: 10, overflow: "hidden" }}>
-                    <ProductImage
-                      image={it.image}
-                      thumbnail={it.thumbnail}
-                      name={it.name}
-                      accent={it.accent}
-                      type={it.type}
-                      category={it.category}
-                    />
+                    <ProductImage image={it.thumbnailUrl} thumbnail={it.thumbnailUrl} name={it.productName} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 500, fontSize: 14 }}>{it.name}</div>
-                    <div style={{ color: "var(--ink-soft)", fontSize: 12 }}>Cantidad: {it.qty}</div>
+                    <div style={{ fontWeight: 500, fontSize: 14 }}>{it.productName}</div>
+                    <div style={{ color: "var(--ink-soft)", fontSize: 12 }}>Cantidad: {it.quantity}</div>
                   </div>
                   <div className="display" style={{ fontSize: 16 }}>
-                    {formatCurrency(it.price * it.qty)}
+                    {formatCurrency(it.subtotal)}
                   </div>
                 </div>
               ))}

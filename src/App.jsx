@@ -12,13 +12,13 @@ import { EmailVerificationModal } from "@features/auth/components/verify-email/E
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DeleteAccountModal } from "@features/profile/components/delete-account/DeleteAccountModal";
 import { useAuth } from "@shared/auth/AuthContext";
+import { useCart } from "@shared/cart/CartContext";
 import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
 import { WishlistModal } from "@features/wishlist/components/WishlistModal";
 import { ProductDetailModal } from "@features/catalog/components/ProductDetailModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
-import { Z } from "@ui/zIndex";
 
 const ACCENT_PALETTES = {
   botanic: { deep: "#5E7860", soft: "#9CB29B", paper: "#D2DFD0" },
@@ -64,8 +64,7 @@ function App() {
   // una la suya (Modal nunca se desmonta, así que tres instancias propias dejaban
   // tres <div id="product-detail-title"> duplicados en el DOM simultáneamente).
   const [detailSlug, setDetailSlug] = useState(null);
-  const [cart, setCart] = useState([]);
-  const [toast, setToast] = useState(null);
+  const { mergeGuestCart } = useCart();
   const [tweaks, setTweaks] = useState({
     accent: "botanic",
     showAnnouncement: true,
@@ -78,18 +77,6 @@ function App() {
       return next;
     });
   };
-
-  const onAdd = (product) => {
-    setCart(prev => {
-      const ex = prev.find(p => p.id === product.id);
-      if (ex) return prev.map(p => p.id === product.id ? { ...p, qty: p.qty + 1 } : p);
-      return [...prev, { ...product, qty: 1 }];
-    });
-    setToast({ name: product.name, t: Date.now() });
-    setTimeout(() => setToast(null), 2400);
-  };
-
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
   const openAuth = (mode = "register") => {
     setAuthInitialMode(mode);
@@ -152,6 +139,9 @@ function App() {
       },
       accessToken
     );
+    // [0028][FE] Google simulado no trae accessToken, así que no hay carrito de
+    // cuenta contra el que fusionar todavía — solo el login real dispara el merge.
+    if (accessToken) mergeGuestCart(accessToken);
   };
 
   // Direcciones sí son reales desde [0007][BE]: se cargan contra la API apenas hay
@@ -250,7 +240,6 @@ function App() {
         onOpenMenu={() => setMenuOpen(true)}
         onOpenAccount={() => (user ? setProfileOpen(true) : openAuth("register"))}
         onOpenWishlist={openWishlist}
-        cartCount={cartCount}
         wishlistCount={wishlist.length}
         loggedIn={Boolean(user)}
       />
@@ -259,22 +248,22 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
           <Route
             path="/tienda"
-            element={<CatalogPage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+            element={<CatalogPage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
           {/* /reset-password y /verify-email son solo puntos de entrada para un modal
               (ver ResetPasswordModal/EmailVerificationModal abajo) — el fondo siempre
               fue la landing, así que cae en Home igual que antes de tener router. */}
           <Route
             path="/reset-password"
-            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
           <Route
             path="/verify-email"
-            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -285,8 +274,6 @@ function App() {
       <CartDrawer
         open={cartOpen}
         onClose={() => setCartOpen(false)}
-        items={cart}
-        setItems={setCart}
         user={user}
         addresses={addresses}
         onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
@@ -296,7 +283,7 @@ function App() {
         slug={detailSlug}
         onClose={() => setDetailSlug(null)}
         onSlugChange={setDetailSlug}
-        onAdd={onAdd}
+        onViewCart={() => { setDetailSlug(null); setCartOpen(true); }}
         onWish={handleWish}
         wishlistIds={wishlistIds}
         orders={orders}
@@ -305,7 +292,7 @@ function App() {
         open={wishlistOpen}
         onClose={() => setWishlistOpen(false)}
         items={wishlist}
-        onAdd={onAdd}
+        onOpenProduct={setDetailSlug}
         onRemove={handleWish}
       />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
@@ -346,25 +333,6 @@ function App() {
         onClose={() => setDeleteAccountOpen(false)}
         onDeleted={handleAccountDeleted}
       />
-
-      {toast && (
-        <div style={{
-          position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",
-          background: "var(--ink)", color: "var(--cream)",
-          padding: "14px 22px", borderRadius: 999,
-          fontSize: 13, fontWeight: 500, zIndex: Z.toast,
-          boxShadow: "var(--shadow-lg)",
-          display: "flex", alignItems: "center", gap: 10,
-          animation: "scaleIn .25s ease-out"
-        }}>
-          <span style={{ color: "var(--gold-soft)" }}>✦</span>
-          {toast.name} añadido a tu bolsa
-          <button onClick={() => { setToast(null); setCartOpen(true); }}
-            style={{ marginLeft: 6, background: "transparent", border: 0, color: "var(--botanic)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>
-            Ver bolsa
-          </button>
-        </div>
-      )}
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Estética" />
