@@ -200,10 +200,10 @@ export const CheckoutForm = forwardRef(({ items, shippingCost, user, addresses }
       const payload = {
         items: items.map((it) => ({
           productId: it.productId,
-          productName: it.name,
-          sku: it.sku,
-          unitPrice: it.price,
-          quantity: it.qty,
+          variantId: it.variantId,
+          productName: it.productName,
+          unitPrice: it.unitPrice,
+          quantity: it.quantity,
         })),
         shippingCost,
         paymentMethod,
