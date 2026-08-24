@@ -9,6 +9,7 @@ export class ApiError extends Error {
     this.status = status;
     this.code = body?.error;
     this.issues = body?.issues;
+    this.availableQuantity = body?.availableQuantity;
   }
 }
 

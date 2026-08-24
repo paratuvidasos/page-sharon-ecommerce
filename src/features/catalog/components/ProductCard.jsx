@@ -12,7 +12,11 @@ const STOCK_BADGE = {
   LOW_STOCK: { label: "Últimas unidades", bg: "var(--ink)" },
 };
 
-export const ProductCard = ({ product, onAdd, onWish, onViewDetail, wished = false }) => {
+// [0023][BE] "Añadir" no llama al carrito directo: el listado no trae variantId
+// (solo GET /products/:slug las expone), así que abre el detalle para que el
+// selector de variante/cantidad que ya vive ahí confirme qué se agrega.
+
+export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) => {
   const [hover, setHover] = useState(false);
   const hasGallery = product.gallery && product.gallery.length > 0;
   const outOfStock = product.stockStatus === "OUT_OF_STOCK";
@@ -143,7 +147,7 @@ export const ProductCard = ({ product, onAdd, onWish, onViewDetail, wished = fal
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (!outOfStock) onAdd(product);
+              if (!outOfStock) onViewDetail && onViewDetail(product.slug);
             }}
             disabled={outOfStock}
             style={{
