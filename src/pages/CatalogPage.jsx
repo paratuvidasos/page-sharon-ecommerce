@@ -7,7 +7,7 @@ import { Products } from "@features/catalog/components/Products";
 // a tienda real necesita su propia URL, accesible desde el Nav — referencia de
 // estructura: e-commerce tipo Undergold (breadcrumb + header simple, cuerpo con
 // sidebar de filtros). El paddingTop despeja el Nav fijo (no hay Hero encima acá).
-export const CatalogPage = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => (
+export const CatalogPage = ({ onWish, wishlistIds, onOpenProduct }) => (
   <div style={{ paddingTop: 150, paddingBottom: 100, minHeight: "60vh" }}>
     <div className="wrap" style={{ marginBottom: 40 }}>
       <Reveal>
@@ -22,6 +22,6 @@ export const CatalogPage = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => (
       </Reveal>
     </div>
 
-    <Products onAdd={onAdd} onWish={onWish} wishlistIds={wishlistIds} onOpenProduct={onOpenProduct} />
+    <Products onWish={onWish} wishlistIds={wishlistIds} onOpenProduct={onOpenProduct} />
   </div>
 );

@@ -13,7 +13,7 @@ import { ProductCard } from "./ProductCard";
 // No hay noción de rol admin en el frontend todavía (ver AuthContext), así que el
 // toggle de destacado (PATCH /admin/products/:id/featured) queda pendiente: no hay
 // desde dónde mostrarlo sin inventar una pantalla admin que nadie pidió.
-export const FeaturedProducts = ({ onAdd, onWish, wishlistIds, onOpenProduct }) => {
+export const FeaturedProducts = ({ onWish, wishlistIds, onOpenProduct }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -54,7 +54,6 @@ export const FeaturedProducts = ({ onAdd, onWish, wishlistIds, onOpenProduct }) 
             <Reveal key={p.id} delay={i * 60}>
               <ProductCard
                 product={p}
-                onAdd={onAdd}
                 onWish={onWish}
                 onViewDetail={onOpenProduct}
                 wished={wishlistIds?.has(p.productId)}

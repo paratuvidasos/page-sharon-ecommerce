@@ -6,7 +6,7 @@ import { ProductCard } from "./ProductCard";
 // [0020][BE] Relacionados: misma categoría, sin agotados, ordenados por más
 // vendidos (GET /products/:slug/related). Clickear uno actualiza el slug del
 // propio ProductDetailModal (onSelect) en vez de abrir un modal anidado.
-export const ProductRelated = ({ slug, onAdd, onWish, wishlistIds, onSelect }) => {
+export const ProductRelated = ({ slug, onWish, wishlistIds, onSelect }) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -34,7 +34,6 @@ export const ProductRelated = ({ slug, onAdd, onWish, wishlistIds, onSelect }) =
           <div key={p.id} style={{ minWidth: 200, maxWidth: 200, flexShrink: 0 }}>
             <ProductCard
               product={p}
-              onAdd={onAdd}
               onWish={onWish}
               onViewDetail={onSelect}
               wished={wishlistIds?.has(p.productId)}

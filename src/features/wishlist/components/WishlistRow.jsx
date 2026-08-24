@@ -5,7 +5,7 @@ import { formatCurrency } from "@shared/i18n/currency";
 // Fila de un producto guardado: los datos de nombre/precio/imagen se resuelven contra
 // el catálogo local (products.js) porque el backend de wishlist solo devuelve
 // productId + addedAt (el módulo catalog todavía no existe del lado del backend).
-export const WishlistRow = ({ product, onAdd, onRemove }) => {
+export const WishlistRow = ({ product, onOpenProduct, onRemove }) => {
   if (!product) return null;
 
   return (
@@ -35,7 +35,7 @@ export const WishlistRow = ({ product, onAdd, onRemove }) => {
       </div>
       <button
         type="button"
-        onClick={() => onAdd(product)}
+        onClick={() => onOpenProduct && onOpenProduct(product.slug)}
         style={{
           border: 0,
           cursor: "pointer",

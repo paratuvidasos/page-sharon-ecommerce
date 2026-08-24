@@ -23,6 +23,16 @@ export {
   restoreAddress,
 } from "./addresses";
 export { listOrders, checkout } from "./orders";
+export {
+  getCart,
+  addCartItem,
+  updateCartItem,
+  removeCartItem,
+  clearCart,
+  applyCoupon,
+  removeCoupon,
+  mergeCart,
+} from "./cart";
 export { listWishlist, addToWishlist, removeFromWishlist } from "./wishlist";
 export {
   listProducts,
