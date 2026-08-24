@@ -3,9 +3,8 @@ import { Icon, Stars } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
 
-export const ProductCard = ({ product, onAdd, onWish }) => {
+export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
   const [hover, setHover] = useState(false);
-  const [wished, setWished] = useState(false);
   const hasGallery = product.gallery && product.gallery.length > 0;
 
   return (
@@ -51,7 +50,6 @@ export const ProductCard = ({ product, onAdd, onWish }) => {
         color={wished ? "var(--botanic-deep)" : "var(--ink-soft)"}
         onClick={(e) => {
           e.stopPropagation();
-          setWished((w) => !w);
           onWish && onWish(product);
         }}
         aria-label="Favorito"

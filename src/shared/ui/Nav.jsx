@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon } from "./Icon";
 import { IconButton } from "./components/IconButton";
 
-export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, cartCount }) => {
+export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpenWishlist, cartCount, wishlistCount, loggedIn }) => {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
@@ -56,7 +56,8 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, cartCount }) => {
 
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" />
-          <IconButton icon="user" iconSize={18} aria-label="Cuenta" className="nav-user" />
+          <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label="Favoritos" badge={wishlistCount} />
+          <IconButton icon="user" iconSize={18} onClick={onOpenAccount} aria-label={loggedIn ? "Mi perfil" : "Cuenta"} className="nav-user" />
           <IconButton icon="cart" iconSize={18} onClick={onOpenCart} aria-label="Bolsa" badge={cartCount} />
         </div>
       </div>

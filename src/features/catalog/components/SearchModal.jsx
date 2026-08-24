@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
+import { Z } from "@ui/zIndex";
 
 export const SearchModal = ({ open, onClose, products, onPick }) => {
   const [q, setQ] = useState("");
@@ -19,11 +20,11 @@ export const SearchModal = ({ open, onClose, products, onPick }) => {
       <div onClick={onClose} style={{
         position: "fixed", inset: 0, background: "rgba(27,24,21,.5)",
         opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
-        transition: "opacity .3s ease", zIndex: 90, backdropFilter: "blur(6px)"
+        transition: "opacity .3s ease", zIndex: Z.search, backdropFilter: "blur(6px)"
       }} />
       <div style={{
         position: "fixed", top: 80, left: "50%", transform: `translateX(-50%) ${open ? "translateY(0)" : "translateY(-20px)"}`,
-        width: "min(640px, 92vw)", background: "#fff", borderRadius: 20, zIndex: 91,
+        width: "min(640px, 92vw)", background: "#fff", borderRadius: 20, zIndex: Z.search + 1,
         opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none",
         transition: "opacity .3s ease, transform .3s ease",
         boxShadow: "0 24px 80px rgba(27,24,21,.25)",
