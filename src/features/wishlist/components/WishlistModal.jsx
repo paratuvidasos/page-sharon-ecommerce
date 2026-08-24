@@ -1,17 +1,39 @@
+import { useEffect, useState } from "react";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
-import { PRODUCTS } from "@features/catalog/data/products";
+import { listProducts } from "@shared/api-client";
+import { normalizeProduct } from "@features/catalog/utils/normalizeProduct";
 import { WishlistRow } from "./WishlistRow";
 
 // Lista de deseos: top-level (como CartDrawer), no anidada dentro de ProfileModal,
 // porque agregar/quitar productos es una acción de compra, no de cuenta. El backend
 // de wishlist solo devuelve productId + addedAt, así que cada item se resuelve contra
-// el catálogo local para mostrar nombre/precio/imagen (ver comentario en WishlistRow).
+// el catálogo real ([0013][BE]) para mostrar nombre/precio/imagen — se pide una sola
+// página grande al abrir el modal en vez de una llamada por producto (ver comentario
+// en WishlistRow).
 export const WishlistModal = ({ open, onClose, items, onAdd, onRemove }) => {
+  const [catalogById, setCatalogById] = useState(new Map());
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    listProducts({ limit: 100 })
+      .then((res) => {
+        if (cancelled) return;
+        setCatalogById(new Map(res.items.map((item) => [item.id, normalizeProduct(item)])));
+      })
+      .catch(() => {
+        if (!cancelled) setCatalogById(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
   const rows = items
-    .map((item) => ({ item, product: PRODUCTS.find((p) => p.productId === item.productId) }))
+    .map((item) => ({ item, product: catalogById.get(item.productId) }))
     .filter((r) => r.product)
     .sort((a, b) => b.item.addedAt.localeCompare(a.item.addedAt));
 

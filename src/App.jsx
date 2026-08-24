@@ -1,13 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Nav } from "@ui/Nav";
-import { Hero } from "@ui/Hero";
-import { Products } from "@features/catalog/components/Products";
-import { Benefits } from "@ui/Benefits";
-import { BeforeAfter } from "@ui/BeforeAfter";
-import { Testimonials } from "@ui/Testimonials";
-import { PurchaseProcess } from "@ui/PurchaseProcess";
-import { OfferBanner } from "@ui/OfferBanner";
-import { Newsletter } from "@ui/Newsletter";
+import { HomePage } from "./pages/HomePage";
+import { CatalogPage } from "./pages/CatalogPage";
 import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
@@ -19,10 +14,10 @@ import { DeleteAccountModal } from "@features/profile/components/delete-account/
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
 import { WishlistModal } from "@features/wishlist/components/WishlistModal";
+import { ProductDetailModal } from "@features/catalog/components/ProductDetailModal";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
-import { PRODUCTS } from "@features/catalog/data/products";
 import { Z } from "@ui/zIndex";
 
 const ACCENT_PALETTES = {
@@ -64,6 +59,11 @@ function App() {
   const [orders, setOrders] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [wishlistOpen, setWishlistOpen] = useState(false);
+  // Única instancia de ProductDetailModal en toda la app — Products/SearchModal/
+  // FeaturedProducts abren el mismo modal vía onOpenProduct en vez de montar cada
+  // una la suya (Modal nunca se desmonta, así que tres instancias propias dejaban
+  // tres <div id="product-detail-title"> duplicados en el DOM simultáneamente).
+  const [detailSlug, setDetailSlug] = useState(null);
   const [cart, setCart] = useState([]);
   const [toast, setToast] = useState(null);
   const [tweaks, setTweaks] = useState({
@@ -256,14 +256,28 @@ function App() {
       />
 
       <main>
-        <Hero onShop={() => document.getElementById("shop").scrollIntoView({ behavior: "smooth", block: "start" })} />
-        <Products onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} />
-        <Benefits />
-        <BeforeAfter />
-        <PurchaseProcess />
-        <Testimonials />
-        <OfferBanner />
-        <Newsletter />
+        <Routes>
+          <Route
+            path="/"
+            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route
+            path="/tienda"
+            element={<CatalogPage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          {/* /reset-password y /verify-email son solo puntos de entrada para un modal
+              (ver ResetPasswordModal/EmailVerificationModal abajo) — el fondo siempre
+              fue la landing, así que cae en Home igual que antes de tener router. */}
+          <Route
+            path="/reset-password"
+            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route
+            path="/verify-email"
+            element={<HomePage onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       <Footer />
@@ -277,7 +291,16 @@ function App() {
         addresses={addresses}
         onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
       />
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} onOpenProduct={setDetailSlug} />
+      <ProductDetailModal
+        slug={detailSlug}
+        onClose={() => setDetailSlug(null)}
+        onSlugChange={setDetailSlug}
+        onAdd={onAdd}
+        onWish={handleWish}
+        wishlistIds={wishlistIds}
+        orders={orders}
+      />
       <WishlistModal
         open={wishlistOpen}
         onClose={() => setWishlistOpen(false)}
