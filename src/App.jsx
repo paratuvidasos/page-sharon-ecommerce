@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Nav } from "@ui/Nav";
 import { HomePage } from "./pages/HomePage";
 import { CatalogPage } from "./pages/CatalogPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
+import { CheckoutResultPage } from "./pages/CheckoutResultPage";
 import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
@@ -254,6 +256,11 @@ function App() {
             path="/tienda"
             element={<CatalogPage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
+          <Route
+            path="/checkout"
+            element={<CheckoutPage user={user} addresses={addresses} onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])} />}
+          />
+          <Route path="/checkout/resultado" element={<CheckoutResultPage />} />
           {/* /reset-password y /verify-email son solo puntos de entrada para un modal
               (ver ResetPasswordModal/EmailVerificationModal abajo) — el fondo siempre
               fue la landing, así que cae en Home igual que antes de tener router. */}
@@ -271,13 +278,7 @@ function App() {
 
       <Footer />
 
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        user={user}
-        addresses={addresses}
-        onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
-      />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} onOpenProduct={setDetailSlug} />
       <ProductDetailModal
         slug={detailSlug}

@@ -22,7 +22,9 @@ export {
   archiveAddress,
   restoreAddress,
 } from "./addresses";
-export { listOrders, checkout } from "./orders";
+export { listOrders, checkout, getOrder, retryPayment } from "./orders";
+export { quoteShipping } from "./shipping";
+export { listPaymentMethods, getPaymentStatus, simulatePaymentStatus } from "./payments";
 export {
   getCart,
   addCartItem,
