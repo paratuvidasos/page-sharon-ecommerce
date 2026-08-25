@@ -18,6 +18,9 @@ import { useCart } from "@shared/cart/CartContext";
 import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
 import { WishlistModal } from "@features/wishlist/components/WishlistModal";
 import { ProductDetailModal } from "@features/catalog/components/ProductDetailModal";
+import { OrderDetailModal } from "@features/orders/components/OrderDetailModal";
+import { OrderHistoryModal } from "@features/orders/components/OrderHistoryModal";
+import { Z } from "@ui/zIndex";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
@@ -66,6 +69,16 @@ function App() {
   // una la suya (Modal nunca se desmonta, así que tres instancias propias dejaban
   // tres <div id="product-detail-title"> duplicados en el DOM simultáneamente).
   const [detailSlug, setDetailSlug] = useState(null);
+  // Pedido abierto desde una notificación ([0044][FE]): la campana no navega a una
+  // ruta (no existe /pedidos/:orderNumber todavía), resuelve el orderNumber contra
+  // `orders` (ya cargado por sesión, ver el efecto de listOrders más abajo) y abre
+  // el mismo OrderDetailModal que usa el historial de pedidos del perfil.
+  const [trackedOrderNumber, setTrackedOrderNumber] = useState(null);
+  const trackedOrder = orders.find((o) => o.orderNumber === trackedOrderNumber) || null;
+  // Historial de pedidos: se abre directo desde el menú desplegable de la cuenta
+  // (AccountMenu), no desde dentro de ProfileModal — solo tiene sentido para cuentas
+  // registradas (AccountMenu ya oculta esta opción para invitados/sin sesión).
+  const [orderHistoryOpen, setOrderHistoryOpen] = useState(false);
   const { mergeGuestCart } = useCart();
   const [tweaks, setTweaks] = useState({
     accent: "botanic",
@@ -172,6 +185,12 @@ function App() {
   // (mismo patrón que direcciones arriba) y se limpian al cerrar sesión. El backend
   // pagina, pero hoy no hay UI de paginación — se pide una sola página grande y basta,
   // porque mientras no exista creación real de pedidos ([checkout]) el historial es corto.
+  const refreshOrders = () => {
+    if (!user) return;
+    listOrders({ limit: 100 }, getAccessToken())
+      .then((res) => setOrders(res.items))
+      .catch(() => {});
+  };
   useEffect(() => {
     if (!user) {
       setOrders([]);
@@ -189,6 +208,21 @@ function App() {
       cancelled = true;
     };
   }, [user?.email]);
+
+  // El pedido que arma POST /orders/checkout todavía tiene status: "PENDING" a
+  // propósito (el pago no se resolvió en ese instante) — CheckoutResultPage hace
+  // polling sobre GET /orders/:orderNumber hasta confirmarlo y avisa acá para que la
+  // fila en `orders` (historial, tracking desde notificaciones) no se quede congelada
+  // en PENDING después de que el pago sí se aprobó.
+  const handleOrderUpdated = (order) => {
+    setOrders((prev) => {
+      const idx = prev.findIndex((o) => o.orderNumber === order.orderNumber);
+      if (idx === -1) return [order, ...prev];
+      const next = [...prev];
+      next[idx] = order;
+      return next;
+    });
+  };
 
   // [0012][BE] Favoritos reales: mismo patrón que addresses/orders arriba, se cargan
   // contra GET /wishlist apenas hay sesión y se limpian al cerrar sesión. El backend
@@ -233,6 +267,11 @@ function App() {
     setProfileOpen(false);
   };
 
+  const handleOpenOrderHistory = () => {
+    setOrderHistoryOpen(true);
+    refreshOrders();
+  };
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -240,10 +279,13 @@ function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
-        onOpenAccount={() => (user ? setProfileOpen(true) : openAuth("register"))}
+        onOpenAuth={() => openAuth("register")}
+        onOpenProfile={() => setProfileOpen(true)}
+        onOpenOrderHistory={handleOpenOrderHistory}
+        onLogout={handleLogout}
         onOpenWishlist={openWishlist}
         wishlistCount={wishlist.length}
-        loggedIn={Boolean(user)}
+        onOpenOrder={setTrackedOrderNumber}
       />
 
       <main>
@@ -260,7 +302,7 @@ function App() {
             path="/checkout"
             element={<CheckoutPage user={user} addresses={addresses} onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])} />}
           />
-          <Route path="/checkout/resultado" element={<CheckoutResultPage />} />
+          <Route path="/checkout/resultado" element={<CheckoutResultPage onOrderUpdated={handleOrderUpdated} />} />
           {/* /reset-password y /verify-email son solo puntos de entrada para un modal
               (ver ResetPasswordModal/EmailVerificationModal abajo) — el fondo siempre
               fue la landing, así que cae en Home igual que antes de tener router. */}
@@ -324,7 +366,6 @@ function App() {
         onSave={(profile) => updateUser(profile)}
         addresses={addresses}
         setAddresses={setAddresses}
-        orders={orders}
         onLogout={handleLogout}
         onLogoutAll={handleLogoutAll}
         onOpenDeleteAccount={() => setDeleteAccountOpen(true)}
@@ -333,6 +374,16 @@ function App() {
         open={deleteAccountOpen}
         onClose={() => setDeleteAccountOpen(false)}
         onDeleted={handleAccountDeleted}
+      />
+      <OrderHistoryModal
+        open={orderHistoryOpen}
+        onClose={() => setOrderHistoryOpen(false)}
+        orders={orders}
+      />
+      <OrderDetailModal
+        order={trackedOrder}
+        onClose={() => setTrackedOrderNumber(null)}
+        zIndex={Z.orderTracking}
       />
 
       <TweaksPanel title="Tweaks">

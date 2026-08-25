@@ -32,6 +32,8 @@ export const ICONS = {
   FACEBOOK: "fb",
   LEAF_DECO: "leaf-deco",
   WHATSAPP: "wp",
+  BELL: "bell",
+  LOGOUT: "logout",
 };
 
 const VALID_ICON_NAMES = new Set(Object.values(ICONS));
@@ -89,6 +91,10 @@ export const Icon = ({ name, size = 22, stroke = 1.5, color = "currentColor" }) 
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M12 5v14M5 12h14"/></svg>);
     case "minus":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M5 12h14"/></svg>);
+    case "bell":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6Z"/><path {...p} d="M10 20a2 2 0 0 0 4 0"/></svg>);
+    case "logout":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path {...p} d="M15 16l4-4-4-4M19 12H9"/></svg>);
     case "ig":
       return (<svg viewBox="0 0 24 24" style={s}><rect {...p} x="3.5" y="3.5" width="17" height="17" rx="5"/><circle {...p} cx="12" cy="12" r="4"/><circle fill="currentColor" stroke="none" cx="17.5" cy="6.5" r="1"/></svg>);
     case "tt":

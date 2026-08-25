@@ -76,6 +76,14 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
   const hasAddress = isManual ? Boolean(manual.stateProvince.trim() && manual.countryCode) : Boolean(selected);
   const addressCountryCode = isManual ? manual.countryCode : selected?.countryCode || COUNTRIES[0].code;
   const addressStateProvince = isManual ? manual.stateProvince : selected?.stateProvince || "";
+  const addressPostalCode = isManual ? manual.postalCode : selected?.postalCode || "";
+
+  // Referencia estable para no re-cotizar en cada render (ShippingMethodStep depende
+  // de `items` en su useEffect) — solo cambia cuando de verdad cambia el contenido.
+  const shippingItems = useMemo(
+    () => cart.items.map((it) => ({ variantId: it.variantId, quantity: it.quantity })),
+    [cart.items]
+  );
 
   if (!cartLoading && cart.items.length === 0 && phase === "form") {
     return <Navigate to="/tienda" replace />;
@@ -174,7 +182,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
         setGuestTouched((prev) => ({ ...prev, email: true }));
         setGuestErrors((prev) => ({ ...prev, email: e.message }));
       } else if (e instanceof ApiError) {
-        setCheckoutError({ code: e.code, message: e.message, lines: e.lines });
+        setCheckoutError({ code: e.code, message: e.message, lines: e.lines, restrictedProducts: e.restrictedProducts });
       } else {
         setCheckoutError({ code: null, message: "No pudimos procesar tu pedido. Intenta de nuevo en unos segundos." });
       }
@@ -203,7 +211,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
           <div>
             {phase === "form" ? (
               <>
-                <CheckoutErrorBanner error={checkoutError} onRefreshCart={handleRefreshCart} onRemoveCoupon={handleRemoveCoupon} />
+                <CheckoutErrorBanner error={checkoutError} cartItems={cart.items} onRefreshCart={handleRefreshCart} onRemoveCoupon={handleRemoveCoupon} />
 
                 <Section title="Contacto">
                   <ContactStep user={user} guest={guest} onGuestChange={handleGuestChange} errors={guestErrors} touched={guestTouched} onBlur={handleGuestBlur} />
@@ -226,8 +234,10 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                   <ShippingMethodStep
                     countryCode={addressCountryCode}
                     stateProvince={addressStateProvince}
+                    postalCode={addressPostalCode}
                     subtotal={cart.total}
                     currency={CURRENCY}
+                    items={shippingItems}
                     hasAddress={hasAddress}
                     value={shippingOption}
                     onSelect={setShippingOption}

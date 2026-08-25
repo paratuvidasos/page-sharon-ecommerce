@@ -23,8 +23,16 @@ export {
   restoreAddress,
 } from "./addresses";
 export { listOrders, checkout, getOrder, retryPayment } from "./orders";
-export { quoteShipping } from "./shipping";
+export { quoteShipping, getShippingCoverage } from "./shipping";
 export { listPaymentMethods, getPaymentStatus, simulatePaymentStatus } from "./payments";
+export {
+  listNotifications,
+  getUnreadNotificationCount,
+  markNotificationRead,
+  markAllNotificationsRead,
+  getNotificationPreferences,
+  updateNotificationPreferences,
+} from "./notifications";
 export {
   getCart,
   addCartItem,

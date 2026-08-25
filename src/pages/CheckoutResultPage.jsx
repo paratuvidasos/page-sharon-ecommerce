@@ -15,7 +15,7 @@ const POLL_TIMEOUT_MS = 30000;
 // Aterrizaje del retorno de Bold ([0039][0040]): bold-order-id/bold-tx-status vienen
 // del navegador y solo sirven de pista de UI — el estado real se confirma contra el
 // backend con polling corto sobre GET /orders/:orderNumber, tal como pide el handoff.
-export const CheckoutResultPage = () => {
+export const CheckoutResultPage = ({ onOrderUpdated }) => {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get("order");
   const boldTxStatus = searchParams.get("bold-tx-status");
@@ -47,6 +47,10 @@ export const CheckoutResultPage = () => {
         const res = await getOrder(orderNumber, { email }, getAccessToken());
         if (cancelled) return;
         setOrder(res);
+        // El pedido en App.jsx (historial, tracking desde notificaciones) se sembró
+        // con la respuesta de /checkout, que legítimamente trae status: "PENDING" —
+        // sin esto se queda congelado ahí aunque el pago ya se haya confirmado.
+        onOrderUpdated?.(res);
         if (res.status === "PAID") {
           setStatus("paid");
           clearInterval(interval);

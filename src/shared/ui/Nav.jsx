@@ -5,6 +5,8 @@ import { IconButton } from "./components/IconButton";
 import { ProductImage } from "./ProductImage";
 import { useCart } from "@shared/cart/CartContext";
 import { formatCurrency } from "@shared/i18n/currency";
+import { NotificationsBell } from "@features/notifications/components/NotificationsBell";
+import { AccountMenu } from "@features/profile/components/AccountMenu";
 
 const MAX_MINI_CART_LINES = 3;
 
@@ -22,7 +24,7 @@ const SECTION_LINKS = [
   { label: "Historia", hash: "#testimonios" },
 ];
 
-export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpenWishlist, wishlistCount, loggedIn }) => {
+export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenProfile, onOpenOrderHistory, onLogout, onOpenWishlist, wishlistCount, onOpenOrder }) => {
   const [scrolled, setScrolled] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const { cart, itemCount } = useCart();
@@ -79,7 +81,8 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAccount, onOpe
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" />
           <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label="Favoritos" badge={wishlistCount} />
-          <IconButton icon="user" iconSize={18} onClick={onOpenAccount} aria-label={loggedIn ? "Mi perfil" : "Cuenta"} className="nav-user" />
+          <NotificationsBell onOpenOrder={onOpenOrder} />
+          <AccountMenu onOpenAuth={onOpenAuth} onOpenProfile={onOpenProfile} onOpenOrderHistory={onOpenOrderHistory} onLogout={onLogout} />
 
           {/* [0030][FE] Mini-carrito: hover/focus sobre el mismo ícono que abre el
               drawer completo, reutilizando el `cart` que ya trajo CartProvider (GET

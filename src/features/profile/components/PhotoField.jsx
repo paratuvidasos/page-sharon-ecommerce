@@ -38,54 +38,75 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
 
   return (
     <div>
-      <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>
-        Foto de perfil
-      </span>
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: "50%",
-            overflow: "hidden",
-            background: "var(--botanic-muted)",
-            display: "grid",
-            placeItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          {value ? (
-            <img
-              src={value}
-              alt="Previsualización de tu foto de perfil"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            <span style={{ fontFamily: "var(--serif)", fontSize: 26, color: "var(--botanic-deep)" }}>
-              {initials}
-            </span>
-          )}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          background: "var(--cream-2)",
+          borderRadius: 16,
+          padding: 16,
+        }}
+      >
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div
+            style={{
+              width: 58,
+              height: 58,
+              borderRadius: "50%",
+              overflow: "hidden",
+              background: "var(--botanic-muted)",
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            {value ? (
+              <img
+                src={value}
+                alt="Previsualización de tu foto de perfil"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <span style={{ fontFamily: "var(--serif)", fontSize: 22, color: "var(--botanic-deep)" }}>
+                {initials}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: -2,
+              right: -2,
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "var(--terracotta)",
+              border: "2px solid var(--cream-2)",
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            <Icon name="camera" size={11} color="#fff" />
+          </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <span className="eyebrow" style={{ fontSize: 10 }}>Foto de perfil</span>
           <div style={{ display: "flex", gap: 14 }}>
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
                 background: "none",
                 border: 0,
                 padding: 0,
-                fontSize: 12.5,
-                fontWeight: 500,
-                color: "var(--ink)",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "var(--terracotta-deep)",
                 textDecoration: "underline",
                 cursor: "pointer",
               }}
             >
-              <Icon name="camera" size={14} /> {value ? "Cambiar foto" : "Subir foto"}
+              {value ? "Cambiar foto" : "Subir foto"}
             </button>
             {value && (
               <button
@@ -95,7 +116,7 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
                   background: "none",
                   border: 0,
                   padding: 0,
-                  fontSize: 12.5,
+                  fontSize: 13,
                   color: "var(--ink-soft)",
                   textDecoration: "underline",
                   cursor: "pointer",
