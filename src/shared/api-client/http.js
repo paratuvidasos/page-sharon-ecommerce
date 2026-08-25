@@ -13,6 +13,9 @@ export class ApiError extends Error {
     // CHECKOUT_PRICE_CHANGED / CHECKOUT_ITEM_UNAVAILABLE (POST /orders/checkout) traen
     // las líneas afectadas acá, con previousUnitPrice/currentUnitPrice o availableQuantity.
     this.lines = body?.lines;
+    // PRODUCTS_RESTRICTED_FOR_ZONE (POST /orders/checkout) y la respuesta de
+    // POST /shipping/quote traen acá los productos que no se pueden enviar a la zona.
+    this.restrictedProducts = body?.restrictedProducts;
   }
 }
 

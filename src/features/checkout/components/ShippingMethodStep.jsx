@@ -4,31 +4,38 @@ import { formatCurrency } from "@shared/i18n/currency";
 import { fieldLabelStyle, optionCardStyle, optionRowStyle } from "../fieldStyles";
 
 // Cotiza el envío contra el backend (POST /shipping/quote) cada vez que cambia la
-// dirección o el subtotal (aplicar un cupón cambia el subtotal y puede activar envío
-// gratis). El costo mostrado acá es solo informativo — lo que de verdad se cobra lo
-// recalcula el backend en POST /orders/checkout a partir de shippingMethod.
-export const ShippingMethodStep = ({ countryCode, stateProvince, subtotal, currency, hasAddress, value, onSelect }) => {
-  const [state, setState] = useState({ loading: false, options: [], zoneName: "", error: null });
+// dirección, el subtotal (aplicar un cupón cambia el subtotal y puede activar envío
+// gratis) o el carrito. El costo mostrado acá es solo informativo — lo que de verdad se
+// cobra lo recalcula el backend en POST /orders/checkout a partir de shippingMethod.
+// `items` (variantId + quantity) se manda siempre que haya carrito: sin eso el backend
+// solo devuelve la tarifa de respaldo en vez de cotizar con la transportadora real.
+export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, subtotal, currency, items, hasAddress, value, onSelect }) => {
+  const [state, setState] = useState({ loading: false, options: [], zoneName: "", restrictedProducts: [], error: null });
 
   useEffect(() => {
-    if (!hasAddress || !stateProvince) {
-      setState({ loading: false, options: [], zoneName: "", error: null });
+    if (!hasAddress || (!stateProvince && !postalCode)) {
+      setState({ loading: false, options: [], zoneName: "", restrictedProducts: [], error: null });
       return;
     }
     let cancelled = false;
     const timer = setTimeout(() => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
-      quoteShipping({ countryCode, stateProvince, subtotal, currency })
+      quoteShipping({ countryCode, stateProvince, postalCode, subtotal, currency, items })
         .then((res) => {
           if (cancelled) return;
-          setState({ loading: false, options: res.options, zoneName: res.zoneName, error: null });
-          const stillValid = res.options.some((o) => o.method === value?.method);
-          if (!stillValid) onSelect(res.options[0] || null);
+          // Envío exprés fuera de servicio por ahora: la transportadora real todavía
+          // no está definida (ver CARRIER_* en .env.example) y el tiempo 1-2 días de
+          // la tarifa de respaldo no es un compromiso real, así que se oculta la opción
+          // en vez de mostrar una promesa que no se puede cumplir.
+          const options = res.options.filter((o) => o.method !== "EXPRESS");
+          setState({ loading: false, options, zoneName: res.zoneName, restrictedProducts: res.restrictedProducts || [], error: null });
+          const stillValid = options.some((o) => o.method === value?.method);
+          if (!stillValid) onSelect(options[0] || null);
         })
         .catch((e) => {
           if (cancelled) return;
           const message = e instanceof ApiError ? e.message : "No pudimos cotizar el envío. Intenta de nuevo.";
-          setState({ loading: false, options: [], zoneName: "", error: { code: e instanceof ApiError ? e.code : null, message } });
+          setState({ loading: false, options: [], zoneName: "", restrictedProducts: [], error: { code: e instanceof ApiError ? e.code : null, message } });
           onSelect(null);
         });
     }, 400);
@@ -37,7 +44,7 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, subtotal, curre
       clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countryCode, stateProvince, subtotal, currency, hasAddress]);
+  }, [countryCode, stateProvince, postalCode, subtotal, currency, items, hasAddress]);
 
   if (!hasAddress) {
     return (
@@ -80,7 +87,12 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, subtotal, curre
                   style={{ accentColor: "var(--botanic-deep)" }}
                 />
                 <span>
-                  <div style={{ fontSize: 13.5 }}>{opt.label}</div>
+                  <div style={{ fontSize: 13.5 }}>
+                    {opt.label}
+                    {opt.source === "CARRIER" && opt.carrierName && (
+                      <span style={{ color: "var(--ink-soft)" }}> · {opt.carrierName}</span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>
                     {opt.estimatedMinDays === opt.estimatedMaxDays
                       ? `${opt.estimatedMinDays} día${opt.estimatedMinDays === 1 ? "" : "s"}`
@@ -93,6 +105,21 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, subtotal, curre
               </span>
             </label>
           ))}
+        </div>
+      )}
+
+      {!state.loading && state.restrictedProducts.length > 0 && (
+        <div
+          role="alert"
+          style={{ background: "rgba(201,168,118,.14)", border: "1px solid rgba(201,168,118,.4)", borderRadius: 14, padding: "12px 18px", fontSize: 12.5, color: "#7A5E2E", marginTop: 10 }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Algunos productos de tu bolsa no se pueden enviar a esta dirección</div>
+          <ul style={{ margin: 0, paddingLeft: 18 }}>
+            {state.restrictedProducts.map((p) => (
+              <li key={p.productId}>{p.reason}</li>
+            ))}
+          </ul>
+          <div style={{ marginTop: 4 }}>Cambia el destino o quita esos productos de la bolsa antes de pagar.</div>
         </div>
       )}
     </div>

@@ -8,12 +8,15 @@ const CODE_LABELS = {
   NO_SHIPPING_COVERAGE: "No hacemos envíos a esa dirección",
   SHIPPING_METHOD_NOT_AVAILABLE: "Ese método de envío ya no está disponible",
   PAYMENT_METHOD_NOT_AVAILABLE: "Ese método de pago ya no está disponible",
+  PRODUCTS_RESTRICTED_FOR_ZONE: "Algunos productos no se pueden enviar a esa zona",
 };
 
 // Mapea los códigos de error documentados en el handoff de checkout con Bold a un
-// mensaje + acción de recuperación. `error` es { code, message, lines? } armado en
-// CheckoutPage a partir del ApiError que devuelve POST /orders/checkout.
-export const CheckoutErrorBanner = ({ error, onRefreshCart, onRemoveCoupon }) => {
+// mensaje + acción de recuperación. `error` es { code, message, lines?, restrictedProducts? }
+// armado en CheckoutPage a partir del ApiError que devuelve POST /orders/checkout.
+// `cartItems` sirve solo para resolver el nombre de los productos restringidos (el
+// backend únicamente manda productId + reason).
+export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveCoupon }) => {
   if (!error) return null;
 
   const isCouponError = typeof error.code === "string" && error.code.startsWith("COUPON_");
@@ -46,6 +49,16 @@ export const CheckoutErrorBanner = ({ error, onRefreshCart, onRemoveCoupon }) =>
                 <> — antes {formatCurrency(line.previousUnitPrice)}, ahora {formatCurrency(line.currentUnitPrice)}</>
               )}
               {line.availableQuantity != null && <> — quedan {line.availableQuantity} disponibles</>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {error.restrictedProducts?.length > 0 && (
+        <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+          {error.restrictedProducts.map((p) => (
+            <li key={p.productId} style={{ fontSize: 12 }}>
+              {cartItems?.find((it) => it.productId === p.productId)?.productName || "Producto"} — {p.reason}
             </li>
           ))}
         </ul>
