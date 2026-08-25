@@ -11,12 +11,12 @@ export const listPaymentMethods = ({ countryCode, currency }, accessToken) => {
 export const getPaymentStatus = (referenceId, accessToken) =>
   request(`/payments/${referenceId}/status`, { token: accessToken });
 
-// Solo para el modo simulado (sin cuenta de Bold, ver SimulatedPaymentPanel.jsx):
-// contrato best-effort, no documentado en el handoff — ajustar si el backend expone
-// otro endpoint para marcar una orden simulada como pagada/rechazada.
-export const simulatePaymentStatus = (referenceId, status, accessToken) =>
-  request(`/payments/${referenceId}/status/simulate`, {
+// Solo para el modo simulado (sin cuenta de Bold, ver SimulatedPaymentPanel.jsx).
+// Endpoint fijo POST /payments/simulate — referenceId, outcome (y failureCode
+// opcional) van en el body, no en el path.
+export const simulatePaymentStatus = (referenceId, outcome, failureCode, accessToken) =>
+  request(`/payments/simulate`, {
     method: "POST",
-    body: { status },
+    body: { referenceId, outcome, ...(failureCode ? { failureCode } : {}) },
     token: accessToken,
   });

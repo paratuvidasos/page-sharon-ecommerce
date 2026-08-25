@@ -6,14 +6,6 @@ import { simulatePaymentStatus } from "@shared/api-client";
 // Modo simulado (sin cuenta de Bold): el backend responde payment.session.scriptUrl
 // vacío + sandbox:true. Solo visible en desarrollo (gateado por import.meta.env.DEV
 // en BoldPaymentPanel) para poder probar [0038]-[0040] sin la pasarela real.
-//
-// SUPUESTO A CONFIRMAR CON BACKEND: en sandbox no hay webhook automático, así que no
-// hay forma documentada en el handoff de marcar la orden simulada como pagada/
-// rechazada. Se intenta un endpoint best-effort (POST /payments/{referenceId}/status/
-// simulate) antes de navegar al resultado; si no existe, el resultado va a quedar en
-// PENDING y el polling de CheckoutResultPage lo mostrará como "confirmando" hasta que
-// se agote el timeout — ajustar esta llamada cuando se confirme el contrato real en
-// /api/docs del backend.
 export const SimulatedPaymentPanel = ({ orderNumber, referenceId, email }) => {
   const navigate = useNavigate();
   const [pending, setPending] = useState(null);
@@ -21,9 +13,13 @@ export const SimulatedPaymentPanel = ({ orderNumber, referenceId, email }) => {
   const simulate = async (result) => {
     setPending(result);
     try {
-      await simulatePaymentStatus(referenceId, result === "approved" ? "APPROVED" : "REJECTED");
+      await simulatePaymentStatus(
+        referenceId,
+        result === "approved" ? "SALE_APPROVED" : "SALE_REJECTED",
+      );
     } catch {
-      // Silencioso a propósito: el endpoint es un supuesto best-effort, ver comentario arriba.
+      // Silencioso a propósito: seguimos navegando al resultado aunque falle
+      // la llamada de simulación, para no bloquear la prueba manual del flujo.
     } finally {
       const params = new URLSearchParams({ order: orderNumber, "bold-tx-status": result });
       if (email) params.set("email", email);
