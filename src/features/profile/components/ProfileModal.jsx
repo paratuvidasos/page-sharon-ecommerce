@@ -6,7 +6,6 @@ import { Modal, MODAL_CLOSE_MS } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { ProfileForm } from "./ProfileForm";
 import { AddressBookModal } from "./addresses/AddressBookModal";
-import { OrderHistoryModal } from "@features/orders/components/OrderHistoryModal";
 
 const SAVED_BANNER_MS = 3000;
 
@@ -24,16 +23,17 @@ const linkBtnStyle = {
 // scroll, footer con el botón de guardar), igual que AuthModal/ResetPasswordModal.
 // Al guardar, avisa al padre vía onSave para que el estado de sesión (App.jsx) se
 // actualice de inmediato, y muestra un banner de confirmación breve sin cerrar el modal.
-// También aloja la entrada a AddressBookModal (direcciones) y OrderHistoryModal
-// (pedidos), ambos anidados como hermanos del Modal principal (mismo patrón que el
-// diálogo de Google dentro de AuthModal) para que su propio overlay/panel no queden
-// atrapados por el `transform` del panel de este Modal.
-export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, orders, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
+// También aloja la entrada a AddressBookModal (direcciones), anidada como hermana del
+// Modal principal (mismo patrón que el diálogo de Google dentro de AuthModal) para
+// que su propio overlay/panel no quede atrapado por el `transform` del panel de este
+// Modal. El historial de pedidos ya no vive acá: se abre directo desde el menú
+// desplegable de la cuenta (ver AccountMenu.jsx / App.jsx), no hace falta pasar por
+// "Editar perfil" para verlo.
+export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
   const [submitting, setSubmitting] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
   const [formKey, setFormKey] = useState(0);
   const [addressBookOpen, setAddressBookOpen] = useState(false);
-  const [orderHistoryOpen, setOrderHistoryOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [loggingOutAll, setLoggingOutAll] = useState(false);
   const [confirmingLogoutAll, setConfirmingLogoutAll] = useState(false);
@@ -120,8 +120,8 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
         >
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-              <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }} />
-              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Tu cuenta</span>
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--terracotta)" }} />
+              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em", color: "var(--terracotta-deep)" }}>Tu cuenta</span>
             </div>
             <div id="profile-modal-title" className="display" style={{ fontSize: 24, lineHeight: 1.15 }}>
               Editar perfil
@@ -170,22 +170,6 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => setAddressBookOpen(true)}>
                 Gestionar direcciones
-              </Button>
-            </div>
-          </div>
-
-          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-              <div>
-                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 4 }}>Pedidos</span>
-                <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                  {orders.length === 0
-                    ? "Sin pedidos todavía"
-                    : `${orders.length} ${orders.length === 1 ? "pedido" : "pedidos"} en tu historial`}
-                </div>
-              </div>
-              <Button type="button" variant="ghost" size="sm" onClick={() => setOrderHistoryOpen(true)}>
-                Ver historial
               </Button>
             </div>
           </div>
@@ -267,12 +251,6 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
         onClose={() => setAddressBookOpen(false)}
         addresses={addresses}
         setAddresses={setAddresses}
-      />
-
-      <OrderHistoryModal
-        open={orderHistoryOpen}
-        onClose={() => setOrderHistoryOpen(false)}
-        orders={orders}
       />
     </>
   );

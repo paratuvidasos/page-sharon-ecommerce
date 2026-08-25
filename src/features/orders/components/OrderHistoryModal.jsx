@@ -19,9 +19,10 @@ const filterInputStyle = {
 
 const INITIAL_FILTERS = { status: "all", from: "", to: "" };
 
-// Pantalla de historial de pedidos: filtros (rango de fechas + estado) y el listado,
-// anidada dentro de ProfileModal (mismo patrón que AddressBookModal). El detalle de
-// cada pedido vive en OrderDetailModal, anidado a su vez dentro de este.
+// Pantalla de historial de pedidos: filtros (rango de fechas + estado) y el listado.
+// Hermana top-level en App.jsx (se abre directo desde "Historial de pedidos" en
+// AccountMenu, no anidada dentro de ProfileModal). El detalle de cada pedido vive en
+// OrderDetailModal, anidado a su vez dentro de este.
 export const OrderHistoryModal = ({ open, onClose, orders }) => {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [selectedOrder, setSelectedOrder] = useState(null);
