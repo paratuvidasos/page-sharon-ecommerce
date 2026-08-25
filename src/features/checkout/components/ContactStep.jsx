@@ -9,13 +9,10 @@ import { validateGuestEmail, validateFirstName, validateLastName, validatePasswo
 export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlur }) => {
   const [visible, setVisible] = useState(false);
 
+  // La sección "Contacto" ya viene con su propio eyebrow desde <Section> en
+  // CheckoutPage — repetirlo acá duplicaba el texto en pantalla.
   if (user) {
-    return (
-      <div>
-        <div className="eyebrow" style={fieldLabelStyle}>Contacto</div>
-        <div style={{ fontSize: 14 }}>{user.email}</div>
-      </div>
-    );
+    return <div style={{ fontSize: 14 }}>{user.email}</div>;
   }
 
   const set = (field) => (e) => onGuestChange(field, e.target.value);

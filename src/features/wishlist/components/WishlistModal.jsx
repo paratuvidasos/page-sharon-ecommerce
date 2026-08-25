@@ -15,23 +15,35 @@ import { WishlistRow } from "./WishlistRow";
 // en WishlistRow).
 export const WishlistModal = ({ open, onClose, items, onOpenProduct, onRemove }) => {
   const [catalogById, setCatalogById] = useState(new Map());
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    setLoading(true);
+    setLoadError(false);
     listProducts({ limit: 100 })
       .then((res) => {
         if (cancelled) return;
         setCatalogById(new Map(res.items.map((item) => [item.id, normalizeProduct(item)])));
       })
       .catch(() => {
-        if (!cancelled) setCatalogById(new Map());
+        if (cancelled) return;
+        setCatalogById(new Map());
+        setLoadError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, [open]);
 
+  // Si el catálogo no cargó (todavía cargando o falló la llamada), no hay forma de
+  // saber si `items` tiene productos válidos o no — mostrar "no tienes favoritos" en
+  // ese caso sería engañoso cuando el badge de Nav sí trae un conteo > 0.
   const rows = items
     .map((item) => ({ item, product: catalogById.get(item.productId) }))
     .filter((r) => r.product)
@@ -75,7 +87,15 @@ export const WishlistModal = ({ open, onClose, items, onOpenProduct, onRemove })
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "8px 26px 20px" }}>
-        {rows.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
+            <p style={{ fontSize: 13 }}>Cargando tus favoritos…</p>
+          </div>
+        ) : loadError ? (
+          <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
+            <p style={{ fontSize: 13 }}>No pudimos cargar tus favoritos. Intenta de nuevo.</p>
+          </div>
+        ) : rows.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
             <Icon name="heart" size={26} />
             <p style={{ fontSize: 13, marginTop: 10 }}>Todavía no guardas productos.</p>
