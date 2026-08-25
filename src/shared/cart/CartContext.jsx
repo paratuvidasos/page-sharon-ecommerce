@@ -124,6 +124,20 @@ export function CartProvider({ children }) {
     }
   }, [getAccessToken]);
 
+  // Recarga el carrito contra el backend sin mutarlo (a diferencia de add/update/remove,
+  // que ya devuelven el carrito actualizado). Se usa tras un error de checkout como
+  // CHECKOUT_PRICE_CHANGED / CHECKOUT_ITEM_UNAVAILABLE, cuando lo que cambió fue el
+  // catálogo (precio/stock) y no una acción del usuario sobre su propio carrito.
+  const refreshCart = useCallback(async () => {
+    try {
+      const next = await getCart(getAccessToken());
+      setCart(next);
+      return { ok: true };
+    } catch (e) {
+      return toResult(e);
+    }
+  }, [getAccessToken]);
+
   const mergeGuestCart = useCallback(async (accessToken) => {
     try {
       const next = await mergeCart(accessToken);
@@ -146,6 +160,7 @@ export function CartProvider({ children }) {
     clear,
     applyCoupon,
     removeCoupon,
+    refreshCart,
     mergeGuestCart,
   };
 

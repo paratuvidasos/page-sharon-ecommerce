@@ -21,7 +21,7 @@ export const Z = {
   // ProfileModal se auto-oculta (`if (!user) return null`) apenas la cuenta se elimina
   // y perdería la pantalla de éxito si viviera dentro de su árbol.
   mobileMenu: 104, // MobileMenu
-  checkout: 109, // CheckoutModal (anidado dentro de CartDrawer)
+  // checkout ya no es modal: es una vista dedicada en /checkout (ver src/pages/CheckoutPage.jsx).
   googleDialog: 119, // diálogo simulado de Google, anidado dentro de AuthModal
   verifyEmail: 121, // EmailVerificationModal (aterrizaje del enlace de verificación de correo)
 };

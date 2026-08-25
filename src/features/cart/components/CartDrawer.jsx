@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
-import { CheckoutModal } from "@features/checkout/components/CheckoutModal";
 import { CouponForm } from "./CouponForm";
 import { Z } from "@ui/zIndex";
 import { formatCurrency } from "@shared/i18n/currency";
@@ -121,9 +121,9 @@ const CartLine = ({ item }) => {
   );
 };
 
-export const CartDrawer = ({ open, onClose, user, addresses, onOrderPlaced }) => {
+export const CartDrawer = ({ open, onClose }) => {
+  const navigate = useNavigate();
   const { cart, clear } = useCart();
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [clearing, setClearing] = useState(false);
 
@@ -220,7 +220,7 @@ export const CartDrawer = ({ open, onClose, user, addresses, onOrderPlaced }) =>
               <span className="display" style={{ fontSize: 22 }}>Total</span>
               <span className="display" style={{ fontSize: 28 }}>{formatCurrency(cart.total + shipping)}</span>
             </div>
-            <Button onClick={() => setCheckoutOpen(true)} style={{ width: "100%", justifyContent: "center" }}>
+            <Button onClick={() => { onClose(); navigate("/checkout"); }} style={{ width: "100%", justifyContent: "center" }}>
               Finalizar compra <Icon name="arrow" size={16} />
             </Button>
             <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
@@ -231,16 +231,6 @@ export const CartDrawer = ({ open, onClose, user, addresses, onOrderPlaced }) =>
           </div>
         )}
       </aside>
-
-      <CheckoutModal
-        open={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        cart={cart}
-        onClearCart={clear}
-        onOrderPlaced={onOrderPlaced}
-        user={user}
-        addresses={addresses}
-      />
     </>
   );
 };

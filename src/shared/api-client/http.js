@@ -10,6 +10,9 @@ export class ApiError extends Error {
     this.code = body?.error;
     this.issues = body?.issues;
     this.availableQuantity = body?.availableQuantity;
+    // CHECKOUT_PRICE_CHANGED / CHECKOUT_ITEM_UNAVAILABLE (POST /orders/checkout) traen
+    // las líneas afectadas acá, con previousUnitPrice/currentUnitPrice o availableQuantity.
+    this.lines = body?.lines;
   }
 }
 

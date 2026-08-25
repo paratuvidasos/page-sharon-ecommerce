@@ -22,3 +22,22 @@ export function checkout(payload, accessToken) {
     token: accessToken,
   });
 }
+
+// [checkout Bold] El pedido queda en PENDING hasta que Bold confirme el pago (webhook
+// o retorno del usuario) — la pantalla de resultado usa esto para hacer polling. Como
+// invitado, el backend exige ?email= porque no hay sesión que valide la dueñez del pedido.
+export function getOrder(orderNumber, { email } = {}, accessToken) {
+  const qs = email ? `?email=${encodeURIComponent(email)}` : "";
+  return request(`/orders/${orderNumber}${qs}`, { token: accessToken });
+}
+
+// Reintento de pago tras un rechazo: el orderNumber no cambia, pero Bold exige una
+// referenceId nueva (no acepta referencias repetidas), así que el backend genera una
+// sesión de pago nueva en la respuesta.
+export function retryPayment(orderNumber, payload, accessToken) {
+  return request(`/orders/${orderNumber}/retry-payment`, {
+    method: "POST",
+    body: payload,
+    token: accessToken,
+  });
+}
