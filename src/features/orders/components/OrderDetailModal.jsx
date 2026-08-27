@@ -82,8 +82,7 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
-          padding: "22px 26px",
-          borderBottom: "1px solid var(--line)",
+          padding: "22px 26px 0",
           flexShrink: 0,
         }}
       >
@@ -112,6 +111,8 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
         <IconButton icon="close" size={36} iconSize={18} onClick={onClose} aria-label="Cerrar" />
       </div>
 
+      <div className="stitch" style={{ margin: "18px 26px 0", flexShrink: 0 }} />
+
       <div style={{ flex: 1, overflowY: "auto", padding: "18px 26px" }}>
         <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Productos</span>
         {order.items.map((item) => {
@@ -130,14 +131,14 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
           );
         })}
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "14px 0", marginBottom: 4 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "14px 16px", marginBottom: 24, background: "var(--cream-2)", borderRadius: 14 }}>
           <span className="display" style={{ fontSize: 18 }}>Total</span>
-          <span className="display" style={{ fontSize: 22 }}>{formatCurrency(order.total)}</span>
+          <span className="display" style={{ fontSize: 24 }}>{formatCurrency(order.total)}</span>
         </div>
 
-        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+        <div>
           <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Dirección de envío</span>
-          <p style={{ fontSize: 13, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>
             <strong>{order.shippingAddress.recipientName}</strong>
             <br />
             {order.shippingAddress.streetLine1}
@@ -147,13 +148,13 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
           </p>
         </div>
 
-        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+        <div style={{ marginTop: 20 }}>
           <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Método de pago</span>
-          <p style={{ fontSize: 13 }}>{order.paymentMethodLabel}</p>
+          <p style={{ fontSize: 13.5 }}>{order.paymentMethodLabel}</p>
         </div>
 
         {order.shipment && (
-          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+          <div style={{ marginTop: 20 }}>
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Envío</span>
             <p style={{ fontSize: 13, lineHeight: 1.6 }}>
               {order.shipment.carrierName || order.shipment.carrierCode}
@@ -175,7 +176,7 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
         )}
 
         {order.statusHistory?.length > 0 && (
-          <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+          <div style={{ marginTop: 20 }}>
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Seguimiento del pedido</span>
             <div>
               {order.statusHistory.map((entry, i) => {

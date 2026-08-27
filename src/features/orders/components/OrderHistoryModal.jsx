@@ -8,9 +8,11 @@ import { OrderRow } from "./OrderRow";
 import { OrderDetailModal } from "./OrderDetailModal";
 
 const filterInputStyle = {
-  padding: "10px 14px",
-  border: ".5px solid var(--line)",
-  borderRadius: 999,
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "10px 12px",
+  border: "1px solid var(--line)",
+  borderRadius: 10,
   background: "#fff",
   fontSize: 13,
   fontFamily: "var(--sans)",
@@ -47,7 +49,7 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
         open={open}
         onClose={onClose}
         zIndex={Z.orderHistory}
-        width="min(600px, 92vw)"
+        width="min(720px, 92vw)"
         labelledBy="order-history-title"
         panelStyle={{
           maxHeight: "88vh",
@@ -71,8 +73,11 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
           }}
         >
           <div>
-            <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Tu cuenta</span>
-            <div id="order-history-title" className="display" style={{ fontSize: 24, marginTop: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }} />
+              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Tu cuenta</span>
+            </div>
+            <div id="order-history-title" className="display" style={{ fontSize: 24 }}>
               Historial de pedidos
             </div>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 380 }}>
@@ -82,10 +87,10 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
           <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
         </div>
 
-        <div style={{ padding: "16px 26px", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10 }} className="eyebrow">
-              Desde
+        <div style={{ padding: "20px 26px", borderBottom: "1px dashed rgba(27,24,21,.16)", flexShrink: 0 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 14 }} className="order-filters-grid">
+            <label style={{ display: "block" }}>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Desde</span>
               <input
                 type="date"
                 value={filters.from}
@@ -94,8 +99,8 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
                 style={filterInputStyle}
               />
             </label>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10 }} className="eyebrow">
-              Hasta
+            <label style={{ display: "block" }}>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Hasta</span>
               <input
                 type="date"
                 value={filters.to}
@@ -104,8 +109,8 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
                 style={filterInputStyle}
               />
             </label>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 10 }} className="eyebrow">
-              Estado
+            <label style={{ display: "block" }}>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Estado</span>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
@@ -117,16 +122,16 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
                 ))}
               </select>
             </label>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={() => setFilters(INITIAL_FILTERS)}
-                style={{ alignSelf: "flex-end", background: "none", border: 0, padding: "10px 0", fontSize: 12.5, color: "var(--ink-soft)", textDecoration: "underline", cursor: "pointer" }}
-              >
-                Limpiar filtros
-              </button>
-            )}
           </div>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={() => setFilters(INITIAL_FILTERS)}
+              style={{ marginTop: 10, background: "none", border: 0, padding: 0, fontSize: 12.5, color: "var(--ink-soft)", textDecoration: "underline", cursor: "pointer" }}
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "8px 26px 20px" }}>

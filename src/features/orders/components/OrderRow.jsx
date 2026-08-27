@@ -17,7 +17,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
         justifyContent: "space-between",
         gap: 12,
         padding: "14px 0",
-        borderBottom: "1px solid var(--line)",
+        borderBottom: "1px dashed rgba(27,24,21,.16)",
         flexWrap: "wrap",
       }}
     >
