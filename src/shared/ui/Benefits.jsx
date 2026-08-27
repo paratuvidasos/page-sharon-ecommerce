@@ -18,50 +18,42 @@ export const Benefits = () => {
 
       <div className="wrap" style={{ position: "relative", zIndex: 2 }}>
         <Reveal>
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <div className="eyebrow">Por qué Sharon</div>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <div className="eyebrow">Ficha técnica</div>
             <h2 className="display" style={{ fontSize: "clamp(40px, 5vw, 64px)", margin: "10px 0 0" }}>
-              Una promesa para tu <span className="script" style={{ color: "var(--botanic-deep)" }}>cabello</span>
+              Cinco razones para <span className="script" style={{ color: "var(--botanic-deep)" }}>quedarte</span>
             </h2>
           </div>
         </Reveal>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 16
-        }}>
+        <div style={{ background: "var(--cream)", borderRadius: 24, overflow: "hidden" }}>
           {BENEFITS.map((b, i) => (
-            <Reveal key={b.id} delay={i * 100}>
-              <div style={{
-                background: "rgba(255,255,255,.7)",
-                backdropFilter: "blur(14px)",
-                border: ".5px solid rgba(255,255,255,.7)",
-                borderRadius: 20,
-                padding: "30px 24px",
-                height: "100%",
-                transition: "transform .35s ease, box-shadow .35s ease",
-                cursor: "default"
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14,
-                  background: "var(--cream)",
-                  display: "grid", placeItems: "center",
-                  color: "var(--botanic-deep)",
-                  marginBottom: 18,
-                  border: "1px solid var(--line)"
-                }}>
-                  <Icon name={b.icon} size={24} stroke={1.4} />
-                </div>
-                <div className="display" style={{ fontSize: 22, fontWeight: 500, marginBottom: 6 }}>{b.title}</div>
-                <div style={{ color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.55 }}>{b.desc}</div>
+            <Reveal key={b.id} delay={i * 80}>
+              <div
+                className="benefit-row"
+                style={{
+                  display: "flex", alignItems: "center", gap: 24,
+                  padding: "24px 28px",
+                  borderTop: "1px dashed rgba(27,24,21,.16)",
+                  borderBottom: i === BENEFITS.length - 1 ? "1px dashed rgba(27,24,21,.16)" : "none",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span className="mono" style={{ fontSize: 14, color: "var(--gold)", minWidth: 26 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--botanic-muted)", display: "grid", placeItems: "center", flexShrink: 0, color: "var(--botanic-deep)" }}>
+                  <Icon name={b.icon} size={20} stroke={1.5} />
+                </span>
+                <span className="display" style={{ fontSize: 22, fontWeight: 600, minWidth: 220 }}>{b.title}</span>
+                <span style={{ color: "var(--ink-soft)", fontSize: 14, flex: 1 }}>{b.desc}</span>
               </div>
             </Reveal>
           ))}
         </div>
       </div>
+
+      <style>{`.benefit-row:hover{background:var(--cream-2)}`}</style>
     </section>
   );
 };

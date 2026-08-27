@@ -1,4 +1,5 @@
 import { Icon } from "./Icon";
+import { Newsletter } from "./Newsletter";
 
 export const Footer = () => {
   const cols = [
@@ -7,16 +8,28 @@ export const Footer = () => {
     { title: "Sharon", links: ["Sobre nosotras", "Ingredientes", "Sostenibilidad", "Programa profesional", "Diario / Blog"] },
   ];
 
+  // Footer de ancho completo (no flotante, sin radio) — misma paleta oscura de
+  // Testimonials/PurchaseProcess ("aún no he pagado") pero como cierre de página
+  // clásico, con la newsletter compacta integrada arriba en vez de vivir aparte.
   return (
     <footer style={{
-      background: "var(--ink)", color: "var(--cream)",
-      paddingTop: 80, paddingBottom: 30, position: "relative", overflow: "hidden"
+      background: "linear-gradient(180deg, var(--ink) 0%, #2A241E 100%)",
+      color: "var(--cream)",
+      paddingTop: 70,
+      paddingBottom: 30,
+      position: "relative",
+      overflow: "hidden",
     }}>
       <div aria-hidden="true" style={{
         position: "absolute", top: -100, right: 80, width: 240, height: 240, borderRadius: "50%",
         background: "radial-gradient(closest-side, rgba(94,120,96,.25), transparent 70%)"
       }} />
+
       <div className="wrap" style={{ position: "relative" }}>
+        <Newsletter compact />
+
+        <div className="stitch" style={{ margin: "40px 0", opacity: 0.35, filter: "invert(1)" }} />
+
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr repeat(3, 1fr)", gap: 50 }} className="foot-grid">
           <div>
             <div className="script" style={{ fontSize: 48, lineHeight: 1, marginBottom: 18 }}>Sharon</div>
@@ -70,11 +83,16 @@ export const Footer = () => {
       </div>
 
       <style>{`
+        .nl-inline form{ flex: 1; justify-content: flex-end; }
         @media (max-width: 900px){
           .foot-grid{grid-template-columns: 1fr 1fr !important; gap: 36px !important}
         }
         @media (max-width: 560px){
           .foot-grid{grid-template-columns: 1fr !important}
+        }
+        @media (max-width: 640px){
+          .nl-inline{ flex-direction: column; align-items: flex-start !important; }
+          .nl-inline form{ justify-content: flex-start; width: 100%; }
         }
       `}</style>
     </footer>

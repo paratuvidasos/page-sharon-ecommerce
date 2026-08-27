@@ -151,7 +151,7 @@ export const CartDrawer = ({ open, onClose }) => {
         display: "flex", flexDirection: "column",
         boxShadow: "-20px 0 60px rgba(27,24,21,.18)"
       }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px", borderBottom: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px" }}>
           <div>
             <div className="eyebrow">Tu bolsa</div>
             <div className="display" style={{ fontSize: 22 }}>{cart.items.length} {cart.items.length === 1 ? "artículo" : "artículos"}</div>
@@ -168,6 +168,7 @@ export const CartDrawer = ({ open, onClose }) => {
             <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar bolsa" />
           </div>
         </div>
+        <div className="stitch" style={{ margin: "0 26px" }} />
 
         {confirmingClear && (
           <div style={{ margin: "16px 26px 0", padding: "10px 12px", background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 12 }}>

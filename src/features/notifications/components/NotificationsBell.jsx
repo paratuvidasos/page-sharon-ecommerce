@@ -37,7 +37,7 @@ const PrefToggle = ({ label, checked, onChange }) => (
 // SUPUESTO A CONFIRMAR CON BACKEND: el shape de cada item de GET /notifications no está
 // documentado más allá de linkUrl — se asume { id, title, message, read, createdAt,
 // linkUrl } (nombres típicos de un buzón), tolerando variantes con fallbacks.
-export const NotificationsBell = ({ onOpenOrder }) => {
+export const NotificationsBell = ({ onOpenOrder, triggerStyle }) => {
   const { user, getAccessToken } = useAuth();
   const [open, setOpen] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
@@ -143,6 +143,8 @@ export const NotificationsBell = ({ onOpenOrder }) => {
         }}
         aria-label="Notificaciones"
         badge={unreadCount}
+        badgeColor="var(--terracotta)"
+        style={triggerStyle}
       />
 
       {open && (

@@ -203,9 +203,33 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
   return (
     <div style={{ paddingTop: 150, paddingBottom: 100, minHeight: "70vh" }}>
       <div className="wrap">
-        <h1 className="display" style={{ fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 32 }}>
+        <h1 className="display" style={{ fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 24 }}>
           {phase === "paying" ? "Completa tu pago" : "Finalizar compra"}
         </h1>
+
+        {phase === "form" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36, flexWrap: "wrap" }}>
+            {[
+              ["1", "Contacto", user ? true : Boolean(guest.email)],
+              ["2", "Entrega", hasAddress],
+              ["3", "Envío", Boolean(shippingOption)],
+              ["4", "Pago", Boolean(paymentMethod)],
+            ].map(([n, label, done], i, arr) => (
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{
+                  width: 30, height: 30, borderRadius: "50%",
+                  background: done ? "var(--ink)" : "transparent",
+                  border: done ? "none" : "1.5px solid rgba(27,24,21,.25)",
+                  color: done ? "var(--cream)" : "var(--ink-soft)",
+                  display: "grid", placeItems: "center",
+                  fontFamily: "var(--mono)", fontSize: 12, fontWeight: 700,
+                }}>{n}</span>
+                <span style={{ fontSize: 13, fontWeight: done ? 600 : 500, color: done ? "var(--ink)" : "var(--ink-soft)" }}>{label}</span>
+                {i < arr.length - 1 && <div className="stitch" style={{ width: 36, marginLeft: 4 }} />}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="checkout-layout" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 40, alignItems: "start" }}>
           <div>

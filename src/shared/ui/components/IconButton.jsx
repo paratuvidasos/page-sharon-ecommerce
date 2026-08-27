@@ -6,6 +6,7 @@ export const IconButton = ({
   iconSize,
   color,
   badge,
+  badgeColor = "var(--botanic-deep)",
   style = {},
   children,
   ...rest
@@ -33,7 +34,7 @@ export const IconButton = ({
             position: "absolute",
             top: 6,
             right: 4,
-            background: "var(--botanic-deep)",
+            background: badgeColor,
             color: "#fff",
             fontSize: 10,
             fontWeight: 600,

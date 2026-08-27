@@ -30,6 +30,7 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
   const { cart, itemCount } = useCart();
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isTienda = location.pathname === "/tienda";
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
@@ -38,14 +39,16 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
     return () => window.removeEventListener("scroll", on);
   }, []);
 
-  const linkStyle = {
-    fontSize: 13, fontWeight: 500, letterSpacing: ".06em", textTransform: "uppercase",
-    color: "var(--ink)", position: "relative", padding: "6px 0", textDecoration: "none",
-  };
-  const linkHover = {
-    onMouseEnter: (e) => (e.currentTarget.style.color = "var(--botanic-deep)"),
-    onMouseLeave: (e) => (e.currentTarget.style.color = "var(--ink)"),
-  };
+  const linkStyle = (active) => ({
+    fontSize: 13, fontWeight: active ? 700 : 500, letterSpacing: ".06em", textTransform: "uppercase",
+    color: active ? "var(--ink)" : "var(--ink-soft)", position: "relative", padding: "6px 0", textDecoration: "none",
+    borderBottom: active ? "2px solid var(--terracotta)" : "2px solid transparent",
+  });
+  const linkHover = (active) => ({
+    onMouseEnter: (e) => { if (!active) e.currentTarget.style.color = "var(--botanic-deep)"; },
+    onMouseLeave: (e) => { if (!active) e.currentTarget.style.color = "var(--ink-soft)"; },
+  });
+  const iconBtnStyle = { border: "1px solid rgba(27,24,21,.12)" };
 
   return (
     <header style={{
@@ -62,27 +65,30 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
           <Icon name="menu" size={22} />
         </button>
 
-        <Link to="/" className="script" style={{ fontSize: 34, lineHeight: 1, color: "var(--ink)", letterSpacing: "-.01em", textDecoration: "none" }}>
-          <span style={{ position: "relative" }}>
-            Sharon
-            <span style={{ position: "absolute", right: -10, top: -2, width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }}></span>
+        <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <span style={{
+            width: 38, height: 38, borderRadius: "50%", background: "var(--botanic-deep)",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            <span className="script" style={{ fontSize: 20, color: "var(--cream)" }}>S</span>
           </span>
+          <span className="script" style={{ fontSize: 28, lineHeight: 1, color: "var(--ink)", letterSpacing: "-.01em" }}>Sharon</span>
         </Link>
 
         <nav className="nav-links" style={{ display: "flex", gap: 36, alignItems: "center" }}>
-          <Link to="/tienda" style={linkStyle} {...linkHover}>Shop</Link>
+          <Link to="/tienda" style={linkStyle(isTienda)} {...linkHover(isTienda)}>Shop</Link>
           {SECTION_LINKS.map(l => (
             isHome
-              ? <a key={l.label} href={l.hash} style={linkStyle} {...linkHover}>{l.label}</a>
-              : <Link key={l.label} to={`/${l.hash}`} style={linkStyle} {...linkHover}>{l.label}</Link>
+              ? <a key={l.label} href={l.hash} style={linkStyle(false)} {...linkHover(false)}>{l.label}</a>
+              : <Link key={l.label} to={`/${l.hash}`} style={linkStyle(false)} {...linkHover(false)}>{l.label}</Link>
           ))}
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" />
-          <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label="Favoritos" badge={wishlistCount} />
-          <NotificationsBell onOpenOrder={onOpenOrder} />
-          <AccountMenu onOpenAuth={onOpenAuth} onOpenProfile={onOpenProfile} onOpenOrderHistory={onOpenOrderHistory} onLogout={onLogout} />
+          <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" style={iconBtnStyle} />
+          <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label="Favoritos" badge={wishlistCount} badgeColor="var(--terracotta)" style={iconBtnStyle} />
+          <NotificationsBell onOpenOrder={onOpenOrder} triggerStyle={iconBtnStyle} />
+          <AccountMenu onOpenAuth={onOpenAuth} onOpenProfile={onOpenProfile} onOpenOrderHistory={onOpenOrderHistory} onLogout={onLogout} triggerStyle={iconBtnStyle} />
 
           {/* [0030][FE] Mini-carrito: hover/focus sobre el mismo ícono que abre el
               drawer completo, reutilizando el `cart` que ya trajo CartProvider (GET

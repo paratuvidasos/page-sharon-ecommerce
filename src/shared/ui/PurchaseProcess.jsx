@@ -48,11 +48,34 @@ export const PurchaseProcess = () => {
 
       <div className="wrap" style={{ position: "relative", zIndex: 2 }}>
         <Reveal>
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div className="eyebrow">Guía de compra</div>
             <h2 className="display" style={{ fontSize: "clamp(40px, 5vw, 64px)", margin: "10px 0 0" }}>
               Proceso de <span className="script" style={{ color: "var(--botanic-deep)" }}>compra</span>
             </h2>
+          </div>
+        </Reveal>
+
+        <Reveal delay={60}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap", margin: "0 0 44px" }}>
+            {[
+              ["1", "Eliges tu producto", true],
+              ["2", "Escoges tu camino de pago", true],
+              ["3", "Confirmamos por WhatsApp", false],
+            ].map(([n, label, done], i, arr) => (
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{
+                  width: 32, height: 32, borderRadius: "50%",
+                  background: done ? "var(--ink)" : "transparent",
+                  border: done ? "none" : "1.5px solid rgba(27,24,21,.25)",
+                  color: done ? "var(--cream)" : "var(--ink-soft)",
+                  display: "grid", placeItems: "center",
+                  fontFamily: "var(--mono)", fontSize: 12,
+                }}>{n}</span>
+                <span style={{ fontSize: 13, fontWeight: done ? 600 : 500, color: done ? "var(--ink)" : "var(--ink-soft)" }}>{label}</span>
+                {i < arr.length - 1 && <div className="stitch" style={{ width: 44, marginLeft: 4 }} />}
+              </div>
+            ))}
           </div>
         </Reveal>
 
