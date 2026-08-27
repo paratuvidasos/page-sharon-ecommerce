@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { refreshToken as refreshTokenRequest, getMyProfile, logoutAccount, logoutAllAccounts, deleteAccount as deleteAccountRequest } from "@shared/api-client";
 import { matchCountryByE164, stripDialCode } from "@shared/data/countries";
+import { parseJwt } from "./jwt";
 
 const AuthContext = createContext(null);
 
@@ -31,6 +32,10 @@ export function AuthProvider({ children }) {
   // captura el phone vacío para siempre aunque el context se actualice más tarde.
   // ProfileModal usa este flag para retrasar el montaje del form hasta que sea seguro.
   const [profileReady, setProfileReady] = useState(false);
+  // El claim `role` ("ADMIN"/"CUSTOMER") sí se puede guardar en estado (a diferencia
+  // del accessToken): no es un secreto, solo gatea qué se muestra en el cliente — el
+  // backend es quien de verdad exige role:"ADMIN" en cada ruta /admin/*.
+  const [role, setRole] = useState(null);
   const accessTokenRef = useRef(null);
 
   // Ni /login ni /refresh-token devuelven el perfil completo (phone/avatarUrl) — solo
@@ -62,6 +67,7 @@ export function AuthProvider({ children }) {
     accessTokenRef.current = accessToken || null;
     setUser(nextUser);
     setStatus("authenticated");
+    setRole(accessToken ? parseJwt(accessToken)?.role ?? null : null);
     if (accessToken) {
       setProfileReady(false);
       hydrateProfile(accessToken);
@@ -83,6 +89,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setStatus("guest");
       setProfileReady(false);
+      setRole(null);
     }
   }, []);
 
@@ -94,6 +101,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setStatus("guest");
       setProfileReady(false);
+      setRole(null);
     }
   }, []);
 
@@ -106,6 +114,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setStatus("guest");
     setProfileReady(false);
+    setRole(null);
     return result;
   }, []);
 
@@ -121,6 +130,7 @@ export function AuthProvider({ children }) {
         accessTokenRef.current = accessToken;
         setUser((prev) => toProfileUser(apiUser, prev));
         setStatus("authenticated");
+        setRole(parseJwt(accessToken)?.role ?? null);
         hydrateProfile(accessToken);
       })
       .catch(() => {
@@ -136,6 +146,8 @@ export function AuthProvider({ children }) {
     status,
     isAuthenticated: status === "authenticated",
     profileReady,
+    role,
+    isAdmin: role === "ADMIN",
     getAccessToken: () => accessTokenRef.current,
     login,
     logout,

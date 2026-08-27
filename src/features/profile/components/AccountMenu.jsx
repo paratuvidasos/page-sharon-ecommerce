@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Z } from "@ui/zIndex";
@@ -55,8 +56,8 @@ const Avatar = ({ user, size = 32, fontSize = 14 }) =>
 // pedidos" abre OrderHistoryModal directo, ya no vive dentro de ProfileModal — con
 // !user este componente ni se monta (ver más abajo), así que la opción nunca llega a
 // mostrarse a un invitado. "Cerrar sesión" llama directo a onLogout sin pasar por el modal.
-export const AccountMenu = ({ onOpenAuth, onOpenProfile, onOpenOrderHistory, onLogout }) => {
-  const { user } = useAuth();
+export const AccountMenu = ({ onOpenAuth, onOpenProfile, onOpenOrderHistory, onLogout, triggerStyle }) => {
+  const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const rootRef = useRef(null);
@@ -81,7 +82,7 @@ export const AccountMenu = ({ onOpenAuth, onOpenProfile, onOpenOrderHistory, onL
   };
 
   if (!user) {
-    return <IconButton icon="user" iconSize={18} onClick={onOpenAuth} aria-label="Cuenta" className="nav-user" />;
+    return <IconButton icon="user" iconSize={18} onClick={onOpenAuth} aria-label="Cuenta" className="nav-user" style={triggerStyle} />;
   }
 
   const firstName = user.name?.trim().split(/\s+/)[0] || "Tu cuenta";
@@ -167,6 +168,22 @@ export const AccountMenu = ({ onOpenAuth, onOpenProfile, onOpenOrderHistory, onL
           >
             <Icon name="cart" size={16} /> Historial de pedidos
           </button>
+
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              style={{ ...menuItemStyle(false), marginTop: 2, textDecoration: "none" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--cream-2)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              <Icon name="grid" size={16} color="var(--botanic-deep)" />
+              Panel CRM
+              <span className="mono" style={{ marginLeft: "auto", fontSize: 9, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--gold)" }}>
+                Admin
+              </span>
+            </Link>
+          )}
 
           <button
             type="button"

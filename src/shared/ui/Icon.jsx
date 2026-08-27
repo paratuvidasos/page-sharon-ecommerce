@@ -34,6 +34,21 @@ export const ICONS = {
   WHATSAPP: "wp",
   BELL: "bell",
   LOGOUT: "logout",
+  GRID: "grid",
+  BOX: "box",
+  PEOPLE: "people",
+  TAG: "tag",
+  GEAR: "gear",
+  PENCIL: "pencil",
+  TRASH: "trash",
+  TEAM: "team",
+  CHECK: "check",
+  IMAGE: "image",
+  LAYERS: "layers",
+  SLIDERS: "sliders",
+  MEGAPHONE: "megaphone",
+  DOWNLOAD: "download",
+  WAREHOUSE: "warehouse",
 };
 
 const VALID_ICON_NAMES = new Set(Object.values(ICONS));
@@ -95,6 +110,36 @@ export const Icon = ({ name, size = 22, stroke = 1.5, color = "currentColor" }) 
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M6 10a6 6 0 1 1 12 0c0 4 1.5 5.5 2 6H4c.5-.5 2-2 2-6Z"/><path {...p} d="M10 20a2 2 0 0 0 4 0"/></svg>);
     case "logout":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path {...p} d="M15 16l4-4-4-4M19 12H9"/></svg>);
+    case "grid":
+      return (<svg viewBox="0 0 24 24" style={s}><rect {...p} x="3" y="3" width="8" height="8" rx="2"/><rect {...p} x="13" y="3" width="8" height="8" rx="2"/><rect {...p} x="3" y="13" width="8" height="8" rx="2"/><rect {...p} x="13" y="13" width="8" height="8" rx="2"/></svg>);
+    case "box":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M3 8l9-5 9 5-9 5-9-5Z"/><path {...p} d="M3 8v8l9 5 9-5V8"/><path {...p} d="M12 13v8"/></svg>);
+    case "people":
+      return (<svg viewBox="0 0 24 24" style={s}><circle {...p} cx="9" cy="8" r="3.2"/><path {...p} d="M2.5 20c.7-3.4 3.3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><circle {...p} cx="17" cy="8" r="2.6"/><path {...p} d="M16 14.6c2.4.4 4.2 2.1 4.7 4.4"/></svg>);
+    case "tag":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M3 12 12 3h6a2 2 0 0 1 2 2v6l-9 9a1.5 1.5 0 0 1-2 0L3 14a1.5 1.5 0 0 1 0-2Z"/><circle cx="15" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg>);
+    case "gear":
+      return (<svg viewBox="0 0 24 24" style={s}><circle {...p} cx="12" cy="12" r="3"/><path {...p} d="M12 3v2M12 19v2M4.2 6.2l1.5 1.5M18.3 16.3l1.5 1.5M3 12h2M19 12h2M4.2 17.8l1.5-1.5M18.3 7.7l1.5-1.5"/></svg>);
+    case "pencil":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>);
+    case "trash":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>);
+    case "team":
+      return (<svg viewBox="0 0 24 24" style={s}><circle {...p} cx="9" cy="8" r="3.2"/><path {...p} d="M2.5 20c.7-3.4 3.3-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><circle {...p} cx="17" cy="8" r="2.6"/><path {...p} d="M16 14.6c2.4.4 4.2 2.1 4.7 4.4"/></svg>);
+    case "check":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 12.5 9.5 18 20 6"/></svg>);
+    case "image":
+      return (<svg viewBox="0 0 24 24" style={s}><rect {...p} x="3" y="4" width="18" height="16" rx="2.5"/><circle {...p} cx="8.5" cy="10" r="1.6"/><path {...p} d="m4 17 5-5 4 4 3-3 4 4"/></svg>);
+    case "layers":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="m12 3 9 5-9 5-9-5 9-5Z"/><path {...p} d="m3 13 9 5 9-5"/></svg>);
+    case "sliders":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h13M21 18h-1"/><circle cx="15" cy="6" r="2" fill="var(--cream)" stroke="currentColor" strokeWidth="1.5"/><circle cx="7" cy="12" r="2" fill="var(--cream)" stroke="currentColor" strokeWidth="1.5"/><circle cx="17" cy="18" r="2" fill="var(--cream)" stroke="currentColor" strokeWidth="1.5"/></svg>);
+    case "megaphone":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M3 11v2a2 2 0 0 0 2 2h1l2 5h2l-1-5h2l9 4V6l-9 4H6a2 2 0 0 0-2 2Z"/><path {...p} d="M19 9v6"/></svg>);
+    case "download":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M12 3v13m0 0-4-4m4 4 4-4"/><path {...p} d="M4 20h16"/></svg>);
+    case "warehouse":
+      return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M3 10 12 4l9 6v9a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1v-9Z"/><path {...p} d="M9 20v-3h6v3"/></svg>);
     case "ig":
       return (<svg viewBox="0 0 24 24" style={s}><rect {...p} x="3.5" y="3.5" width="17" height="17" rx="5"/><circle {...p} cx="12" cy="12" r="4"/><circle fill="currentColor" stroke="none" cx="17.5" cy="6.5" r="1"/></svg>);
     case "tt":

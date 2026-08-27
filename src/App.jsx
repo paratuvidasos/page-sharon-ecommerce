@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Nav } from "@ui/Nav";
 import { HomePage } from "./pages/HomePage";
 import { CatalogPage } from "./pages/CatalogPage";
@@ -24,6 +24,18 @@ import { Z } from "@ui/zIndex";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
+import { AdminLayout } from "@features/admin/components/AdminLayout";
+import { AdminDashboard } from "@features/admin/components/dashboard/AdminDashboard";
+import { AdminOrders } from "@features/admin/components/orders/AdminOrders";
+import { AdminProducts } from "@features/admin/components/products/AdminProducts";
+import { AdminCustomers } from "@features/admin/components/customers/AdminCustomers";
+import { AdminCoupons } from "@features/admin/components/coupons/AdminCoupons";
+import { AdminTeam } from "@features/admin/components/team/AdminTeam";
+import { AdminSettings } from "@features/admin/components/settings/AdminSettings";
+import { AdminCategories } from "@features/admin/components/categories/AdminCategories";
+import { AdminInventory } from "@features/admin/components/inventory/AdminInventory";
+import { AdminReviews } from "@features/admin/components/reviews/AdminReviews";
+import { AdminBanners } from "@features/admin/components/banners/AdminBanners";
 
 const ACCENT_PALETTES = {
   botanic: { deep: "#5E7860", soft: "#9CB29B", paper: "#D2DFD0" },
@@ -271,6 +283,30 @@ function App() {
     setOrderHistoryOpen(true);
     refreshOrders();
   };
+
+  // El panel admin tiene su propio shell (AdminLayout: sidebar + topbar), sin el
+  // Nav/Footer de la tienda ni los modales globales de abajo — se renderiza aparte
+  // en vez de meterlo dentro de <main> junto al resto de las rutas.
+  const location = useLocation();
+  if (location.pathname.startsWith("/admin")) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="inventory" element={<AdminInventory />} />
+          <Route path="customers" element={<AdminCustomers />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="banners" element={<AdminBanners />} />
+          <Route path="team" element={<AdminTeam />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
+    );
+  }
 
   return (
     <>
