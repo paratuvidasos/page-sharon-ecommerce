@@ -49,18 +49,23 @@ export const BeforeAfter = () => {
             </Reveal>
 
             <Reveal delay={150}>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
                 {[
-                  ["+38%", "más brillo medido en laboratorio"],
-                  ["−72%", "rotura al cepillar"],
-                  ["+24%", "densidad capilar percibida"],
-                ].map(([k, v]) => (
-                  <li key={k} style={{ display: "flex", alignItems: "baseline", gap: 16, paddingBottom: 12, borderBottom: "1px solid var(--line)" }}>
-                    <span className="display" style={{ fontSize: 32, color: "var(--botanic-deep)", minWidth: 96 }}>{k}</span>
-                    <span style={{ color: "var(--ink-soft)", fontSize: 14 }}>{v}</span>
-                  </li>
+                  ["+38%", "más brillo medido en laboratorio", false],
+                  ["−72%", "rotura al cepillar", true],
+                  ["+24%", "densidad capilar percibida", false],
+                ].map(([k, v, dark]) => (
+                  <div key={k} style={{
+                    flex: 1, minWidth: 150, borderRadius: 16, padding: "18px 20px",
+                    background: dark ? "var(--ink)" : "#fff",
+                    border: dark ? "none" : "1px dashed rgba(27,24,21,.3)",
+                    color: dark ? "var(--cream)" : "var(--ink)",
+                  }}>
+                    <div className="display" style={{ fontSize: 26, color: dark ? "var(--cream)" : "var(--botanic-deep)" }}>{k}</div>
+                    <div style={{ fontSize: 11.5, color: dark ? "rgba(255,255,255,.75)" : "var(--ink-soft)", marginTop: 4 }}>{v}</div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </Reveal>
 
             <Reveal delay={300}>
