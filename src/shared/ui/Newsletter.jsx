@@ -7,7 +7,7 @@ import { Button } from "./components/Button";
 // ver CLAUDE.md) — mismo patrón mínimo (guarda, confirma 4s, limpia) en la tarjeta
 // completa de abajo y en esta fila compacta del footer, solo que la compacta pide
 // únicamente correo (sin nombre), a propósito para caber en una sola línea.
-const useEmailSubscribe = () => {
+export const useEmailSubscribe = () => {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -23,16 +23,28 @@ const useEmailSubscribe = () => {
   return { email, setEmail, sent, submit };
 };
 
-// Fila compacta para el footer (rebrand: "Join the studio" del mockup de referencia)
-// — un solo campo visible (correo) y estilos para fondo oscuro.
-const NewsletterInline = () => {
+// Fila compacta reutilizada tanto por el footer (rebrand: "Join the studio" del mockup
+// de referencia) como por la franja de comunidad al final de OfferBanner (ver diseño 1b:
+// "reutiliza el patrón inline que ya existe en el footer") — un solo campo visible
+// (correo) y estilos para fondo oscuro. `eyebrow`/`heading` son personalizables porque
+// cada lugar donde se usa tiene su propio copy (footer: "Únete a Sharon"; oferta:
+// "Comunidad Sharon" + mención del -10%).
+export const NewsletterInline = ({
+  eyebrow,
+  heading = <>Únete a <span className="script" style={{ color: "var(--botanic)" }}>Sharon</span></>,
+}) => {
   const { email, setEmail, sent, submit } = useEmailSubscribe();
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }} className="nl-inline">
-      <h2 className="display" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "var(--cream)", margin: 0 }}>
-        Únete al <span className="script" style={{ color: "var(--botanic)" }}>ritual</span>
-      </h2>
+      <div>
+        {eyebrow && (
+          <div className="eyebrow" style={{ color: "var(--botanic)", marginBottom: 6 }}>{eyebrow}</div>
+        )}
+        <h2 className="display" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "var(--cream)", margin: 0 }}>
+          {heading}
+        </h2>
+      </div>
       <form onSubmit={submit} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <input
           value={email}

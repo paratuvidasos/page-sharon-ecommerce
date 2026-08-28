@@ -307,6 +307,16 @@ a {
   transform: translateY(-1px);
 }
 
+.btn-whatsapp {
+  background: #25D366;
+  color: #fff;
+}
+
+.btn-whatsapp:hover {
+  background: #1EBE5A;
+  transform: translateY(-1px);
+}
+
 .btn-sm {
   padding: 10px 18px;
   font-size: 12px;

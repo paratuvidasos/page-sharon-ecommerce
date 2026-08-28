@@ -43,7 +43,7 @@ export const BeforeAfter = () => {
                 Antes &<br /><span className="script" style={{ color: "var(--botanic-deep)" }}>después</span>
               </h2>
               <p style={{ color: "var(--ink-soft)", fontSize: 16, lineHeight: 1.65, maxWidth: 460, marginBottom: 28 }}>
-                4 semanas de ritual Sharon: tónico anti-caída, mascarilla reparadora y aceite de argán.
+                4 semanas de hábitos Sharon: tónico anti-caída, mascarilla reparadora y aceite de argán.
                 Sin retoques, sin filtros, sin promesas vacías.
               </p>
             </Reveal>

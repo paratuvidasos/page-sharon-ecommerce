@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Hero } from "@ui/Hero";
+import { CampaignCarousel } from "@ui/CampaignCarousel";
 import { Benefits } from "@ui/Benefits";
 import { BeforeAfter } from "@ui/BeforeAfter";
 import { Testimonials } from "@ui/Testimonials";
-import { PurchaseProcess } from "@ui/PurchaseProcess";
 import { OfferBanner } from "@ui/OfferBanner";
-import { Newsletter } from "@ui/Newsletter";
 import { FeaturedProducts } from "@features/catalog/components/FeaturedProducts";
 
 // Landing/home: ya no incluye el grid completo del catálogo (eso vive en /tienda,
@@ -29,13 +28,12 @@ export const HomePage = ({ onWish, wishlistIds, onOpenProduct }) => {
   return (
     <>
       <Hero onShop={() => navigate("/tienda")} />
+      <CampaignCarousel />
       <Benefits />
       <BeforeAfter />
-      <PurchaseProcess />
       <Testimonials />
       <FeaturedProducts onWish={onWish} wishlistIds={wishlistIds} onOpenProduct={onOpenProduct} />
       <OfferBanner />
-      <Newsletter />
     </>
   );
 };

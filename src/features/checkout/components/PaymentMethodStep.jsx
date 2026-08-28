@@ -1,7 +1,27 @@
 import { useEffect, useState } from "react";
 import { listPaymentMethods, ApiError } from "@shared/api-client";
+import { Icon, ICONS } from "@ui/Icon";
 import { fieldLabelStyle, optionCardStyle, optionRowStyle } from "../fieldStyles";
 import { CardBrandIcons } from "./CardBrandIcons";
+
+// Método de pago "WHATSAPP": no viene del backend (GET /payments/methods) — es un
+// camino alterno puramente de frontend. La persona arma el pedido en el checkout normal
+// y, en vez de pagar con tarjeta/Bold, confirma y coordina el pago directo por WhatsApp
+// (ver features/checkout/whatsapp.js). Se agrega siempre como última opción de la lista.
+const WHATSAPP_METHOD = {
+  method: "WHATSAPP",
+  uiLabel: "Pagar por WhatsApp",
+  uiDescription: "Te armamos el resumen de tu pedido, listo para enviarnos por chat.",
+};
+
+const WhatsAppBadge = () => (
+  <span style={{
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+    width: 26, height: 26, borderRadius: "50%", background: "#25D366", flexShrink: 0,
+  }}>
+    <Icon name={ICONS.WHATSAPP} size={14} />
+  </span>
+);
 
 // El backend (GET /payments/methods) devuelve hasta 5 códigos para CO/COP
 // (CREDIT_CARD, DEBIT_CARD, PSE, NEQUI, BANCOLOMBIA_BUTTON), pero todos terminan en
@@ -13,8 +33,10 @@ import { CardBrandIcons } from "./CardBrandIcons";
 const CARD_CODES = ["CREDIT_CARD", "DEBIT_CARD"];
 
 // `compact` se usa cuando este mismo componente se reutiliza dentro de
-// RetryPaymentPanel (pantalla de resultado, tras un pago rechazado).
-export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, compact = false }) => {
+// RetryPaymentPanel (pantalla de resultado, tras un pago rechazado). Ahí también se
+// desactiva `allowWhatsApp`: ese panel llama POST /orders/{orderNumber}/retry-payment,
+// que espera uno de los códigos reales del backend — "WHATSAPP" no es uno de ellos.
+export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, compact = false, allowWhatsApp = true }) => {
   const [state, setState] = useState({ loading: true, methods: [], error: null });
 
   useEffect(() => {
@@ -24,7 +46,7 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
       .then((res) => {
         if (cancelled) return;
         setState({ loading: false, methods: res.methods, error: null });
-        const stillValid = res.methods.some((m) => m.method === value?.method);
+        const stillValid = (allowWhatsApp && value?.method === WHATSAPP_METHOD.method) || res.methods.some((m) => m.method === value?.method);
         if (!stillValid) {
           const card = CARD_CODES.map((code) => res.methods.find((m) => m.method === code)).find(Boolean);
           onSelect(card || res.methods[0] || null);
@@ -45,6 +67,7 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
   const options = [
     cardMethod && { ...cardMethod, uiLabel: "Tarjeta de crédito o débito", uiDescription: "Visa, Mastercard, American Express y Diners." },
     boldMethod && { ...boldMethod, uiLabel: "Paga con Bold", uiDescription: "Serás redirigido a Bold para completar el pago de forma segura." },
+    allowWhatsApp && !state.loading && !state.error && WHATSAPP_METHOD,
   ].filter(Boolean);
 
   return (
@@ -53,7 +76,7 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
         <>
           <div className="eyebrow" style={fieldLabelStyle}>Método de pago</div>
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 14 }}>
-            Todas las transacciones son seguras. Bold procesa tu pago de forma encriptada.
+            Los pagos con tarjeta o Bold se procesan de forma encriptada. También puedes coordinar tu pago directo por WhatsApp.
           </p>
         </>
       )}
@@ -85,6 +108,7 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
                   </span>
                 </span>
                 {CARD_CODES.includes(m.method) && <CardBrandIcons />}
+                {m.method === WHATSAPP_METHOD.method && <WhatsAppBadge />}
               </label>
             );
           })}

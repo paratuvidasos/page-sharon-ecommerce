@@ -9,8 +9,8 @@ export const Footer = () => {
   ];
 
   // Footer de ancho completo (no flotante, sin radio) — misma paleta oscura de
-  // Testimonials/PurchaseProcess ("aún no he pagado") pero como cierre de página
-  // clásico, con la newsletter compacta integrada arriba en vez de vivir aparte.
+  // Testimonials pero como cierre de página clásico, con la newsletter compacta
+  // integrada arriba en vez de vivir aparte.
   return (
     <footer style={{
       background: "linear-gradient(180deg, var(--ink) 0%, #2A241E 100%)",
@@ -35,7 +35,7 @@ export const Footer = () => {
             <div className="script" style={{ fontSize: 48, lineHeight: 1, marginBottom: 18 }}>Sharon</div>
             <p style={{ color: "rgba(255,255,255,.65)", fontSize: 14, lineHeight: 1.65, maxWidth: 320, marginBottom: 24 }}>
               Cuidado capilar profesional, formulado en pequeños lotes en Colombia.
-              Botánica · ciencia · ritual.
+              Botánica · ciencia · hábitos.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               {[["ig", "Instagram"], ["tt", "TikTok"], ["pin", "Pinterest"], ["fb", "Facebook"]].map(([k, label]) => (

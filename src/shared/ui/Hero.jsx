@@ -44,7 +44,7 @@ export const Hero = ({ onShop }) => {
             <Reveal delay={260}>
               <p style={{ fontSize: 17, lineHeight: 1.65, color: "var(--ink-soft)", maxWidth: 520, margin: "28px 0 36px" }}>
                 Fórmulas botánicas, libres de sulfatos y desarrolladas por especialistas.
-                Sharon es el ritual diario que tu cabello pidió desde siempre.
+                Sharon es el hábito diario que tu cabello pidió desde siempre.
               </p>
             </Reveal>
 

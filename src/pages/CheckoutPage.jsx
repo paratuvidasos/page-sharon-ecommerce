@@ -13,6 +13,8 @@ import { OrderSummary } from "@features/checkout/components/OrderSummary";
 import { CheckoutErrorBanner } from "@features/checkout/components/CheckoutErrorBanner";
 import { BoldPaymentPanel } from "@features/checkout/components/payment/BoldPaymentPanel";
 import { validateAddressFields } from "@features/checkout/validation";
+import { Icon, ICONS } from "@ui/Icon";
+import { buildWhatsAppCheckoutMessage, whatsAppCheckoutUrl } from "@features/checkout/whatsapp";
 
 // [0041] Solo COP está habilitado hoy (mismo alcance que shared/i18n/currency.js) — no
 // hay endpoint para saber qué monedas habilitó el backend, así que no se pinta selector.
@@ -70,6 +72,8 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
   const [checkoutError, setCheckoutError] = useState(null);
   const [phase, setPhase] = useState("form"); // "form" | "paying"
   const [orderResult, setOrderResult] = useState(null);
+  const [whatsappNotice, setWhatsappNotice] = useState(false);
+  const isWhatsapp = paymentMethod?.method === "WHATSAPP";
 
   const selected = savedAddresses.find((a) => a.id === selectedAddressId);
   const isManual = selectedAddressId === MANUAL_ADDRESS || savedAddresses.length === 0;
@@ -127,6 +131,27 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
     }
     if (!paymentMethod) {
       setCheckoutError({ code: null, message: "Selecciona un método de pago antes de continuar." });
+      return;
+    }
+
+    if (isWhatsapp) {
+      const country = COUNTRIES.find((c) => c.code === addressCountryCode) || COUNTRIES[0];
+      const contact = isManual
+        ? {
+            name: manual.recipientName.trim(),
+            phone: `${country.dialCode}${manual.phone}`,
+            address: [manual.streetLine1.trim(), manual.streetLine2.trim(), manual.city.trim(), manual.stateProvince.trim()].filter(Boolean).join(", "),
+            email: user?.email || guest.email.trim(),
+          }
+        : {
+            name: selected.recipientName,
+            phone: selected.phone,
+            address: [selected.streetLine1, selected.streetLine2, selected.city, selected.stateProvince].filter(Boolean).join(", "),
+            email: user?.email || guest.email.trim(),
+          };
+      const message = buildWhatsAppCheckoutMessage({ cart, shippingOption, contact });
+      window.open(whatsAppCheckoutUrl(message), "_blank", "noopener,noreferrer");
+      setWhatsappNotice(true);
       return;
     }
 
@@ -273,17 +298,28 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                     countryCode={addressCountryCode}
                     currency={CURRENCY}
                     value={paymentMethod}
-                    onSelect={setPaymentMethod}
+                    onSelect={(m) => { setPaymentMethod(m); setWhatsappNotice(false); }}
                   />
                 </Section>
 
                 <Button
                   onClick={handleConfirm}
                   disabled={submitting}
-                  style={{ width: "100%", justifyContent: "center", opacity: submitting ? 0.6 : 1, cursor: submitting ? "not-allowed" : "pointer", marginTop: 8 }}
+                  variant={isWhatsapp ? "whatsapp" : "dark"}
+                  style={{ width: "100%", justifyContent: "center", gap: 8, opacity: submitting ? 0.6 : 1, cursor: submitting ? "not-allowed" : "pointer", marginTop: 8 }}
                 >
-                  {submitting ? "Procesando…" : "Pagar ahora"}
+                  {isWhatsapp && <Icon name={ICONS.WHATSAPP} size={16} />}
+                  {submitting ? "Procesando…" : isWhatsapp ? "Continuar por WhatsApp" : "Pagar ahora"}
                 </Button>
+                {isWhatsapp && whatsappNotice && (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    background: "rgba(37,211,102,.1)", border: "1px solid rgba(37,211,102,.35)",
+                    borderRadius: 14, padding: "12px 18px", fontSize: 12.5, color: "var(--ink)", marginTop: 12,
+                  }}>
+                    Abrimos WhatsApp con tu pedido listo — solo dale enviar. Si no se abrió, revisa que tu navegador no haya bloqueado la ventana emergente.
+                  </div>
+                )}
                 <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 8 }}>
                   Al confirmar aceptas nuestros términos y condiciones.
                 </div>

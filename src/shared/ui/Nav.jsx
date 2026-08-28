@@ -20,7 +20,6 @@ const MAX_MINI_CART_LINES = 3;
 const SECTION_LINKS = [
   { label: "Hábitos", hash: "#beneficios" },
   { label: "Resultados", hash: "#antes-despues" },
-  { label: "Proceso de compra", hash: "#proceso-compra" },
   { label: "Historia", hash: "#testimonios" },
 ];
 

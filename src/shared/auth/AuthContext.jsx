@@ -36,15 +36,21 @@ export function AuthProvider({ children }) {
   // del accessToken): no es un secreto, solo gatea qué se muestra en el cliente — el
   // backend es quien de verdad exige role:"ADMIN" en cada ruta /admin/*.
   const [role, setRole] = useState(null);
+  // null mientras no se sabe todavía (antes de que resuelva hydrateProfile). false =
+  // cuenta creada solo por Google/Clerk, sin contraseña propia — la usan ProfileModal
+  // (para ofrecer "crear contraseña") y DeleteAccountModal (para bloquear el borrado
+  // hasta que exista una contraseña con la que confirmarlo).
+  const [hasPassword, setHasPassword] = useState(null);
   const accessTokenRef = useRef(null);
 
-  // Ni /login ni /refresh-token devuelven el perfil completo (phone/avatarUrl) — solo
-  // GET /accounts/me lo trae, así que hay que pedirlo aparte apenas hay accessToken y
-  // parchear el `user` ya seteado. El teléfono viene en E.164 sin el país por separado
+  // Ni /login ni /refresh-token devuelven el perfil completo (phone/avatarUrl/hasPassword)
+  // — solo GET /accounts/me lo trae, así que hay que pedirlo aparte apenas hay accessToken
+  // y parchear el `user` ya seteado. El teléfono viene en E.164 sin el país por separado
   // (a diferencia de las direcciones), así que el país se infiere del propio dial code.
   const hydrateProfile = useCallback(async (accessToken) => {
     try {
       const apiUser = await getMyProfile(accessToken);
+      setHasPassword(apiUser.hasPassword ?? null);
       setUser((prev) => {
         if (!prev) return prev;
         const patch = { avatarUrl: apiUser.avatarUrl ?? prev.avatarUrl };
@@ -57,7 +63,7 @@ export function AuthProvider({ children }) {
       });
     } catch {
       // Silencioso: el perfil ya se ve con lo que trajo login/refresh, solo faltaría
-      // el teléfono/avatar hasta que el usuario reabra el modal o recargue.
+      // el teléfono/avatar/hasPassword hasta que el usuario reabra el modal o recargue.
     } finally {
       setProfileReady(true);
     }
@@ -72,9 +78,15 @@ export function AuthProvider({ children }) {
       setProfileReady(false);
       hydrateProfile(accessToken);
     } else {
-      setProfileReady(true); // Google simulado: no hay accessToken, nada que hidratar.
+      setHasPassword(null);
+      setProfileReady(true); // Sin accessToken no hay perfil (GET /accounts/me) que pedir.
     }
   }, [hydrateProfile]);
+
+  // DeleteAccountModal llama esto justo después de que POST /accounts/set-password
+  // responde 200, para no tener que esperar un refetch de GET /accounts/me solo para
+  // desbloquear el flujo de borrado en la misma sesión.
+  const markPasswordCreated = useCallback(() => setHasPassword(true), []);
 
   // El backend usa JWT sin estado para el accessToken: /logout y /logout-all solo
   // revocan el refresh token (cookie httpOnly) en la base de datos, no pueden invalidar
@@ -90,6 +102,7 @@ export function AuthProvider({ children }) {
       setStatus("guest");
       setProfileReady(false);
       setRole(null);
+      setHasPassword(null);
     }
   }, []);
 
@@ -102,6 +115,7 @@ export function AuthProvider({ children }) {
       setStatus("guest");
       setProfileReady(false);
       setRole(null);
+      setHasPassword(null);
     }
   }, []);
 
@@ -115,6 +129,7 @@ export function AuthProvider({ children }) {
     setStatus("guest");
     setProfileReady(false);
     setRole(null);
+    setHasPassword(null);
     return result;
   }, []);
 
@@ -148,6 +163,8 @@ export function AuthProvider({ children }) {
     profileReady,
     role,
     isAdmin: role === "ADMIN",
+    hasPassword,
+    markPasswordCreated,
     getAccessToken: () => accessTokenRef.current,
     login,
     logout,

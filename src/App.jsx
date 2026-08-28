@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useUser as useClerkUser, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { Nav } from "@ui/Nav";
 import { HomePage } from "./pages/HomePage";
 import { CatalogPage } from "./pages/CatalogPage";
@@ -11,11 +12,12 @@ import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
+import { SsoCallbackHandler } from "@features/auth/components/sso-callback/SsoCallbackHandler";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DeleteAccountModal } from "@features/profile/components/delete-account/DeleteAccountModal";
 import { useAuth } from "@shared/auth/AuthContext";
 import { useCart } from "@shared/cart/CartContext";
-import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
+import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist, loginWithGoogle } from "@shared/api-client";
 import { WishlistModal } from "@features/wishlist/components/WishlistModal";
 import { ProductDetailModal } from "@features/catalog/components/ProductDetailModal";
 import { OrderDetailModal } from "@features/orders/components/OrderDetailModal";
@@ -69,7 +71,10 @@ function App() {
   const [verifyModalOpen, setVerifyModalOpen] = useState(
     () => window.location.pathname === "/verify-email" && new URLSearchParams(window.location.search).has("token")
   );
-  const { user, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady } = useAuth();
+  const { user, status, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady, hasPassword } = useAuth();
+  const { isLoaded: clerkLoaded, isSignedIn: clerkSignedIn } = useClerkUser();
+  const { getToken: getClerkSessionToken } = useClerkAuth();
+  const { signOut: clerkSignOut } = useClerk();
   const [profileOpen, setProfileOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
@@ -151,9 +156,11 @@ function App() {
   };
 
   // El "usuario logueado" y su accessToken viven en AuthContext (ver src/shared/auth),
-  // en memoria únicamente. Login por correo trae accessToken real (sesión de verdad);
-  // Google sigue simulado y no trae token. Solo se conserva phone/countryCode/avatarUrl
-  // previos si es la misma cuenta ya editada en esta sesión (ProfileModal los llena).
+  // en memoria únicamente. Tanto login por correo como Google (vía ClerkGoogleBridge
+  // abajo, que cambia el session token de Clerk por un accessToken real de este backend
+  // en POST /accounts/oauth/google) llegan acá con un accessToken de verdad. Solo se
+  // conserva phone/countryCode/avatarUrl previos si es la misma cuenta ya editada en
+  // esta sesión (ProfileModal los llena).
   const handleAuthSuccess = ({ name, email, accessToken }) => {
     const samePrevAccount = user?.email === email;
     authLogin(
@@ -166,10 +173,38 @@ function App() {
       },
       accessToken
     );
-    // [0028][FE] Google simulado no trae accessToken, así que no hay carrito de
-    // cuenta contra el que fusionar todavía — solo el login real dispara el merge.
     if (accessToken) mergeGuestCart(accessToken);
   };
+
+  // Puente entre la sesión de Clerk (Google) y la sesión real de este backend: el redirect
+  // de OAuth sale de la SPA por completo (ver AuthModal.handleGoogleContinue +
+  // SsoCallbackHandler), así que nada dentro del modal sigue vivo para recibir el
+  // resultado. En cuanto Clerk reporta sesión activa y el AuthContext local sigue en
+  // "guest", se cambia el session token de Clerk por un accessToken propio en
+  // POST /accounts/oauth/google (el backend vincula por email o crea la cuenta) y se
+  // completa el login local igual que un login por correo. Se frena solo con
+  // `status !== "guest"`: handleAuthSuccess deja status en "authenticated", así que este
+  // efecto no vuelve a dispararse hasta el próximo logout.
+  useEffect(() => {
+    if (!clerkLoaded || !clerkSignedIn || status !== "guest") return;
+    let cancelled = false;
+    (async () => {
+      const sessionToken = await getClerkSessionToken();
+      if (cancelled || !sessionToken) return;
+      const { accessToken, user: apiUser } = await loginWithGoogle({ sessionToken });
+      if (cancelled) return;
+      handleAuthSuccess({
+        name: `${apiUser.firstName} ${apiUser.lastName}`,
+        email: apiUser.email,
+        accessToken,
+      });
+    })().catch((err) => {
+      console.error("No se pudo sincronizar el login con Google contra el backend", err);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [clerkLoaded, clerkSignedIn, status]);
 
   // Direcciones sí son reales desde [0007][BE]: se cargan contra la API apenas hay
   // sesión (login por correo o el refresh-token automático al montar la app en
@@ -264,11 +299,15 @@ function App() {
   const handleLogout = async () => {
     setProfileOpen(false);
     await authLogout();
+    // Sin esto, una sesión iniciada con Google (Clerk) seguiría activa del lado de Clerk
+    // y ClerkGoogleBridge la volvería a loguear localmente en el siguiente render.
+    await clerkSignOut().catch(() => {});
   };
 
   const handleLogoutAll = async () => {
     setProfileOpen(false);
     await authLogoutAll();
+    await clerkSignOut().catch(() => {});
   };
 
   // [0010][BE] Eliminar cuenta: DeleteAccountModal ya hizo el DELETE real y limpió la
@@ -350,6 +389,13 @@ function App() {
             path="/verify-email"
             element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
           />
+          {/* Aterrizaje del redirect de OAuth de Google (ver AuthModal + SsoCallbackHandler
+              abajo) — mismo patrón que /reset-password y /verify-email: el fondo es la
+              landing, SsoCallbackHandler hace el trabajo real y no renderiza nada visible. */}
+          <Route
+            path="/sso-callback"
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -375,6 +421,7 @@ function App() {
         onRemove={handleWish}
       />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SsoCallbackHandler />
       <AuthModal
         open={accountOpen}
         onClose={() => setAccountOpen(false)}
@@ -399,6 +446,7 @@ function App() {
         onClose={() => setProfileOpen(false)}
         user={user}
         profileReady={profileReady}
+        hasPassword={hasPassword}
         onSave={(profile) => updateUser(profile)}
         addresses={addresses}
         setAddresses={setAddresses}

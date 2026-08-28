@@ -5,6 +5,7 @@ import { Button } from "@ui/components/Button";
 import { Modal, MODAL_CLOSE_MS } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { ProfileForm } from "./ProfileForm";
+import { CreatePasswordSection } from "./CreatePasswordSection";
 import { AddressBookModal } from "./addresses/AddressBookModal";
 
 const SAVED_BANNER_MS = 3000;
@@ -29,7 +30,7 @@ const linkBtnStyle = {
 // Modal. El historial de pedidos ya no vive acá: se abre directo desde el menú
 // desplegable de la cuenta (ver AccountMenu.jsx / App.jsx), no hace falta pasar por
 // "Editar perfil" para verlo.
-export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addresses, setAddresses, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
+export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, onSave, addresses, setAddresses, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
   const [submitting, setSubmitting] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
   const [formKey, setFormKey] = useState(0);
@@ -39,6 +40,7 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
   const [confirmingLogoutAll, setConfirmingLogoutAll] = useState(false);
   const formRef = useRef(null);
   const savedTimeoutRef = useRef(null);
+  const createPasswordRef = useRef(null);
 
   // `if (!user) return null` más abajo hace que este componente nunca se desmonte de
   // verdad al cerrar sesión (React conserva el mismo fiber, solo deja de renderizar
@@ -68,6 +70,10 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
     onClose();
     setSavedAt(0);
     setTimeout(() => setFormKey((k) => k + 1), MODAL_CLOSE_MS);
+  };
+
+  const scrollToCreatePassword = () => {
+    createPasswordRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   useEffect(() => () => {
@@ -174,6 +180,12 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
             </div>
           </div>
 
+          {hasPassword === false && (
+            <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
+              <CreatePasswordSection ref={createPasswordRef} />
+            </div>
+          )}
+
           <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Sesión</span>
             {confirmingLogoutAll ? (
@@ -224,9 +236,21 @@ export const ProfileModal = ({ open, onClose, user, profileReady, onSave, addres
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10, color: "#9C4A4A" }}>
               Zona de peligro
             </span>
-            <button type="button" onClick={onOpenDeleteAccount} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
-              Eliminar mi cuenta
-            </button>
+            {hasPassword === false ? (
+              <>
+                <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 8, lineHeight: 1.5 }}>
+                  Necesitas crear una contraseña antes de poder eliminar tu cuenta (tu cuenta llegó
+                  por Google y hoy no tiene ninguna con la que confirmar el borrado).
+                </p>
+                <button type="button" onClick={scrollToCreatePassword} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
+                  Crear contraseña
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={onOpenDeleteAccount} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
+                Eliminar mi cuenta
+              </button>
+            )}
           </div>
         </div>
 

@@ -192,7 +192,7 @@ export const CartDrawer = ({ open, onClose }) => {
               </div>
               <div>
                 <div className="display" style={{ fontSize: 22 }}>Tu bolsa está vacía</div>
-                <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>Añade algún producto para empezar tu ritual.</div>
+                <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>Añade algún producto para empezar tus hábitos.</div>
               </div>
               <Button onClick={onClose} size="sm" style={{ marginTop: 6 }}>Explorar productos</Button>
             </div>

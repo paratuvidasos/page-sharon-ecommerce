@@ -49,7 +49,7 @@ export const RetryPaymentPanel = ({ order, countryCode, currency, email }) => {
   return (
     <div>
       <CheckoutErrorBanner error={error} onRefreshCart={() => {}} onRemoveCoupon={() => {}} />
-      <PaymentMethodStep countryCode={countryCode} currency={currency} value={paymentMethod} onSelect={setPaymentMethod} />
+      <PaymentMethodStep countryCode={countryCode} currency={currency} value={paymentMethod} onSelect={setPaymentMethod} allowWhatsApp={false} />
       <Button
         type="button"
         onClick={handleRetry}

@@ -31,7 +31,7 @@ export const TESTIMONIALS = [
     name: "Marta Solís",
     role: "Medellin, COL",
     rating: 5,
-    quote: "El tónico anticaída funciona, pero lo que me enamoró fue el ritual. Da gusto cuidarse con productos así.",
+    quote: "El tónico anticaída funciona, pero lo que me enamoró fueron los hábitos. Da gusto cuidarse con productos así.",
     avatar: "M",
     tone: "rose"
   },

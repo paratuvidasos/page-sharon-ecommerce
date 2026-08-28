@@ -28,6 +28,5 @@ export const Z = {
   // hermano top-level en App.jsx (mismo motivo que Z.deleteAccount: la instancia de
   // OrderDetailModal que vive dentro de OrderHistoryModal solo se monta si esa modal está abierta).
   // checkout ya no es modal: es una vista dedicada en /checkout (ver src/pages/CheckoutPage.jsx).
-  googleDialog: 119, // diálogo simulado de Google, anidado dentro de AuthModal
   verifyEmail: 121, // EmailVerificationModal (aterrizaje del enlace de verificación de correo)
 };
