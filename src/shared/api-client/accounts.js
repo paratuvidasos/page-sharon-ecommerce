@@ -25,6 +25,17 @@ export function loginAccount({ email, password, rememberMe }) {
   });
 }
 
+// El sessionToken viene de Clerk (getToken() de useAuth()/useSession()) tras completar
+// "Continuar con Google" — el backend lo verifica server-side y vincula por email o crea
+// la cuenta. Responde con el mismo shape que loginAccount (accessToken + refresh_token
+// como cookie httpOnly), así que del lado del cliente se trata exactamente como un login.
+export function loginWithGoogle({ sessionToken, rememberMe }) {
+  return request("/accounts/oauth/google", {
+    method: "POST",
+    body: { sessionToken, rememberMe },
+  });
+}
+
 export function refreshToken() {
   return request("/accounts/refresh-token", { method: "POST" });
 }
@@ -53,6 +64,16 @@ export function logoutAccount() {
 
 export function logoutAllAccounts(accessToken) {
   return request("/accounts/logout-all", { method: "POST", token: accessToken });
+}
+
+// Solo válido para cuentas sin contraseña propia (hasPassword === false en GET /accounts/me,
+// ej. cuentas creadas solo por Google) — el backend responde 409 si la cuenta ya tenía una.
+export function setPassword({ newPassword, accessToken }) {
+  return request("/accounts/set-password", {
+    method: "POST",
+    body: { newPassword },
+    token: accessToken,
+  });
 }
 
 export function deleteAccount({ password, reason, accessToken }) {

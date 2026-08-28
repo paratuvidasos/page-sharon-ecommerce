@@ -19,6 +19,8 @@
   --ink-soft: #4A413A;
   --gold: #C9A876;
   --gold-soft: #E2CDA3;
+  --terracotta: #C1633F;
+  --terracotta-deep: #B4573F;
   --line: rgba(27,24,21,.08);
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
@@ -305,6 +307,16 @@ a {
   transform: translateY(-1px);
 }
 
+.btn-whatsapp {
+  background: #25D366;
+  color: #fff;
+}
+
+.btn-whatsapp:hover {
+  background: #1EBE5A;
+  transform: translateY(-1px);
+}
+
 .btn-sm {
   padding: 10px 18px;
   font-size: 12px;
@@ -345,4 +357,11 @@ a {
 
 [data-screen-label] {
   scroll-margin-top: 100px;
+}
+
+/* Divisor punteado tipo "costura" (rebrand: acentos hechos a mano) */
+.stitch {
+  background-image: repeating-linear-gradient(90deg, rgba(27,24,21,.22) 0 6px, transparent 6px 12px);
+  height: 1px;
+  border: none;
 }

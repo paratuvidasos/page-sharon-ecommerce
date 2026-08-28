@@ -1,29 +1,43 @@
 import { useEffect, useMemo, useState } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useUser as useClerkUser, useAuth as useClerkAuth, useClerk } from "@clerk/react";
 import { Nav } from "@ui/Nav";
-import { Hero } from "@ui/Hero";
-import { Products } from "@features/catalog/components/Products";
-import { Benefits } from "@ui/Benefits";
-import { BeforeAfter } from "@ui/BeforeAfter";
-import { Testimonials } from "@ui/Testimonials";
-import { PurchaseProcess } from "@ui/PurchaseProcess";
-import { OfferBanner } from "@ui/OfferBanner";
-import { Newsletter } from "@ui/Newsletter";
+import { HomePage } from "./pages/HomePage";
+import { CatalogPage } from "./pages/CatalogPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
+import { CheckoutResultPage } from "./pages/CheckoutResultPage";
 import { Footer } from "@ui/Footer";
 import { CartDrawer } from "@features/cart/components/CartDrawer";
 import { SearchModal } from "@features/catalog/components/SearchModal";
 import { AuthModal } from "@features/auth/components/AuthModal";
 import { ResetPasswordModal } from "@features/auth/components/reset-password/ResetPasswordModal";
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
+import { SsoCallbackHandler } from "@features/auth/components/sso-callback/SsoCallbackHandler";
 import { ProfileModal } from "@features/profile/components/ProfileModal";
 import { DeleteAccountModal } from "@features/profile/components/delete-account/DeleteAccountModal";
 import { useAuth } from "@shared/auth/AuthContext";
-import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist } from "@shared/api-client";
+import { useCart } from "@shared/cart/CartContext";
+import { listAddresses, listOrders, listWishlist, addToWishlist, removeFromWishlist, loginWithGoogle } from "@shared/api-client";
 import { WishlistModal } from "@features/wishlist/components/WishlistModal";
+import { ProductDetailModal } from "@features/catalog/components/ProductDetailModal";
+import { OrderDetailModal } from "@features/orders/components/OrderDetailModal";
+import { OrderHistoryModal } from "@features/orders/components/OrderHistoryModal";
+import { Z } from "@ui/zIndex";
 import { MobileMenu } from "@ui/MobileMenu";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
-import { PRODUCTS } from "@features/catalog/data/products";
-import { Z } from "@ui/zIndex";
+import { AdminLayout } from "@features/admin/components/AdminLayout";
+import { AdminDashboard } from "@features/admin/components/dashboard/AdminDashboard";
+import { AdminOrders } from "@features/admin/components/orders/AdminOrders";
+import { AdminProducts } from "@features/admin/components/products/AdminProducts";
+import { AdminCustomers } from "@features/admin/components/customers/AdminCustomers";
+import { AdminCoupons } from "@features/admin/components/coupons/AdminCoupons";
+import { AdminTeam } from "@features/admin/components/team/AdminTeam";
+import { AdminSettings } from "@features/admin/components/settings/AdminSettings";
+import { AdminCategories } from "@features/admin/components/categories/AdminCategories";
+import { AdminInventory } from "@features/admin/components/inventory/AdminInventory";
+import { AdminReviews } from "@features/admin/components/reviews/AdminReviews";
+import { AdminBanners } from "@features/admin/components/banners/AdminBanners";
 
 const ACCENT_PALETTES = {
   botanic: { deep: "#5E7860", soft: "#9CB29B", paper: "#D2DFD0" },
@@ -57,15 +71,32 @@ function App() {
   const [verifyModalOpen, setVerifyModalOpen] = useState(
     () => window.location.pathname === "/verify-email" && new URLSearchParams(window.location.search).has("token")
   );
-  const { user, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady } = useAuth();
+  const { user, status, login: authLogin, logout: authLogout, logoutAll: authLogoutAll, updateUser, getAccessToken, profileReady, hasPassword } = useAuth();
+  const { isLoaded: clerkLoaded, isSignedIn: clerkSignedIn } = useClerkUser();
+  const { getToken: getClerkSessionToken } = useClerkAuth();
+  const { signOut: clerkSignOut } = useClerk();
   const [profileOpen, setProfileOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [wishlistOpen, setWishlistOpen] = useState(false);
-  const [cart, setCart] = useState([]);
-  const [toast, setToast] = useState(null);
+  // Única instancia de ProductDetailModal en toda la app — Products/SearchModal/
+  // FeaturedProducts abren el mismo modal vía onOpenProduct en vez de montar cada
+  // una la suya (Modal nunca se desmonta, así que tres instancias propias dejaban
+  // tres <div id="product-detail-title"> duplicados en el DOM simultáneamente).
+  const [detailSlug, setDetailSlug] = useState(null);
+  // Pedido abierto desde una notificación ([0044][FE]): la campana no navega a una
+  // ruta (no existe /pedidos/:orderNumber todavía), resuelve el orderNumber contra
+  // `orders` (ya cargado por sesión, ver el efecto de listOrders más abajo) y abre
+  // el mismo OrderDetailModal que usa el historial de pedidos del perfil.
+  const [trackedOrderNumber, setTrackedOrderNumber] = useState(null);
+  const trackedOrder = orders.find((o) => o.orderNumber === trackedOrderNumber) || null;
+  // Historial de pedidos: se abre directo desde el menú desplegable de la cuenta
+  // (AccountMenu), no desde dentro de ProfileModal — solo tiene sentido para cuentas
+  // registradas (AccountMenu ya oculta esta opción para invitados/sin sesión).
+  const [orderHistoryOpen, setOrderHistoryOpen] = useState(false);
+  const { mergeGuestCart } = useCart();
   const [tweaks, setTweaks] = useState({
     accent: "botanic",
     showAnnouncement: true,
@@ -78,18 +109,6 @@ function App() {
       return next;
     });
   };
-
-  const onAdd = (product) => {
-    setCart(prev => {
-      const ex = prev.find(p => p.id === product.id);
-      if (ex) return prev.map(p => p.id === product.id ? { ...p, qty: p.qty + 1 } : p);
-      return [...prev, { ...product, qty: 1 }];
-    });
-    setToast({ name: product.name, t: Date.now() });
-    setTimeout(() => setToast(null), 2400);
-  };
-
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
   const openAuth = (mode = "register") => {
     setAuthInitialMode(mode);
@@ -137,9 +156,11 @@ function App() {
   };
 
   // El "usuario logueado" y su accessToken viven en AuthContext (ver src/shared/auth),
-  // en memoria únicamente. Login por correo trae accessToken real (sesión de verdad);
-  // Google sigue simulado y no trae token. Solo se conserva phone/countryCode/avatarUrl
-  // previos si es la misma cuenta ya editada en esta sesión (ProfileModal los llena).
+  // en memoria únicamente. Tanto login por correo como Google (vía ClerkGoogleBridge
+  // abajo, que cambia el session token de Clerk por un accessToken real de este backend
+  // en POST /accounts/oauth/google) llegan acá con un accessToken de verdad. Solo se
+  // conserva phone/countryCode/avatarUrl previos si es la misma cuenta ya editada en
+  // esta sesión (ProfileModal los llena).
   const handleAuthSuccess = ({ name, email, accessToken }) => {
     const samePrevAccount = user?.email === email;
     authLogin(
@@ -152,7 +173,38 @@ function App() {
       },
       accessToken
     );
+    if (accessToken) mergeGuestCart(accessToken);
   };
+
+  // Puente entre la sesión de Clerk (Google) y la sesión real de este backend: el redirect
+  // de OAuth sale de la SPA por completo (ver AuthModal.handleGoogleContinue +
+  // SsoCallbackHandler), así que nada dentro del modal sigue vivo para recibir el
+  // resultado. En cuanto Clerk reporta sesión activa y el AuthContext local sigue en
+  // "guest", se cambia el session token de Clerk por un accessToken propio en
+  // POST /accounts/oauth/google (el backend vincula por email o crea la cuenta) y se
+  // completa el login local igual que un login por correo. Se frena solo con
+  // `status !== "guest"`: handleAuthSuccess deja status en "authenticated", así que este
+  // efecto no vuelve a dispararse hasta el próximo logout.
+  useEffect(() => {
+    if (!clerkLoaded || !clerkSignedIn || status !== "guest") return;
+    let cancelled = false;
+    (async () => {
+      const sessionToken = await getClerkSessionToken();
+      if (cancelled || !sessionToken) return;
+      const { accessToken, user: apiUser } = await loginWithGoogle({ sessionToken });
+      if (cancelled) return;
+      handleAuthSuccess({
+        name: `${apiUser.firstName} ${apiUser.lastName}`,
+        email: apiUser.email,
+        accessToken,
+      });
+    })().catch((err) => {
+      console.error("No se pudo sincronizar el login con Google contra el backend", err);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [clerkLoaded, clerkSignedIn, status]);
 
   // Direcciones sí son reales desde [0007][BE]: se cargan contra la API apenas hay
   // sesión (login por correo o el refresh-token automático al montar la app en
@@ -180,6 +232,12 @@ function App() {
   // (mismo patrón que direcciones arriba) y se limpian al cerrar sesión. El backend
   // pagina, pero hoy no hay UI de paginación — se pide una sola página grande y basta,
   // porque mientras no exista creación real de pedidos ([checkout]) el historial es corto.
+  const refreshOrders = () => {
+    if (!user) return;
+    listOrders({ limit: 100 }, getAccessToken())
+      .then((res) => setOrders(res.items))
+      .catch(() => {});
+  };
   useEffect(() => {
     if (!user) {
       setOrders([]);
@@ -197,6 +255,21 @@ function App() {
       cancelled = true;
     };
   }, [user?.email]);
+
+  // El pedido que arma POST /orders/checkout todavía tiene status: "PENDING" a
+  // propósito (el pago no se resolvió en ese instante) — CheckoutResultPage hace
+  // polling sobre GET /orders/:orderNumber hasta confirmarlo y avisa acá para que la
+  // fila en `orders` (historial, tracking desde notificaciones) no se quede congelada
+  // en PENDING después de que el pago sí se aprobó.
+  const handleOrderUpdated = (order) => {
+    setOrders((prev) => {
+      const idx = prev.findIndex((o) => o.orderNumber === order.orderNumber);
+      if (idx === -1) return [order, ...prev];
+      const next = [...prev];
+      next[idx] = order;
+      return next;
+    });
+  };
 
   // [0012][BE] Favoritos reales: mismo patrón que addresses/orders arriba, se cargan
   // contra GET /wishlist apenas hay sesión y se limpian al cerrar sesión. El backend
@@ -226,11 +299,15 @@ function App() {
   const handleLogout = async () => {
     setProfileOpen(false);
     await authLogout();
+    // Sin esto, una sesión iniciada con Google (Clerk) seguiría activa del lado de Clerk
+    // y ClerkGoogleBridge la volvería a loguear localmente en el siguiente render.
+    await clerkSignOut().catch(() => {});
   };
 
   const handleLogoutAll = async () => {
     setProfileOpen(false);
     await authLogoutAll();
+    await clerkSignOut().catch(() => {});
   };
 
   // [0010][BE] Eliminar cuenta: DeleteAccountModal ya hizo el DELETE real y limpió la
@@ -241,6 +318,35 @@ function App() {
     setProfileOpen(false);
   };
 
+  const handleOpenOrderHistory = () => {
+    setOrderHistoryOpen(true);
+    refreshOrders();
+  };
+
+  // El panel admin tiene su propio shell (AdminLayout: sidebar + topbar), sin el
+  // Nav/Footer de la tienda ni los modales globales de abajo — se renderiza aparte
+  // en vez de meterlo dentro de <main> junto al resto de las rutas.
+  const location = useLocation();
+  if (location.pathname.startsWith("/admin")) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="inventory" element={<AdminInventory />} />
+          <Route path="customers" element={<AdminCustomers />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="banners" element={<AdminBanners />} />
+          <Route path="team" element={<AdminTeam />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
+    );
+  }
+
   return (
     <>
       {/* <AnnouncementBar show={tweaks.showAnnouncement} /> */}
@@ -248,44 +354,74 @@ function App() {
         onOpenCart={() => setCartOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
-        onOpenAccount={() => (user ? setProfileOpen(true) : openAuth("register"))}
+        onOpenAuth={() => openAuth("register")}
+        onOpenProfile={() => setProfileOpen(true)}
+        onOpenOrderHistory={handleOpenOrderHistory}
+        onLogout={handleLogout}
         onOpenWishlist={openWishlist}
-        cartCount={cartCount}
         wishlistCount={wishlist.length}
-        loggedIn={Boolean(user)}
+        onOpenOrder={setTrackedOrderNumber}
       />
 
       <main>
-        <Hero onShop={() => document.getElementById("shop").scrollIntoView({ behavior: "smooth", block: "start" })} />
-        <Products onAdd={onAdd} onWish={handleWish} wishlistIds={wishlistIds} />
-        <Benefits />
-        <BeforeAfter />
-        <PurchaseProcess />
-        <Testimonials />
-        <OfferBanner />
-        <Newsletter />
+        <Routes>
+          <Route
+            path="/"
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route
+            path="/tienda"
+            element={<CatalogPage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route
+            path="/checkout"
+            element={<CheckoutPage user={user} addresses={addresses} onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])} />}
+          />
+          <Route path="/checkout/resultado" element={<CheckoutResultPage onOrderUpdated={handleOrderUpdated} />} />
+          {/* /reset-password y /verify-email son solo puntos de entrada para un modal
+              (ver ResetPasswordModal/EmailVerificationModal abajo) — el fondo siempre
+              fue la landing, así que cae en Home igual que antes de tener router. */}
+          <Route
+            path="/reset-password"
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route
+            path="/verify-email"
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          {/* Aterrizaje del redirect de OAuth de Google (ver AuthModal + SsoCallbackHandler
+              abajo) — mismo patrón que /reset-password y /verify-email: el fondo es la
+              landing, SsoCallbackHandler hace el trabajo real y no renderiza nada visible. */}
+          <Route
+            path="/sso-callback"
+            element={<HomePage onWish={handleWish} wishlistIds={wishlistIds} onOpenProduct={setDetailSlug} />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       <Footer />
 
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        items={cart}
-        setItems={setCart}
-        user={user}
-        addresses={addresses}
-        onOrderPlaced={(order) => setOrders((prev) => [order, ...prev])}
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} onOpenProduct={setDetailSlug} />
+      <ProductDetailModal
+        slug={detailSlug}
+        onClose={() => setDetailSlug(null)}
+        onSlugChange={setDetailSlug}
+        onViewCart={() => { setDetailSlug(null); setCartOpen(true); }}
+        onWish={handleWish}
+        wishlistIds={wishlistIds}
+        orders={orders}
       />
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} products={PRODUCTS} onPick={onAdd} />
       <WishlistModal
         open={wishlistOpen}
         onClose={() => setWishlistOpen(false)}
         items={wishlist}
-        onAdd={onAdd}
+        onOpenProduct={setDetailSlug}
         onRemove={handleWish}
       />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SsoCallbackHandler />
       <AuthModal
         open={accountOpen}
         onClose={() => setAccountOpen(false)}
@@ -310,10 +446,10 @@ function App() {
         onClose={() => setProfileOpen(false)}
         user={user}
         profileReady={profileReady}
+        hasPassword={hasPassword}
         onSave={(profile) => updateUser(profile)}
         addresses={addresses}
         setAddresses={setAddresses}
-        orders={orders}
         onLogout={handleLogout}
         onLogoutAll={handleLogoutAll}
         onOpenDeleteAccount={() => setDeleteAccountOpen(true)}
@@ -323,25 +459,16 @@ function App() {
         onClose={() => setDeleteAccountOpen(false)}
         onDeleted={handleAccountDeleted}
       />
-
-      {toast && (
-        <div style={{
-          position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",
-          background: "var(--ink)", color: "var(--cream)",
-          padding: "14px 22px", borderRadius: 999,
-          fontSize: 13, fontWeight: 500, zIndex: Z.toast,
-          boxShadow: "var(--shadow-lg)",
-          display: "flex", alignItems: "center", gap: 10,
-          animation: "scaleIn .25s ease-out"
-        }}>
-          <span style={{ color: "var(--gold-soft)" }}>✦</span>
-          {toast.name} añadido a tu bolsa
-          <button onClick={() => { setToast(null); setCartOpen(true); }}
-            style={{ marginLeft: 6, background: "transparent", border: 0, color: "var(--botanic)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>
-            Ver bolsa
-          </button>
-        </div>
-      )}
+      <OrderHistoryModal
+        open={orderHistoryOpen}
+        onClose={() => setOrderHistoryOpen(false)}
+        orders={orders}
+      />
+      <OrderDetailModal
+        order={trackedOrder}
+        onClose={() => setTrackedOrderNumber(null)}
+        zIndex={Z.orderTracking}
+      />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Estética" />

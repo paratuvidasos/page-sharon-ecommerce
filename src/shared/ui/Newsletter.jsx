@@ -3,7 +3,70 @@ import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
 import { Button } from "./components/Button";
 
-export const Newsletter = () => {
+// "Envío" siempre simulado del lado del cliente (no hay endpoint de newsletter,
+// ver CLAUDE.md) — mismo patrón mínimo (guarda, confirma 4s, limpia) en la tarjeta
+// completa de abajo y en esta fila compacta del footer, solo que la compacta pide
+// únicamente correo (sin nombre), a propósito para caber en una sola línea.
+export const useEmailSubscribe = () => {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (email && email.includes("@")) {
+      setSent(true);
+      setTimeout(() => setSent(false), 4000);
+      setEmail("");
+    }
+  };
+
+  return { email, setEmail, sent, submit };
+};
+
+// Fila compacta reutilizada tanto por el footer (rebrand: "Join the studio" del mockup
+// de referencia) como por la franja de comunidad al final de OfferBanner (ver diseño 1b:
+// "reutiliza el patrón inline que ya existe en el footer") — un solo campo visible
+// (correo) y estilos para fondo oscuro. `eyebrow`/`heading` son personalizables porque
+// cada lugar donde se usa tiene su propio copy (footer: "Únete a Sharon"; oferta:
+// "Comunidad Sharon" + mención del -10%).
+export const NewsletterInline = ({
+  eyebrow,
+  heading = <>Únete a <span className="script" style={{ color: "var(--botanic)" }}>Sharon</span></>,
+}) => {
+  const { email, setEmail, sent, submit } = useEmailSubscribe();
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }} className="nl-inline">
+      <div>
+        {eyebrow && (
+          <div className="eyebrow" style={{ color: "var(--botanic)", marginBottom: 6 }}>{eyebrow}</div>
+        )}
+        <h2 className="display" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "var(--cream)", margin: 0 }}>
+          {heading}
+        </h2>
+      </div>
+      <form onSubmit={submit} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="Tu correo"
+          required
+          style={{
+            padding: "14px 20px", border: "1px solid rgba(255,255,255,.18)", borderRadius: 999,
+            background: "rgba(255,255,255,.08)", color: "var(--cream)", fontSize: 14,
+            fontFamily: "var(--sans)", outline: 0, minWidth: 220,
+          }}
+        />
+        <Button type="submit" style={{ whiteSpace: "nowrap" }}>
+          {sent ? "¡Listo! ✧" : "Suscribirme"}
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+export const Newsletter = ({ compact = false }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -16,6 +79,8 @@ export const Newsletter = () => {
       setName(""); setEmail("");
     }
   };
+
+  if (compact) return <NewsletterInline />;
 
   return (
     <section style={{ padding: "60px 0 120px" }}>
@@ -67,7 +132,7 @@ export const Newsletter = () => {
                   onBlur={e => e.target.style.borderColor = "var(--line)"} />
               </label>
               <Button type="submit" style={{ justifyContent: "center", marginTop: 6 }}>
-                {sent ? "\u00a1Suscripción confirmada \u2726" : "Quiero mi -10%"} <Icon name="arrow" size={16} />
+                {sent ? "¡Suscripción confirmada ✦" : "Quiero mi -10%"} <Icon name="arrow" size={16} />
               </Button>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", textAlign: "center", marginTop: 4 }}>
                 Al suscribirte aceptas nuestra política de privacidad.

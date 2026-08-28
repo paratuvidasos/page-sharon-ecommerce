@@ -1,7 +1,7 @@
 // Único punto de llamadas HTTP al backend (ver CLAUDE.md > Reglas de arquitectura #1).
 // Ningún componente hace fetch directo a la API — todo pasa por request() o por
 // las funciones tipadas de cada recurso (ej. accounts.js).
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
 
 export class ApiError extends Error {
   constructor(status, body) {
@@ -9,6 +9,13 @@ export class ApiError extends Error {
     this.status = status;
     this.code = body?.error;
     this.issues = body?.issues;
+    this.availableQuantity = body?.availableQuantity;
+    // CHECKOUT_PRICE_CHANGED / CHECKOUT_ITEM_UNAVAILABLE (POST /orders/checkout) traen
+    // las líneas afectadas acá, con previousUnitPrice/currentUnitPrice o availableQuantity.
+    this.lines = body?.lines;
+    // PRODUCTS_RESTRICTED_FOR_ZONE (POST /orders/checkout) y la respuesta de
+    // POST /shipping/quote traen acá los productos que no se pueden enviar a la zona.
+    this.restrictedProducts = body?.restrictedProducts;
   }
 }
 

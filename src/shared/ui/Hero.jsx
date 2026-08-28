@@ -44,7 +44,7 @@ export const Hero = ({ onShop }) => {
             <Reveal delay={260}>
               <p style={{ fontSize: 17, lineHeight: 1.65, color: "var(--ink-soft)", maxWidth: 520, margin: "28px 0 36px" }}>
                 Fórmulas botánicas, libres de sulfatos y desarrolladas por especialistas.
-                Sharon es el ritual diario que tu cabello pidió desde siempre.
+                Sharon es el hábito diario que tu cabello pidió desde siempre.
               </p>
             </Reveal>
 
@@ -95,35 +95,43 @@ export const Hero = ({ onShop }) => {
               </div>
             </div>
 
-            <div className="drift" style={{
-              position: "absolute", bottom: 30, left: -20,
-              background: "rgba(255,255,255,.7)", backdropFilter: "blur(18px)",
-              border: ".5px solid rgba(255,255,255,.7)",
-              borderRadius: 18, padding: 14, width: 220,
-              boxShadow: "var(--shadow)",
-              display: "flex", alignItems: "center", gap: 12,
-              animationDelay: "1s"
-            }}>
-              <div style={{ width: 50, height: 60, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
-                <ProductImage product={PRODUCTS[2]} />
-              </div>
-              <div>
-                <div className="eyebrow" style={{ fontSize: 9 }}>Más vendido</div>
-                <div style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.2 }}>Engrosante & Anticaída</div>
-                <div style={{ marginTop: 4 }}><Stars value={5} size={10} /></div>
+            {/* Insignias orbitando el círculo: el wrapper externo gira 360°/70s
+                alrededor del círculo (mismo tamaño, position:absolute inset:0);
+                el hijo, anclado cerca del borde superior, gira en sentido contrario
+                a la misma velocidad para cancelar la rotación heredada — así la
+                tarjeta viaja alrededor de la imagen sin girar sobre sí misma. */}
+            <div style={{ position: "absolute", inset: 0, animation: "heroOrbitA 70s linear infinite", pointerEvents: "none", zIndex: 2 }}>
+              <div style={{ position: "absolute", top: "1%", left: "50%", transform: "translate(-50%,-50%)", animation: "heroOrbitACounter 70s linear infinite", pointerEvents: "auto" }}>
+                <div style={{
+                  background: "rgba(255,255,255,.85)", backdropFilter: "blur(18px)",
+                  border: ".5px solid rgba(255,255,255,.7)",
+                  borderRadius: 18, padding: 14, width: 220,
+                  boxShadow: "var(--shadow)",
+                  display: "flex", alignItems: "center", gap: 12,
+                }}>
+                  <div style={{ width: 50, height: 60, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+                    <ProductImage product={PRODUCTS[2]} />
+                  </div>
+                  <div>
+                    <div className="eyebrow" style={{ fontSize: 9 }}>Más vendido</div>
+                    <div style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.2 }}>Engrosante & Anticaída</div>
+                    <div style={{ marginTop: 4 }}><Stars value={5} size={10} /></div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="drift" style={{
-              position: "absolute", top: 40, right: -10,
-              background: "rgba(27,24,21,.92)", color: "var(--cream)",
-              borderRadius: 18, padding: "16px 18px", width: 200,
-              boxShadow: "var(--shadow-lg)",
-              animationDelay: ".5s"
-            }}>
-              <div className="eyebrow" style={{ color: "var(--gold-soft)", fontSize: 9 }}>Envío gratis</div>
-              {/* <div className="display" style={{ fontSize: 22, marginTop: 4, color: "var(--cream)" }}>+ 40$</div> */}
-              <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>En toda el area metropolitana de Medellin, en 24h</div>
+            <div style={{ position: "absolute", inset: 0, animation: "heroOrbitB 70s linear infinite", pointerEvents: "none", zIndex: 2 }}>
+              <div style={{ position: "absolute", top: "1%", left: "50%", transform: "translate(-50%,-50%)", animation: "heroOrbitBCounter 70s linear infinite", pointerEvents: "auto" }}>
+                <div style={{
+                  background: "rgba(27,24,21,.92)", color: "var(--cream)",
+                  borderRadius: 18, padding: "16px 18px", width: 200,
+                  boxShadow: "var(--shadow-lg)",
+                }}>
+                  <div className="eyebrow" style={{ color: "var(--gold-soft)", fontSize: 9 }}>Envío gratis</div>
+                  <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>En toda el area metropolitana de Medellin, en 24h</div>
+                </div>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -145,6 +153,10 @@ export const Hero = ({ onShop }) => {
       </div>
 
       <style>{`
+        @keyframes heroOrbitA { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes heroOrbitACounter { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(-360deg); } }
+        @keyframes heroOrbitB { from { transform: rotate(180deg); } to { transform: rotate(540deg); } }
+        @keyframes heroOrbitBCounter { from { transform: translate(-50%,-50%) rotate(-180deg); } to { transform: translate(-50%,-50%) rotate(-540deg); } }
         @media (max-width: 900px){
           .hero-grid{grid-template-columns: 1fr !important; gap: 40px !important}
         }

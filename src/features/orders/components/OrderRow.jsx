@@ -17,7 +17,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
         justifyContent: "space-between",
         gap: 12,
         padding: "14px 0",
-        borderBottom: "1px solid var(--line)",
+        borderBottom: "1px dashed rgba(27,24,21,.16)",
         flexWrap: "wrap",
       }}
     >
@@ -39,7 +39,16 @@ export const OrderRow = ({ order, onViewDetail }) => {
             {status.label}
           </span>
         </div>
-        <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>{formatDate(order.placedAt)}</div>
+        <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>
+          {formatDate(order.placedAt)}
+          {order.shippingMethodLabel && <> · {order.shippingMethodLabel}</>}
+        </div>
+        {order.shipment?.trackingNumber && (
+          <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>
+            Guía {order.shipment.trackingNumber}
+            {order.shipment.carrierName && <> ({order.shipment.carrierName})</>}
+          </div>
+        )}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

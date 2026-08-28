@@ -18,8 +18,8 @@ function withLocalFields(apiAddresses) {
   return apiAddresses.map((a) => ({ ...a, hasActiveOrder: false }));
 }
 
-// Pantalla de gestión de direcciones, anidada dentro de ProfileModal (mismo patrón
-// que CheckoutModal anidado en CartDrawer). Dueña de las llamadas a la API de
+// Pantalla de gestión de direcciones, anidada dentro de ProfileModal (ver la regla de
+// modales anidados en CLAUDE.md). Dueña de las llamadas a la API de
 // direcciones (listar/eliminar/default/archive/restore); crear/editar vive en
 // AddressForm (mismo patrón que ProfileForm con updateProfile). Tras cualquier
 // mutación se recarga la lista completa en vez de parchear el estado local a mano,

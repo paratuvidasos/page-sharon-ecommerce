@@ -1,13 +1,22 @@
+import { ClerkProvider } from "@clerk/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "@shared/auth/AuthContext";
+import { CartProvider } from "@shared/cart/CartContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <ClerkProvider afterSignOutUrl="/">
       <App />
-    </AuthProvider>
+    </ClerkProvider>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

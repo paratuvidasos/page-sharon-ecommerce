@@ -2,15 +2,31 @@ import { useState } from "react";
 import { Icon, Stars } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
+import { formatCurrency } from "@shared/i18n/currency";
 
-export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
+// [0013][BE] stockStatus viene real del backend (agregado entre variantes) —
+// se usa para la píldora de estado y para deshabilitar "Añadir" cuando no hay
+// stock, en vez del "badge" (Nuevo/Más vendido) que antes era dato de mentira.
+const STOCK_BADGE = {
+  OUT_OF_STOCK: { label: "Agotado", bg: "var(--ink-soft)" },
+  LOW_STOCK: { label: "Últimas unidades", bg: "var(--ink)" },
+};
+
+// [0023][BE] "Añadir" no llama al carrito directo: el listado no trae variantId
+// (solo GET /products/:slug las expone), así que abre el detalle para que el
+// selector de variante/cantidad que ya vive ahí confirme qué se agrega.
+
+export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) => {
   const [hover, setHover] = useState(false);
   const hasGallery = product.gallery && product.gallery.length > 0;
+  const outOfStock = product.stockStatus === "OUT_OF_STOCK";
+  const stockBadge = STOCK_BADGE[product.stockStatus];
 
   return (
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={() => onViewDetail && onViewDetail(product.slug)}
       style={{
         position: "relative",
         background: "#fff",
@@ -20,17 +36,17 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
         transition: "transform .35s ease, box-shadow .35s ease",
         transform: hover ? "translateY(-4px)" : "translateY(0)",
         border: ".5px solid var(--line)",
+        cursor: onViewDetail ? "pointer" : undefined,
       }}
     >
-      {product.badge && (
+      {stockBadge && (
         <span
           style={{
             position: "absolute",
             top: 14,
             left: 14,
             zIndex: 2,
-            background:
-              product.badge === "Nuevo" ? "var(--botanic-deep)" : "var(--ink)",
+            background: stockBadge.bg,
             color: "#fff",
             fontSize: 10,
             padding: "5px 10px",
@@ -40,7 +56,7 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
             fontWeight: 600,
           }}
         >
-          {product.badge}
+          {stockBadge.label}
         </span>
       )}
       <IconButton
@@ -79,27 +95,16 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
           thumbnail={product.thumbnail}
           gallery={product.gallery}
           name={product.name}
-          accent={product.accent}
-          type={product.type}
-          category={product.category}
         />
       </div>
 
       <div style={{ padding: "18px 20px 22px" }}>
-        <div className="eyebrow" style={{ fontSize: 10 }}>
-          {product.category}
-        </div>
         <h3
           className="display"
           style={{ fontSize: 24, margin: "6px 0 4px", fontWeight: 500 }}
         >
           {product.name}
         </h3>
-        <div
-          style={{ color: "var(--ink-soft)", fontSize: 13, marginBottom: 12 }}
-        >
-          {product.sub}
-        </div>
 
         <div
           style={{
@@ -109,9 +114,9 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
             marginBottom: 14,
           }}
         >
-          <Stars value={product.rating} />
+          <Stars value={product.ratingAverage ?? 0} />
           <span className="mono" style={{ color: "var(--ink-soft)" }}>
-            {product.rating.toFixed(1)} · {product.reviews}
+            {product.ratingAverage != null ? `${product.ratingAverage.toFixed(1)} · ${product.ratingCount}` : "Sin reseñas"}
           </span>
         </div>
 
@@ -125,7 +130,7 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
         >
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
             <span className="display" style={{ fontSize: 24, fontWeight: 500 }}>
-              ${Intl.NumberFormat("es-CO").format(product.price)}
+              {formatCurrency(product.price)}
             </span>
             {product.oldPrice && (
               <span
@@ -135,19 +140,24 @@ export const ProductCard = ({ product, onAdd, onWish, wished = false }) => {
                   textDecoration: "line-through",
                 }}
               >
-                ${Intl.NumberFormat("es-CO").format(product.oldPrice)}
+                {formatCurrency(product.oldPrice)}
               </span>
             )}
           </div>
           <button
-            onClick={() => onAdd(product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!outOfStock) onViewDetail && onViewDetail(product.slug);
+            }}
+            disabled={outOfStock}
             style={{
               border: 0,
-              cursor: "pointer",
+              cursor: outOfStock ? "not-allowed" : "pointer",
               padding: "10px 14px",
               borderRadius: 999,
-              background: hover ? "var(--ink)" : "var(--cream-2)",
-              color: hover ? "var(--cream)" : "var(--ink)",
+              background: outOfStock ? "var(--cream-2)" : hover ? "var(--ink)" : "var(--cream-2)",
+              color: outOfStock ? "var(--ink-soft)" : hover ? "var(--cream)" : "var(--ink)",
+              opacity: outOfStock ? 0.6 : 1,
               fontSize: 12,
               fontWeight: 500,
               letterSpacing: ".04em",
