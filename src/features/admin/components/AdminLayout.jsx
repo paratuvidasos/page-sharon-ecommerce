@@ -148,17 +148,9 @@ export const AdminLayout = () => {
       </aside>
 
       <main className="admin-main" style={{ flex: 1, padding: "36px 44px", minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <h1 className="display" style={{ fontSize: 34, margin: 0 }}>{active.label}</h1>
-            <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>{active.subtitle}</div>
-          </div>
-          <button className="foc" style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", border: "1px solid var(--line)", background: "#fff", cursor: "pointer", display: "grid", placeItems: "center" }}>
-            <Icon name="bell" size={18} />
-            <span style={{ position: "absolute", top: -2, right: -2, width: 17, height: 17, borderRadius: "50%", background: "var(--terracotta)", color: "#fff", fontSize: 9.5, display: "grid", placeItems: "center", fontWeight: 700 }}>
-              5
-            </span>
-          </button>
+        <div style={{ marginBottom: 32 }}>
+          <h1 className="display" style={{ fontSize: 34, margin: 0 }}>{active.label}</h1>
+          <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>{active.subtitle}</div>
         </div>
 
         {/* En una recarga dura (F5) o entrando directo a /admin/*, el accessToken vive
