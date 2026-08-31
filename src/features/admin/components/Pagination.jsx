@@ -1,14 +1,16 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 
 // Controles de paginación compartidos por todos los listados admin (convención
 // page/limit → {items, meta:{page,limit,total,totalPages}}).
 export const Pagination = ({ meta, page, onPageChange }) => {
+  const { t } = useTranslation("admin");
   if (!meta || meta.totalPages <= 1) return null;
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 22px", borderTop: "1px solid var(--line)" }}>
       <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
-        Página {meta.page} de {meta.totalPages} · {meta.total} en total
+        {t("pagination.summary", { page: meta.page, totalPages: meta.totalPages, total: meta.total })}
       </span>
       <div style={{ display: "flex", gap: 8 }}>
         <button

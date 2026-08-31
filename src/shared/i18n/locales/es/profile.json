@@ -1,0 +1,182 @@
+{
+  "menuLabel": "Perfil",
+  "modal": {
+    "eyebrow": "Tu cuenta",
+    "title": "Editar perfil",
+    "subtitle": "Actualiza tus datos. Los cambios se guardan de inmediato en tu cuenta.",
+    "close": "Cerrar",
+    "savedBanner": "Cambios guardados.",
+    "loading": "Cargando tu perfil…",
+    "shipping": {
+      "eyebrow": "Envíos",
+      "noAddresses": "Sin direcciones guardadas",
+      "addressCount_one": "{{count}} dirección guardada",
+      "addressCount_other": "{{count}} direcciones guardadas",
+      "manage": "Gestionar direcciones"
+    },
+    "session": {
+      "eyebrow": "Sesión",
+      "logout": "Cerrar sesión",
+      "loggingOut": "Cerrando…",
+      "logoutAll": "Cerrar sesión en todos los dispositivos",
+      "confirmLogoutAll": "¿Cerrar sesión en todos tus dispositivos? Tendrás que iniciar sesión de nuevo en cada uno.",
+      "confirmYes": "Sí, cerrar todas",
+      "confirmCancel": "Cancelar",
+      "loggingOutAll": "Cerrando…"
+    },
+    "danger": {
+      "eyebrow": "Zona de peligro",
+      "needsPasswordNotice": "Necesitas crear una contraseña antes de poder eliminar tu cuenta (tu cuenta llegó por Google y hoy no tiene ninguna con la que confirmar el borrado).",
+      "createPassword": "Crear contraseña",
+      "deleteAccount": "Eliminar mi cuenta"
+    },
+    "submit": "Guardar cambios",
+    "submitting": "Guardando…"
+  },
+  "form": {
+    "fieldLabels": { "firstName": "Nombre", "lastName": "Apellido", "phone": "Teléfono" },
+    "summaryTitle": "Hay campos por revisar",
+    "photoFieldSummary": "Foto de perfil",
+    "genericError": "No pudimos guardar tus cambios. Intenta de nuevo en unos segundos.",
+    "firstName": { "label": "Nombre", "placeholder": "Tu nombre", "required": "Necesitamos tu nombre." },
+    "lastName": { "label": "Apellido", "placeholder": "Tu apellido", "required": "Necesitamos tu apellido." },
+    "phoneRequired": "Ingresa tu número de teléfono.",
+    "phoneDigits": "Debe tener {{digits}} dígitos para {{country}}.",
+    "email": { "label": "Correo electrónico", "note": "Para cambiar tu correo necesitas reverificarlo. Escríbenos a soporte para iniciar ese proceso." }
+  },
+  "phoneField": {
+    "label": "Teléfono",
+    "countryAriaLabel": "País",
+    "format": "Formato: {{dialCode}} + {{digits}} dígitos."
+  },
+  "photoField": {
+    "label": "Foto de perfil",
+    "previewAlt": "Previsualización de tu foto de perfil",
+    "change": "Cambiar foto",
+    "upload": "Subir foto",
+    "remove": "Quitar",
+    "hint": "JPG, PNG o WEBP. Máximo 5MB.",
+    "invalidType": "Sube un archivo de imagen (JPG, PNG o WEBP).",
+    "tooLarge": "La imagen no puede pesar más de 5MB."
+  },
+  "createPassword": {
+    "eyebrow": "Seguridad",
+    "description": "Tu cuenta llegó a través de Google y todavía no tiene una contraseña propia. Crea una para poder iniciar sesión con tu correo o eliminar tu cuenta más adelante.",
+    "success": "Contraseña creada correctamente.",
+    "passwordPlaceholder": "Mínimo 8 caracteres",
+    "confirmPlaceholder": "Repite la contraseña",
+    "submit": "Crear contraseña",
+    "submitting": "Creando…",
+    "errors": {
+      "passwordRequired": "Elige una contraseña.",
+      "passwordInvalid": "Necesita al menos 8 caracteres, con una letra y un número.",
+      "confirmRequired": "Confirma tu contraseña.",
+      "confirmMismatch": "Las contraseñas no coinciden todavía.",
+      "generic": "No pudimos crear tu contraseña. Intenta de nuevo en unos segundos."
+    }
+  },
+  "addresses": {
+    "book": {
+      "eyebrow": "Envíos",
+      "title": "Direcciones guardadas",
+      "subtitle": "Agrega, edita o marca la dirección que usamos por defecto en tus pedidos.",
+      "close": "Cerrar",
+      "loading": "Cargando tus direcciones…",
+      "empty": "Todavía no tienes direcciones guardadas.",
+      "loadError": "No pudimos cargar tus direcciones. Intenta de nuevo en unos segundos.",
+      "actionError": "No pudimos completar la acción. Intenta de nuevo.",
+      "add": "Agregar dirección"
+    },
+    "card": {
+      "default": "Predeterminada",
+      "archived": "Archivada",
+      "confirmDelete": "¿Eliminar esta dirección? No se puede deshacer.",
+      "confirmYes": "Sí, eliminar",
+      "deleting": "Eliminando…",
+      "cancel": "Cancelar",
+      "blockedNotice": "No se puede eliminar: tiene un pedido en curso que la referencia. Puedes archivarla en su lugar.",
+      "archiveInstead": "Archivar esta dirección",
+      "archiving": "Archivando…",
+      "restore": "Restaurar",
+      "restoring": "Restaurando…",
+      "edit": "Editar",
+      "setDefault": "Marcar predeterminada",
+      "settingDefault": "Marcando…",
+      "delete": "Eliminar"
+    },
+    "form": {
+      "fieldLabels": {
+        "alias": "Alias",
+        "recipientName": "Nombre de quien recibe",
+        "phone": "Teléfono de contacto",
+        "line1": "Dirección",
+        "stateProvince": "Departamento / estado",
+        "city": "Ciudad",
+        "postalCode": "Código postal"
+      },
+      "summaryTitle": "Hay campos por revisar",
+      "genericError": "No pudimos guardar la dirección. Intenta de nuevo en unos segundos.",
+      "aliasLabel": "Alias",
+      "aliasPlaceholder": "Casa, Oficina…",
+      "aliasRequired": "Ponle un alias para identificarla (ej. Casa, Oficina).",
+      "recipientLabel": "Nombre de quien recibe",
+      "recipientPlaceholder": "Quién recibe el pedido",
+      "recipientRequired": "Necesitamos el nombre de quien recibe.",
+      "countryLabel": "País",
+      "phoneLabel": "Teléfono de contacto",
+      "phoneRequired": "Ingresa un teléfono de contacto.",
+      "phoneDigits": "Debe tener {{digits}} dígitos para {{country}}.",
+      "phoneFormat": "Formato: {{dialCode}} + {{digits}} dígitos.",
+      "line1Label": "Dirección",
+      "line1Placeholder": "Calle, número…",
+      "line1Required": "Necesitamos la dirección.",
+      "line1TooShort": "Agrega un poco más de detalle a la dirección.",
+      "line2Label": "Apto, interior o referencia (opcional)",
+      "line2Placeholder": "Apto 501, torre 2…",
+      "stateProvinceLabel": "Departamento / estado",
+      "stateProvincePlaceholder": "Tu departamento o estado",
+      "stateProvinceRequired": "Necesitamos el departamento o estado.",
+      "cityLabel": "Ciudad",
+      "cityPlaceholder": "Tu ciudad",
+      "cityRequired": "Necesitamos la ciudad.",
+      "postalCodeLabel": "Código postal",
+      "postalCodeRequired": "Necesitamos el código postal.",
+      "postalCodeInvalid": "Formato inválido para {{country}} (ej. {{example}}).",
+      "postalCodeExample": "Ej. {{example}}"
+    },
+    "formModal": {
+      "eyebrow": "Direcciones",
+      "editTitle": "Editar dirección",
+      "addTitle": "Agregar dirección",
+      "close": "Cerrar",
+      "save": "Guardar cambios",
+      "add": "Agregar dirección",
+      "saving": "Guardando…"
+    }
+  },
+  "deleteAccount": {
+    "form": {
+      "passwordLabel": "Contraseña actual",
+      "passwordPlaceholder": "Confirma tu contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "reasonLabel": "Motivo (opcional)",
+      "reasonPlaceholder": "Cuéntanos por qué te vas, nos ayuda a mejorar",
+      "passwordRequired": "Ingresa tu contraseña para confirmar.",
+      "invalidCredentials": "El correo o la contraseña son incorrectos.",
+      "generic": "No pudimos eliminar tu cuenta. Intenta de nuevo en unos segundos."
+    },
+    "modal": {
+      "eyebrowDefault": "Eliminar cuenta",
+      "eyebrowSuccess": "Listo",
+      "title": "¿Eliminar tu cuenta?",
+      "titleSuccess": "Cuenta eliminada",
+      "subtitle": "Esta acción no se puede deshacer. Se eliminarán tu cuenta y tus datos personales.",
+      "close": "Cerrar",
+      "successMessage": "Tu cuenta y tus datos personales fueron eliminados correctamente.",
+      "successOk": "Entendido",
+      "submit": "Eliminar mi cuenta definitivamente",
+      "submitting": "Eliminando…"
+    }
+  }
+}

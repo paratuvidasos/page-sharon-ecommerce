@@ -1,0 +1,43 @@
+{
+  "line": {
+    "remove": "Remove",
+    "priceChanged": "The price of this product changed since you added it.",
+    "unavailable": "No longer available. You can remove it from your cart.",
+    "onlyAvailable": "Only {{count}} left.",
+    "useMaxQuantity": "Use maximum quantity",
+    "confirmRemove": "Remove this product from your cart?",
+    "removing": "Removing…",
+    "confirmYes": "Yes, remove",
+    "cancel": "Cancel"
+  },
+  "drawer": {
+    "title": "Your bag",
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "clear": "Empty cart",
+    "close": "Close bag",
+    "confirmClear": "Empty the entire cart? This can't be undone.",
+    "clearing": "Emptying…",
+    "confirmClearYes": "Yes, empty it",
+    "cancel": "Cancel",
+    "emptyTitle": "Your bag is empty",
+    "emptySubtitle": "Add a product to start your routine.",
+    "exploreProducts": "Explore products",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "shippingFree": "Free",
+    "total": "Total",
+    "checkout": "Checkout",
+    "freeShippingRemaining": "You need {{amount}} more for free shipping",
+    "freeShippingApplied": "Free shipping applied ✦"
+  },
+  "coupon": {
+    "label": "Coupon",
+    "invalid": "no longer valid",
+    "remove": "Remove",
+    "placeholder": "Discount code",
+    "apply": "Apply",
+    "genericError": "We couldn't apply this coupon."
+  }
+}

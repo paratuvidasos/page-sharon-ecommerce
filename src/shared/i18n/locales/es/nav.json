@@ -1,0 +1,27 @@
+{
+  "shop": "Shop",
+  "sections": {
+    "habits": "Hábitos",
+    "results": "Resultados",
+    "story": "Historia"
+  },
+  "menu": "Menú",
+  "search": "Buscar",
+  "wishlist": "Favoritos",
+  "bag": "Bolsa",
+  "closeMenu": "Cerrar menú",
+  "productsCount": "{{count}} productos",
+  "adminPanel": "Panel CRM",
+  "account": "Cuenta",
+  "myAccount": "Mi cuenta",
+  "localization": {
+    "trigger": "Idioma y moneda",
+    "language": "Idioma",
+    "currency": "Moneda"
+  },
+  "miniCart": {
+    "more": "+{{count}} más",
+    "total": "Total",
+    "viewCart": "Ver carrito"
+  }
+}

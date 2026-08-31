@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 import { COUNTRIES } from "@shared/data/countries";
+import { formatCurrency } from "@shared/i18n/currency";
 import { checkout, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
 import { useCart } from "@shared/cart/CartContext";
@@ -9,7 +11,7 @@ import { ContactStep, validateGuestFields } from "@features/checkout/components/
 import { AddressStep, MANUAL_ADDRESS } from "@features/checkout/components/AddressStep";
 import { ShippingMethodStep } from "@features/checkout/components/ShippingMethodStep";
 import { PaymentMethodStep } from "@features/checkout/components/PaymentMethodStep";
-import { OrderSummary } from "@features/checkout/components/OrderSummary";
+import { OrderSummary, computeCheckoutTotal } from "@features/checkout/components/OrderSummary";
 import { CheckoutErrorBanner } from "@features/checkout/components/CheckoutErrorBanner";
 import { BoldPaymentPanel } from "@features/checkout/components/payment/BoldPaymentPanel";
 import { validateAddressFields } from "@features/checkout/validation";
@@ -26,6 +28,7 @@ const CURRENCY = "COP";
 // a la derecha), reemplaza el cálculo de envío en cliente por POST /shipping/quote y
 // agrega selección de método de pago real + Botón de Pagos de Bold.
 export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
+  const { t } = useTranslation("checkout");
   const { getAccessToken, login } = useAuth();
   const { cart, loading: cartLoading, refreshCart, removeCoupon } = useCart();
 
@@ -126,11 +129,11 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
 
     if (hasFieldErrors) return;
     if (!shippingOption) {
-      setCheckoutError({ code: null, message: "Selecciona un método de envío antes de continuar." });
+      setCheckoutError({ code: null, message: t("checkoutPage.selectShippingMethod") });
       return;
     }
     if (!paymentMethod) {
-      setCheckoutError({ code: null, message: "Selecciona un método de pago antes de continuar." });
+      setCheckoutError({ code: null, message: t("checkoutPage.selectPaymentMethod") });
       return;
     }
 
@@ -209,7 +212,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
       } else if (e instanceof ApiError) {
         setCheckoutError({ code: e.code, message: e.message, lines: e.lines, restrictedProducts: e.restrictedProducts });
       } else {
-        setCheckoutError({ code: null, message: "No pudimos procesar tu pedido. Intenta de nuevo en unos segundos." });
+        setCheckoutError({ code: null, message: t("checkoutPage.genericError") });
       }
     } finally {
       setSubmitting(false);
@@ -229,16 +232,16 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
     <div style={{ paddingTop: 150, paddingBottom: 100, minHeight: "70vh" }}>
       <div className="wrap">
         <h1 className="display" style={{ fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 24 }}>
-          {phase === "paying" ? "Completa tu pago" : "Finalizar compra"}
+          {phase === "paying" ? t("checkoutPage.titlePaying") : t("checkoutPage.title")}
         </h1>
 
         {phase === "form" && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36, flexWrap: "wrap" }}>
             {[
-              ["1", "Contacto", user ? true : Boolean(guest.email)],
-              ["2", "Entrega", hasAddress],
-              ["3", "Envío", Boolean(shippingOption)],
-              ["4", "Pago", Boolean(paymentMethod)],
+              ["1", t("checkoutPage.steps.contact"), user ? true : Boolean(guest.email)],
+              ["2", t("checkoutPage.steps.delivery"), hasAddress],
+              ["3", t("checkoutPage.steps.shipping"), Boolean(shippingOption)],
+              ["4", t("checkoutPage.steps.payment"), Boolean(paymentMethod)],
             ].map(([n, label, done], i, arr) => (
               <div key={n} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{
@@ -262,11 +265,11 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
               <>
                 <CheckoutErrorBanner error={checkoutError} cartItems={cart.items} onRefreshCart={handleRefreshCart} onRemoveCoupon={handleRemoveCoupon} />
 
-                <Section title="Contacto">
+                <Section title={t("checkoutPage.steps.contact")}>
                   <ContactStep user={user} guest={guest} onGuestChange={handleGuestChange} errors={guestErrors} touched={guestTouched} onBlur={handleGuestBlur} />
                 </Section>
 
-                <Section title="Entrega">
+                <Section title={t("checkoutPage.steps.delivery")}>
                   <AddressStep
                     addresses={savedAddresses}
                     selectedAddressId={selectedAddressId}
@@ -279,7 +282,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                   />
                 </Section>
 
-                <Section title="Envío">
+                <Section title={t("checkoutPage.steps.shipping")}>
                   <ShippingMethodStep
                     countryCode={addressCountryCode}
                     stateProvince={addressStateProvince}
@@ -293,7 +296,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                   />
                 </Section>
 
-                <Section title="Pago">
+                <Section title={t("checkoutPage.steps.payment")}>
                   <PaymentMethodStep
                     countryCode={addressCountryCode}
                     currency={CURRENCY}
@@ -303,13 +306,14 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                 </Section>
 
                 <Button
+                  className="checkout-submit-inline"
                   onClick={handleConfirm}
                   disabled={submitting}
                   variant={isWhatsapp ? "whatsapp" : "dark"}
                   style={{ width: "100%", justifyContent: "center", gap: 8, opacity: submitting ? 0.6 : 1, cursor: submitting ? "not-allowed" : "pointer", marginTop: 8 }}
                 >
                   {isWhatsapp && <Icon name={ICONS.WHATSAPP} size={16} />}
-                  {submitting ? "Procesando…" : isWhatsapp ? "Continuar por WhatsApp" : "Pagar ahora"}
+                  {submitting ? t("checkoutPage.processing") : isWhatsapp ? t("checkoutPage.continueWhatsapp") : t("checkoutPage.payNow")}
                 </Button>
                 {isWhatsapp && whatsappNotice && (
                   <div style={{
@@ -317,17 +321,22 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
                     background: "rgba(37,211,102,.1)", border: "1px solid rgba(37,211,102,.35)",
                     borderRadius: 14, padding: "12px 18px", fontSize: 12.5, color: "var(--ink)", marginTop: 12,
                   }}>
-                    Abrimos WhatsApp con tu pedido listo — solo dale enviar. Si no se abrió, revisa que tu navegador no haya bloqueado la ventana emergente.
+                    {t("checkoutPage.whatsappNotice")}
                   </div>
                 )}
                 <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 8 }}>
-                  Al confirmar aceptas nuestros términos y condiciones.
+                  {t("checkoutPage.termsNotice")}
                 </div>
               </>
             ) : (
-              <Section title="Pago">
+              <Section title={t("checkoutPage.steps.payment")}>
                 <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 16 }}>
-                  Tu pedido <strong>{orderResult.order.orderNumber}</strong> quedó registrado. Completa el pago para confirmarlo.
+                  <Trans
+                    t={t}
+                    i18nKey="checkoutPage.orderRegistered"
+                    values={{ orderNumber: orderResult.order.orderNumber }}
+                    components={{ strong: <strong /> }}
+                  />
                 </p>
                 <BoldPaymentPanel payment={orderResult.payment} orderNumber={orderResult.order.orderNumber} email={user?.email || guest.email} />
               </Section>
@@ -340,9 +349,38 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
         </div>
       </div>
 
+      {/* Barra fija de móvil: mismo total + mismo botón/handler que el flujo de
+          escritorio (ver .checkout-submit-inline más arriba, oculto bajo 640px). */}
+      {phase === "form" && (
+        <div className="checkout-mobile-bar" style={{
+          display: "none", position: "fixed", left: 0, right: 0, bottom: 0,
+          padding: "12px 20px calc(12px + env(safe-area-inset-bottom))",
+          background: "var(--cream)", borderTop: "1px solid var(--line)",
+          alignItems: "center", gap: 14, zIndex: 40,
+        }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10.5, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".08em" }}>Total</div>
+            <div className="display" style={{ fontSize: 19 }}>{formatCurrency(computeCheckoutTotal(cart, shippingOption).total)}</div>
+          </div>
+          <Button
+            onClick={handleConfirm}
+            disabled={submitting}
+            variant={isWhatsapp ? "whatsapp" : "dark"}
+            style={{ flex: 1, justifyContent: "center", gap: 8, opacity: submitting ? 0.6 : 1, cursor: submitting ? "not-allowed" : "pointer" }}
+          >
+            {isWhatsapp && <Icon name={ICONS.WHATSAPP} size={16} />}
+            {submitting ? "Procesando…" : isWhatsapp ? "Continuar por WhatsApp" : "Pagar ahora"}
+          </Button>
+        </div>
+      )}
+
       <style>{`
         @media (max-width: 860px) {
           .checkout-layout { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .checkout-submit-inline { display: none !important; }
+          .checkout-mobile-bar { display: flex !important; }
         }
       `}</style>
     </div>

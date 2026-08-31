@@ -1,0 +1,11 @@
+{
+  "modal": {
+    "eyebrow": "Favorites",
+    "title": "Your wishlist",
+    "close": "Close",
+    "loading": "Loading your favorites…",
+    "loadError": "We couldn't load your favorites. Please try again.",
+    "empty": "You haven't saved any products yet."
+  },
+  "row": { "add": "Add", "remove": "Remove from favorites" }
+}

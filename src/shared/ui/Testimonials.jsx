@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { Stars } from "./Icon";
 import { TESTIMONIALS } from "./data/testimonials";
@@ -13,6 +14,7 @@ const avatarBg = (tone) => ({
 // (prev/next + dots) por una cinta que se desplaza sola, con pausa al pasar el
 // mouse — misma lista TESTIMONIALS, duplicada una vez para el loop sin costuras.
 export const Testimonials = () => {
+  const { t } = useTranslation("home");
   const trackRef = useRef(null);
 
   const pause = () => { if (trackRef.current) trackRef.current.style.animationPlayState = "paused"; };
@@ -36,9 +38,9 @@ export const Testimonials = () => {
       <div style={{ position: "relative" }}>
         <Reveal>
           <div className="wrap" style={{ textAlign: "center", marginBottom: 40 }}>
-            <div className="eyebrow" style={{ color: "var(--gold-soft)" }}>Lo dicen ellas</div>
+            <div className="eyebrow" style={{ color: "var(--gold-soft)" }}>{t("testimonials.eyebrow")}</div>
             <h2 className="display" style={{ fontSize: "clamp(40px, 5vw, 60px)", margin: "8px 0 0", color: "var(--cream)" }}>
-              Historias de <span className="script" style={{ color: "var(--botanic)" }}>transformación</span>
+              {t("testimonials.title")} <span className="script" style={{ color: "var(--botanic)" }}>{t("testimonials.titleScript")}</span>
             </h2>
           </div>
         </Reveal>
@@ -49,23 +51,23 @@ export const Testimonials = () => {
           onMouseLeave={resume}
         >
           <div ref={trackRef} className="testi-marquee" style={{ display: "flex", gap: 20, width: "max-content" }}>
-            {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-              <div key={`${t.id}-${i}`} style={{
+            {[...TESTIMONIALS, ...TESTIMONIALS].map((item, i) => (
+              <div key={`${item.id}-${i}`} style={{
                 width: 340, flexShrink: 0,
                 background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
                 borderRadius: 18, padding: "26px 24px",
               }}>
-                <Stars value={t.rating} size={13} color="var(--gold-soft)" />
+                <Stars value={item.rating} size={13} color="var(--gold-soft)" />
                 <p className="display" style={{ fontSize: 18, lineHeight: 1.4, margin: "14px 0 18px", fontWeight: 400, color: "var(--cream)" }}>
-                  &ldquo;{t.quote}&rdquo;
+                  &ldquo;{t(`testimonials.items.${item.id}.quote`)}&rdquo;
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{
-                    width: 32, height: 32, borderRadius: "50%", background: avatarBg(t.tone),
+                    width: 32, height: 32, borderRadius: "50%", background: avatarBg(item.tone),
                     display: "grid", placeItems: "center", flexShrink: 0,
                     fontFamily: "var(--serif)", fontStyle: "italic", fontSize: 15,
-                  }}>{t.avatar}</span>
-                  <span style={{ fontSize: 12.5, fontWeight: 500 }}>{t.name} · {t.role}</span>
+                  }}>{item.avatar}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 500 }}>{item.name} · {item.role}</span>
                 </div>
               </div>
             ))}

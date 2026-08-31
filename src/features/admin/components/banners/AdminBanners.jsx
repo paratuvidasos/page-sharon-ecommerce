@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
+import { AdminFormSheet } from "../AdminFormSheet";
 import {
   listBanners,
   createBanner,
@@ -18,6 +20,7 @@ const labelStyle = { fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppe
 // bajar en vez de drag-and-drop, para no sumar una dependencia nueva solo por esto —
 // cada movimiento manda el arreglo COMPLETO reordenado a PUT /admin/banners/order.
 export const AdminBanners = () => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [banners, setBanners] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -57,7 +60,7 @@ export const AdminBanners = () => {
       const res = await uploadBannerImage(file, getAccessToken());
       setForm((f) => ({ ...f, imageUrl: res.url }));
     } catch (err) {
-      setError(err?.message || "No se pudo subir la imagen.");
+      setError(err?.message || t("banners.uploadErrorGeneric"));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -67,7 +70,7 @@ export const AdminBanners = () => {
   const save = async (e) => {
     e.preventDefault();
     if (!form.imageUrl || !form.title.trim()) {
-      setError("La imagen y el título son obligatorios.");
+      setError(t("banners.requiredFieldsError"));
       return;
     }
     const payload = {
@@ -84,7 +87,7 @@ export const AdminBanners = () => {
       setModalOpen(false);
       load();
     } catch (err) {
-      setError(err?.message || "No se pudo guardar el banner.");
+      setError(err?.message || t("banners.saveErrorGeneric"));
     }
   };
 
@@ -131,49 +134,49 @@ export const AdminBanners = () => {
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
         <button onClick={openNew} className="foc" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--ink)", color: "var(--cream)", border: 0, borderRadius: 999, padding: "12px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           <Icon name="plus" size={15} color="var(--cream)" />
-          Nuevo banner
+          {t("banners.newBanner")}
         </button>
       </div>
 
       <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
-        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Cargando banners…</div>}
-        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>No se pudieron cargar los banners.</div>}
-        {status === "ready" && banners.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Todavía no hay banners creados.</div>}
+        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("banners.loading")}</div>}
+        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>{t("banners.error")}</div>}
+        {status === "ready" && banners.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("banners.empty")}</div>}
 
         {banners.map((b, i) => (
           <div key={b.id}>
-            <div className="admin-row" style={{ display: "grid", gridTemplateColumns: "60px 80px 1fr 90px 160px", padding: "12px 22px", alignItems: "center", borderBottom: "1px solid var(--line)", gap: 12 }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <div className="admin-row admin-banner-row" style={{ display: "grid", gridTemplateColumns: "60px 80px 1fr 90px 160px", padding: "12px 22px", alignItems: "center", borderBottom: "1px solid var(--line)", gap: 12 }}>
+              <div className="cell-arrows" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <button onClick={() => move(i, -1)} disabled={i === 0} className="foc" style={{ border: 0, background: "none", cursor: i === 0 ? "not-allowed" : "pointer", opacity: i === 0 ? 0.3 : 1 }}>▲</button>
                 <button onClick={() => move(i, 1)} disabled={i === banners.length - 1} className="foc" style={{ border: 0, background: "none", cursor: i === banners.length - 1 ? "not-allowed" : "pointer", opacity: i === banners.length - 1 ? 0.3 : 1 }}>▼</button>
               </div>
-              <div style={{ width: 60, height: 40, borderRadius: 8, overflow: "hidden", background: "var(--cream-2)" }}>
+              <div className="cell-thumb" style={{ width: 60, height: 40, borderRadius: 8, overflow: "hidden", background: "var(--cream-2)" }}>
                 <img src={b.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
-              <span style={{ fontWeight: 600, fontSize: 13.5 }}>{b.title}</span>
+              <span className="cell-title" style={{ fontWeight: 600, fontSize: 13.5 }}>{b.title}</span>
               <button
                 onClick={() => toggleActive(b)}
                 disabled={togglingId === b.id}
-                title="Activar/desactivar banner"
-                className="foc"
+                title={t("banners.toggleAria")}
+                className="foc cell-toggle"
                 style={{ border: 0, cursor: togglingId === b.id ? "wait" : "pointer", padding: "5px 11px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, background: b.isActive ? "var(--botanic-muted)" : "var(--cream-2)", color: b.isActive ? "#3A4A34" : "var(--ink-soft)", justifySelf: "start" }}
               >
-                {b.isActive ? "Activo" : "Inactivo"}
+                {b.isActive ? t("banners.statusActive") : t("banners.statusInactive")}
               </button>
-              <span style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                <button onClick={() => openEdit(b)} aria-label="Editar banner" title="Editar banner" className="foc" style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid var(--line)", background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
+              <span className="cell-actions" style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                <button onClick={() => openEdit(b)} aria-label={t("banners.editAria")} title={t("banners.editAria")} className="foc" style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid var(--line)", background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
                   <Icon name="pencil" size={14} />
                 </button>
-                <button onClick={() => setConfirmingDeleteId(b.id)} aria-label="Eliminar banner" title="Eliminar banner" className="foc" style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid rgba(193,99,63,.25)", background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
+                <button onClick={() => setConfirmingDeleteId(b.id)} aria-label={t("banners.deleteAria")} title={t("banners.deleteAria")} className="foc" style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid rgba(193,99,63,.25)", background: "transparent", cursor: "pointer", display: "grid", placeItems: "center" }}>
                   <Icon name="trash" size={14} color="var(--terracotta-deep)" />
                 </button>
               </span>
             </div>
             {confirmingDeleteId === b.id && (
               <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 22px", background: "rgba(193,99,63,.06)", borderBottom: "1px solid var(--line)" }}>
-                <span style={{ fontSize: 12.5, color: "#7A3535", flex: 1 }}>¿Eliminar el banner "{b.title}"? No se puede deshacer.</span>
-                <button onClick={() => remove(b.id)} className="foc" style={{ border: 0, borderRadius: 999, padding: "8px 16px", background: "var(--terracotta-deep)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Eliminar</button>
-                <button onClick={() => setConfirmingDeleteId(null)} className="foc" style={{ border: 0, borderRadius: 999, padding: "8px 16px", background: "transparent", color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+                <span style={{ fontSize: 12.5, color: "#7A3535", flex: 1 }}>{t("banners.confirmDelete", { title: b.title })}</span>
+                <button onClick={() => remove(b.id)} className="foc" style={{ border: 0, borderRadius: 999, padding: "8px 16px", background: "var(--terracotta-deep)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{t("banners.delete")}</button>
+                <button onClick={() => setConfirmingDeleteId(null)} className="foc" style={{ border: 0, borderRadius: 999, padding: "8px 16px", background: "transparent", color: "var(--ink)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>{t("banners.cancel")}</button>
               </div>
             )}
           </div>
@@ -181,18 +184,11 @@ export const AdminBanners = () => {
       </div>
 
       {modalOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(27,24,21,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-          <form onSubmit={save} style={{ width: "100%", maxWidth: 460, background: "var(--cream)", borderRadius: 24, padding: 32, boxShadow: "var(--shadow-lg)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-              <div className="display" style={{ fontSize: 24 }}>{form.id ? "Editar banner" : "Nuevo banner"}</div>
-              <button type="button" onClick={() => setModalOpen(false)} className="foc" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--cream-2)", border: 0, cursor: "pointer", display: "grid", placeItems: "center" }}>
-                <Icon name="close" size={13} />
-              </button>
-            </div>
-
+        <AdminFormSheet onClose={() => setModalOpen(false)} eyebrow={t("banners.form.eyebrow")} title={form.id ? t("banners.form.editTitle") : t("banners.form.newTitle")} maxWidth={460}>
+          <form onSubmit={save}>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={labelStyle}>Imagen</label>
+                <label style={labelStyle}>{t("banners.form.imageLabel")}</label>
                 {form.imageUrl && (
                   <div style={{ width: "100%", height: 100, borderRadius: 12, overflow: "hidden", marginBottom: 8, background: "var(--cream-2)" }}>
                     <img src={form.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -200,44 +196,58 @@ export const AdminBanners = () => {
                 )}
                 <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="foc" style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid var(--line)", borderRadius: 999, padding: "10px 16px", background: "#fff", fontSize: 12.5, fontWeight: 600, cursor: uploading ? "wait" : "pointer" }}>
                   <Icon name="image" size={14} />
-                  {uploading ? "Subiendo…" : "Subir imagen"}
+                  {uploading ? t("banners.form.uploading") : t("banners.form.uploadButton")}
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleUpload} style={{ display: "none" }} />
               </div>
               <div>
-                <label style={labelStyle}>Título</label>
+                <label style={labelStyle}>{t("banners.form.titleLabel")}</label>
                 <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={fieldStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Link (opcional)</label>
+                <label style={labelStyle}>{t("banners.form.linkLabel")}</label>
                 <input value={form.linkUrl} onChange={(e) => setForm((f) => ({ ...f, linkUrl: e.target.value }))} style={fieldStyle} />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Desde</label>
+                  <label style={labelStyle}>{t("banners.form.startsAt")}</label>
                   <input value={form.startsAt} onChange={(e) => setForm((f) => ({ ...f, startsAt: e.target.value }))} type="date" style={fieldStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Hasta</label>
+                  <label style={labelStyle}>{t("banners.form.endsAt")}</label>
                   <input value={form.endsAt} onChange={(e) => setForm((f) => ({ ...f, endsAt: e.target.value }))} type="date" style={fieldStyle} />
                 </div>
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
                 <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
-                Activo
+                {t("banners.form.activeLabel")}
               </label>
             </div>
 
             {error && <div style={{ fontSize: 12.5, color: "var(--terracotta-deep)", marginTop: 14 }}>{error}</div>}
 
-            <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-              <button type="submit" className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>Guardar banner</button>
-              <button type="button" onClick={() => setModalOpen(false)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+            <div className="admin-sheet-actions" style={{ display: "flex", gap: 10, marginTop: 22 }}>
+              <button type="submit" className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>{t("banners.form.save")}</button>
+              <button type="button" onClick={() => setModalOpen(false)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>{t("banners.form.cancel")}</button>
             </div>
           </form>
-        </div>
+        </AdminFormSheet>
       )}
-      <style>{`.admin-row:hover{background:#FAF7F0}`}</style>
+      <style>{`
+        .admin-row:hover{background:#FAF7F0}
+        @media (max-width: 720px){
+          .admin-banner-row{
+            grid-template-columns: 34px 60px 1fr !important;
+            grid-template-areas: "arrows thumb title" "arrows toggle actions";
+            row-gap: 8px !important;
+          }
+          .cell-arrows{grid-area: arrows}
+          .cell-thumb{grid-area: thumb}
+          .cell-title{grid-area: title}
+          .cell-toggle{grid-area: toggle}
+          .cell-actions{grid-area: actions; justify-self: end}
+        }
+      `}</style>
     </div>
   );
 };

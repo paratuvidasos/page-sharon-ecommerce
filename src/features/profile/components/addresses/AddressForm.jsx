@@ -1,17 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { COUNTRIES, stripDialCode } from "@shared/data/countries";
 import { createAddress, updateAddress, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
-
-const FIELD_LABELS = {
-  alias: "Alias",
-  recipientName: "Nombre de quien recibe",
-  phone: "Teléfono de contacto",
-  line1: "Dirección",
-  stateProvince: "Departamento / estado",
-  city: "Ciudad",
-  postalCode: "Código postal",
-};
 
 const selectStyle = {
   width: "100%",
@@ -38,38 +29,38 @@ function inputStyle(hasError) {
   };
 }
 
-function validateAlias(value) {
-  if (!value.trim()) return "Ponle un alias para identificarla (ej. Casa, Oficina).";
+function validateAlias(value, t) {
+  if (!value.trim()) return t("addresses.form.aliasRequired");
   return "";
 }
-function validateRecipientName(value) {
-  if (!value.trim()) return "Necesitamos el nombre de quien recibe.";
+function validateRecipientName(value, t) {
+  if (!value.trim()) return t("addresses.form.recipientRequired");
   return "";
 }
-function validatePhone(value, countryCode) {
+function validatePhone(value, countryCode, t) {
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
-  if (!value) return "Ingresa un teléfono de contacto.";
-  if (value.length !== country.phoneDigits) return `Debe tener ${country.phoneDigits} dígitos para ${country.name}.`;
+  if (!value) return t("addresses.form.phoneRequired");
+  if (value.length !== country.phoneDigits) return t("addresses.form.phoneDigits", { digits: country.phoneDigits, country: country.name });
   return "";
 }
-function validateLine1(value) {
-  if (!value.trim()) return "Necesitamos la dirección.";
-  if (value.trim().length < 5) return "Agrega un poco más de detalle a la dirección.";
+function validateLine1(value, t) {
+  if (!value.trim()) return t("addresses.form.line1Required");
+  if (value.trim().length < 5) return t("addresses.form.line1TooShort");
   return "";
 }
-function validateStateProvince(value) {
-  if (!value.trim()) return "Necesitamos el departamento o estado.";
+function validateStateProvince(value, t) {
+  if (!value.trim()) return t("addresses.form.stateProvinceRequired");
   return "";
 }
-function validateCity(value) {
-  if (!value.trim()) return "Necesitamos la ciudad.";
+function validateCity(value, t) {
+  if (!value.trim()) return t("addresses.form.cityRequired");
   return "";
 }
-function validatePostalCode(value, countryCode) {
+function validatePostalCode(value, countryCode, t) {
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
-  if (!value.trim()) return "Necesitamos el código postal.";
+  if (!value.trim()) return t("addresses.form.postalCodeRequired");
   if (!country.postalCodeRegex.test(value.trim())) {
-    return `Formato inválido para ${country.name} (ej. ${country.postalCodeExample}).`;
+    return t("addresses.form.postalCodeInvalid", { country: country.name, example: country.postalCodeExample });
   }
   return "";
 }
@@ -80,6 +71,7 @@ function validatePostalCode(value, countryCode) {
 // incluye "predeterminada" ni "archivada": esas son acciones de la lista (AddressCard),
 // no campos del formulario — las decide el backend (primera activa = predeterminada).
 export const AddressForm = forwardRef(({ initialValues }, ref) => {
+  const { t } = useTranslation("profile");
   const { getAccessToken } = useAuth();
   const isEditing = Boolean(initialValues?.id);
   const [alias, setAlias] = useState(initialValues?.alias || "");

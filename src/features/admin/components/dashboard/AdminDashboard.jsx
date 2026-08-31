@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { formatCurrency } from "@shared/i18n/currency";
 import { useAuth } from "@shared/auth/AuthContext";
@@ -16,6 +17,7 @@ const inputStyle = { padding: "9px 12px", border: "1px solid var(--line)", borde
 // eliminan en vez de dejarlos como mock; la tabla inferior pasa de pedidos recientes
 // a productos más vendidos del período, que sí es un campo real de la respuesta.
 export const AdminDashboard = () => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [range, setRange] = useState({ dateFrom: DEFAULT_FROM, dateTo: DEFAULT_TO });
   const [report, setReport] = useState(null);
@@ -48,34 +50,34 @@ export const AdminDashboard = () => {
     try {
       await downloadSalesReportCsv(range, getAccessToken(), `ventas-${range.dateFrom}-a-${range.dateTo}.csv`);
     } catch {
-      setExportError("No se pudo generar el CSV.");
+      setExportError(t("dashboard.exportError"));
     } finally {
       setExporting(false);
     }
   };
 
   const stats = report ? [
-    { label: "Ventas del período", value: formatCurrency(report.summary.totalSales), icon: "arrow", iconBg: "var(--botanic-muted)", iconColor: "var(--botanic-deep)" },
-    { label: "Ticket promedio", value: formatCurrency(report.summary.averageTicket), icon: "gear", iconBg: "var(--botanic-muted)", iconColor: "var(--botanic-deep)" },
-    { label: "Pedidos", value: report.summary.orderCount, icon: "cart", iconBg: "#F1E4CB", iconColor: "var(--gold)" },
+    { label: t("dashboard.stats.totalSales"), value: formatCurrency(report.summary.totalSales), icon: "arrow", iconBg: "var(--botanic-muted)", iconColor: "var(--botanic-deep)" },
+    { label: t("dashboard.stats.averageTicket"), value: formatCurrency(report.summary.averageTicket), icon: "gear", iconBg: "var(--botanic-muted)", iconColor: "var(--botanic-deep)" },
+    { label: t("dashboard.stats.orderCount"), value: report.summary.orderCount, icon: "cart", iconBg: "#F1E4CB", iconColor: "var(--gold)" },
   ] : [];
 
   return (
     <div>
       <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <input type="date" value={range.dateFrom} max={range.dateTo} onChange={(e) => setRange((r) => ({ ...r, dateFrom: e.target.value }))} style={inputStyle} />
-        <span style={{ color: "var(--ink-soft)", fontSize: 12.5 }}>a</span>
+        <span style={{ color: "var(--ink-soft)", fontSize: 12.5 }}>{t("dashboard.dateRangeSeparator")}</span>
         <input type="date" value={range.dateTo} min={range.dateFrom} onChange={(e) => setRange((r) => ({ ...r, dateTo: e.target.value }))} style={inputStyle} />
         <button onClick={exportCsv} disabled={exporting || status !== "ready"} className="foc" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--line)", borderRadius: 999, padding: "10px 18px", background: "#fff", fontSize: 12.5, fontWeight: 700, cursor: exporting ? "wait" : "pointer" }}>
           <Icon name="download" size={14} />
-          {exporting ? "Generando…" : "Exportar CSV"}
+          {exporting ? t("dashboard.exporting") : t("dashboard.exportCsv")}
         </button>
       </div>
 
       {exportError && <div style={{ fontSize: 12.5, color: "var(--terracotta-deep)", marginBottom: 14 }}>{exportError}</div>}
 
-      {status === "loading" && <div style={{ padding: "24px 0", color: "var(--ink-soft)", fontSize: 13.5 }}>Cargando reporte…</div>}
-      {status === "error" && <div style={{ padding: "24px 0", color: "var(--terracotta-deep)", fontSize: 13.5 }}>No se pudo cargar el reporte de ventas.</div>}
+      {status === "loading" && <div style={{ padding: "24px 0", color: "var(--ink-soft)", fontSize: 13.5 }}>{t("dashboard.loading")}</div>}
+      {status === "error" && <div style={{ padding: "24px 0", color: "var(--terracotta-deep)", fontSize: 13.5 }}>{t("dashboard.loadError")}</div>}
 
       {status === "ready" && (
         <>
@@ -95,19 +97,19 @@ export const AdminDashboard = () => {
 
           <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
             <div style={{ padding: "22px 26px" }}>
-              <div className="display" style={{ fontSize: 19 }}>Productos más vendidos</div>
+              <div className="display" style={{ fontSize: 19 }}>{t("dashboard.topProducts.title")}</div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1.6fr 120px 140px", padding: "10px 26px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
-              <span>Producto</span><span>Unidades</span><span style={{ textAlign: "right" }}>Ingresos</span>
+            <div className="admin-table-head" style={{ display: "grid", gridTemplateColumns: "1.6fr 120px 140px", padding: "10px 26px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+              <span>{t("dashboard.topProducts.columns.product")}</span><span>{t("dashboard.topProducts.columns.units")}</span><span style={{ textAlign: "right" }}>{t("dashboard.topProducts.columns.revenue")}</span>
             </div>
             {report.topProducts.length === 0 ? (
-              <div style={{ padding: "24px 26px", fontSize: 13, color: "var(--ink-soft)" }}>Sin ventas en este período.</div>
+              <div style={{ padding: "24px 26px", fontSize: 13, color: "var(--ink-soft)" }}>{t("dashboard.topProducts.empty")}</div>
             ) : (
               report.topProducts.map((p) => (
-                <div key={p.productId} className="admin-row" style={{ display: "grid", gridTemplateColumns: "1.6fr 120px 140px", padding: "14px 26px", alignItems: "center", fontSize: 13.5, borderBottom: "1px solid var(--line)" }}>
+                <div key={p.productId} className="admin-row admin-list-row" style={{ display: "grid", gridTemplateColumns: "1.6fr 120px 140px", padding: "14px 26px", alignItems: "center", fontSize: 13.5, borderBottom: "1px solid var(--line)" }}>
                   <span style={{ fontWeight: 600 }}>{p.productName}</span>
-                  <span className="mono">{p.unitsSold}</span>
-                  <span style={{ textAlign: "right" }} className="display">{formatCurrency(p.revenue)}</span>
+                  <span className="mono"><span className="cell-label">{t("dashboard.topProducts.columns.units")}</span>{p.unitsSold}</span>
+                  <span style={{ textAlign: "right" }} className="display"><span className="cell-label">{t("dashboard.topProducts.columns.revenue")}</span>{formatCurrency(p.revenue)}</span>
                 </div>
               ))
             )}
@@ -115,7 +117,16 @@ export const AdminDashboard = () => {
         </>
       )}
 
-      <style>{`.admin-row:hover{background:#FAF7F0}`}</style>
+      <style>{`
+        .admin-row:hover{background:#FAF7F0}
+        .cell-label{display:none}
+        @media (max-width: 720px){
+          .admin-table-head{display:none}
+          .admin-list-row{grid-template-columns:1fr !important; gap:6px; align-items:flex-start !important}
+          .admin-list-row .cell-label{display:block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px}
+          .admin-list-row > *{text-align:left !important}
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { inputStyle, fieldLabelStyle, fieldErrorStyle, fieldHintStyle } from "../fieldStyles";
 import { validateGuestEmail, validateFirstName, validateLastName, validatePassword } from "../validation";
 
@@ -7,6 +8,7 @@ import { validateGuestEmail, validateFirstName, validateLastName, validatePasswo
 // contrato de POST /orders/checkout sigue aceptando createAccount/firstName/lastName/
 // password aunque el checkout haya cambiado de modal a página).
 export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlur }) => {
+  const { t } = useTranslation("checkout");
   const [visible, setVisible] = useState(false);
 
   // La sección "Contacto" ya viene con su propio eyebrow desde <Section> en
@@ -21,7 +23,7 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
     <div>
       <div>
         <label htmlFor="checkout-guest-email" className="eyebrow" style={fieldLabelStyle}>
-          Correo electrónico
+          {t("contactStep.email")}
         </label>
         <input
           id="checkout-guest-email"
@@ -29,7 +31,7 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
           onChange={set("email")}
           onBlur={() => onBlur("email")}
           type="email"
-          placeholder="tucorreo@ejemplo.com"
+          placeholder={t("contactStep.emailPlaceholder")}
           autoComplete="email"
           style={inputStyle(touched.email && errors.email)}
         />
@@ -37,7 +39,7 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
           {touched.email && errors.email ? (
             <span role="alert" style={fieldErrorStyle}>{errors.email}</span>
           ) : (
-            <span style={fieldHintStyle}>Ahí te enviamos la confirmación de tu pedido.</span>
+            <span style={fieldHintStyle}>{t("contactStep.emailHint")}</span>
           )}
         </div>
       </div>
@@ -50,21 +52,21 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
             onChange={(e) => onGuestChange("createAccount", e.target.checked)}
             style={{ accentColor: "var(--botanic-deep)", width: 16, height: 16 }}
           />
-          Crear una cuenta con estos datos
+          {t("contactStep.createAccount")}
         </label>
 
         {guest.createAccount && (
           <div style={{ marginTop: 14 }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="checkout-grid">
               <div>
-                <label htmlFor="checkout-firstName" className="eyebrow" style={fieldLabelStyle}>Nombre</label>
+                <label htmlFor="checkout-firstName" className="eyebrow" style={fieldLabelStyle}>{t("contactStep.firstName")}</label>
                 <input
                   id="checkout-firstName"
                   value={guest.firstName}
                   onChange={set("firstName")}
                   onBlur={() => onBlur("firstName")}
                   type="text"
-                  placeholder="Tu nombre"
+                  placeholder={t("contactStep.firstNamePlaceholder")}
                   autoComplete="given-name"
                   style={inputStyle(touched.firstName && errors.firstName)}
                 />
@@ -73,14 +75,14 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
                 </div>
               </div>
               <div>
-                <label htmlFor="checkout-lastName" className="eyebrow" style={fieldLabelStyle}>Apellido</label>
+                <label htmlFor="checkout-lastName" className="eyebrow" style={fieldLabelStyle}>{t("contactStep.lastName")}</label>
                 <input
                   id="checkout-lastName"
                   value={guest.lastName}
                   onChange={set("lastName")}
                   onBlur={() => onBlur("lastName")}
                   type="text"
-                  placeholder="Tu apellido"
+                  placeholder={t("contactStep.lastNamePlaceholder")}
                   autoComplete="family-name"
                   style={inputStyle(touched.lastName && errors.lastName)}
                 />
@@ -90,7 +92,7 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
               </div>
             </div>
 
-            <label htmlFor="checkout-password" className="eyebrow" style={fieldLabelStyle}>Contraseña</label>
+            <label htmlFor="checkout-password" className="eyebrow" style={fieldLabelStyle}>{t("contactStep.password")}</label>
             <div style={{ position: "relative" }}>
               <input
                 id="checkout-password"
@@ -98,27 +100,27 @@ export const ContactStep = ({ user, guest, onGuestChange, errors, touched, onBlu
                 onChange={set("password")}
                 onBlur={() => onBlur("password")}
                 type={visible ? "text" : "password"}
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t("contactStep.passwordPlaceholder")}
                 autoComplete="new-password"
                 style={{ ...inputStyle(touched.password && errors.password), paddingRight: 46 }}
               />
               <button
                 type="button"
                 onClick={() => setVisible((v) => !v)}
-                aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label={visible ? t("contactStep.hidePasswordAria") : t("contactStep.showPasswordAria")}
                 style={{
                   position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)",
                   background: "none", border: 0, padding: 8, cursor: "pointer", fontSize: 11, color: "var(--ink-soft)",
                 }}
               >
-                {visible ? "Ocultar" : "Ver"}
+                {visible ? t("contactStep.hidePassword") : t("contactStep.showPassword")}
               </button>
             </div>
             <div style={{ minHeight: 18, marginTop: 4 }}>
               {touched.password && errors.password ? (
                 <span role="alert" style={fieldErrorStyle}>{errors.password}</span>
               ) : (
-                <span style={fieldHintStyle}>Mínimo 8 caracteres, con una letra y un número.</span>
+                <span style={fieldHintStyle}>{t("contactStep.passwordHint")}</span>
               )}
             </div>
           </div>

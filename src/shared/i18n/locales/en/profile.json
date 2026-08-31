@@ -1,0 +1,182 @@
+{
+  "menuLabel": "Profile",
+  "modal": {
+    "eyebrow": "Your account",
+    "title": "Edit profile",
+    "subtitle": "Update your details. Changes are saved to your account right away.",
+    "close": "Close",
+    "savedBanner": "Changes saved.",
+    "loading": "Loading your profile…",
+    "shipping": {
+      "eyebrow": "Shipping",
+      "noAddresses": "No saved addresses",
+      "addressCount_one": "{{count}} saved address",
+      "addressCount_other": "{{count}} saved addresses",
+      "manage": "Manage addresses"
+    },
+    "session": {
+      "eyebrow": "Session",
+      "logout": "Log out",
+      "loggingOut": "Logging out…",
+      "logoutAll": "Log out of all devices",
+      "confirmLogoutAll": "Log out on all your devices? You'll need to sign in again on each one.",
+      "confirmYes": "Yes, log out everywhere",
+      "confirmCancel": "Cancel",
+      "loggingOutAll": "Logging out…"
+    },
+    "danger": {
+      "eyebrow": "Danger zone",
+      "needsPasswordNotice": "You need to create a password before you can delete your account (your account came from Google and doesn't have one to confirm the deletion yet).",
+      "createPassword": "Create password",
+      "deleteAccount": "Delete my account"
+    },
+    "submit": "Save changes",
+    "submitting": "Saving…"
+  },
+  "form": {
+    "fieldLabels": { "firstName": "First name", "lastName": "Last name", "phone": "Phone" },
+    "summaryTitle": "Some fields need attention",
+    "photoFieldSummary": "Profile photo",
+    "genericError": "We couldn't save your changes. Please try again in a few seconds.",
+    "firstName": { "label": "First name", "placeholder": "Your first name", "required": "We need your first name." },
+    "lastName": { "label": "Last name", "placeholder": "Your last name", "required": "We need your last name." },
+    "phoneRequired": "Enter your phone number.",
+    "phoneDigits": "Must be {{digits}} digits for {{country}}.",
+    "email": { "label": "Email", "note": "Changing your email requires reverification. Contact support to start that process." }
+  },
+  "phoneField": {
+    "label": "Phone",
+    "countryAriaLabel": "Country",
+    "format": "Format: {{dialCode}} + {{digits}} digits."
+  },
+  "photoField": {
+    "label": "Profile photo",
+    "previewAlt": "Preview of your profile photo",
+    "change": "Change photo",
+    "upload": "Upload photo",
+    "remove": "Remove",
+    "hint": "JPG, PNG, or WEBP. Max 5MB.",
+    "invalidType": "Upload an image file (JPG, PNG, or WEBP).",
+    "tooLarge": "The image can't be larger than 5MB."
+  },
+  "createPassword": {
+    "eyebrow": "Security",
+    "description": "Your account signed up through Google and doesn't have its own password yet. Create one so you can sign in with your email or delete your account later.",
+    "success": "Password created successfully.",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPlaceholder": "Repeat your password",
+    "submit": "Create password",
+    "submitting": "Creating…",
+    "errors": {
+      "passwordRequired": "Choose a password.",
+      "passwordInvalid": "Needs at least 8 characters, with a letter and a number.",
+      "confirmRequired": "Confirm your password.",
+      "confirmMismatch": "Passwords don't match yet.",
+      "generic": "We couldn't create your password. Please try again in a few seconds."
+    }
+  },
+  "addresses": {
+    "book": {
+      "eyebrow": "Shipping",
+      "title": "Saved addresses",
+      "subtitle": "Add, edit, or set the address we use by default on your orders.",
+      "close": "Close",
+      "loading": "Loading your addresses…",
+      "empty": "You don't have any saved addresses yet.",
+      "loadError": "We couldn't load your addresses. Please try again in a few seconds.",
+      "actionError": "We couldn't complete that action. Please try again.",
+      "add": "Add address"
+    },
+    "card": {
+      "default": "Default",
+      "archived": "Archived",
+      "confirmDelete": "Delete this address? This can't be undone.",
+      "confirmYes": "Yes, delete",
+      "deleting": "Deleting…",
+      "cancel": "Cancel",
+      "blockedNotice": "Can't be deleted: it's referenced by an order in progress. You can archive it instead.",
+      "archiveInstead": "Archive this address",
+      "archiving": "Archiving…",
+      "restore": "Restore",
+      "restoring": "Restoring…",
+      "edit": "Edit",
+      "setDefault": "Set as default",
+      "settingDefault": "Setting…",
+      "delete": "Delete"
+    },
+    "form": {
+      "fieldLabels": {
+        "alias": "Label",
+        "recipientName": "Recipient's name",
+        "phone": "Contact phone",
+        "line1": "Address",
+        "stateProvince": "State / province",
+        "city": "City",
+        "postalCode": "Postal code"
+      },
+      "summaryTitle": "Some fields need attention",
+      "genericError": "We couldn't save the address. Please try again in a few seconds.",
+      "aliasLabel": "Label",
+      "aliasPlaceholder": "Home, Office…",
+      "aliasRequired": "Give it a label so you can recognize it (e.g. Home, Office).",
+      "recipientLabel": "Recipient's name",
+      "recipientPlaceholder": "Who will receive the order",
+      "recipientRequired": "We need the recipient's name.",
+      "countryLabel": "Country",
+      "phoneLabel": "Contact phone",
+      "phoneRequired": "Enter a contact phone number.",
+      "phoneDigits": "Must be {{digits}} digits for {{country}}.",
+      "phoneFormat": "Format: {{dialCode}} + {{digits}} digits.",
+      "line1Label": "Address",
+      "line1Placeholder": "Street, number…",
+      "line1Required": "We need the address.",
+      "line1TooShort": "Add a bit more detail to the address.",
+      "line2Label": "Apartment, unit, or reference (optional)",
+      "line2Placeholder": "Apt 501, tower 2…",
+      "stateProvinceLabel": "State / province",
+      "stateProvincePlaceholder": "Your state or province",
+      "stateProvinceRequired": "We need the state or province.",
+      "cityLabel": "City",
+      "cityPlaceholder": "Your city",
+      "cityRequired": "We need the city.",
+      "postalCodeLabel": "Postal code",
+      "postalCodeRequired": "We need the postal code.",
+      "postalCodeInvalid": "Invalid format for {{country}} (e.g. {{example}}).",
+      "postalCodeExample": "E.g. {{example}}"
+    },
+    "formModal": {
+      "eyebrow": "Addresses",
+      "editTitle": "Edit address",
+      "addTitle": "Add address",
+      "close": "Close",
+      "save": "Save changes",
+      "add": "Add address",
+      "saving": "Saving…"
+    }
+  },
+  "deleteAccount": {
+    "form": {
+      "passwordLabel": "Current password",
+      "passwordPlaceholder": "Confirm your password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Tell us why you're leaving, it helps us improve",
+      "passwordRequired": "Enter your password to confirm.",
+      "invalidCredentials": "The email or password is incorrect.",
+      "generic": "We couldn't delete your account. Please try again in a few seconds."
+    },
+    "modal": {
+      "eyebrowDefault": "Delete account",
+      "eyebrowSuccess": "Done",
+      "title": "Delete your account?",
+      "titleSuccess": "Account deleted",
+      "subtitle": "This action can't be undone. Your account and personal data will be deleted.",
+      "close": "Close",
+      "successMessage": "Your account and personal data were deleted successfully.",
+      "successOk": "Got it",
+      "submit": "Delete my account permanently",
+      "submitting": "Deleting…"
+    }
+  }
+}

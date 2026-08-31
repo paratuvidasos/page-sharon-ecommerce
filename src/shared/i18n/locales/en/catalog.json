@@ -1,0 +1,105 @@
+{
+  "featured": {
+    "eyebrow": "Featured & offers",
+    "title": "What everyone's asking for",
+    "viewAll": "View full catalog"
+  },
+  "card": {
+    "outOfStock": "Sold out",
+    "lowStock": "Almost gone",
+    "wishlist": "Wishlist",
+    "noReviews": "No reviews",
+    "add": "Add"
+  },
+  "detail": {
+    "close": "Close",
+    "loading": "Loading product…",
+    "notFound": "We couldn't find this product.",
+    "error": "We couldn't load the product. Please try again in a moment.",
+    "wishlist": "Wishlist",
+    "noReviews": "No reviews",
+    "chooseOption": "Choose an option",
+    "ingredients": "Ingredients",
+    "adding": "Adding…",
+    "addToBag": "Add to bag",
+    "addedToBag": "Added to your bag.",
+    "viewBag": "View bag",
+    "onlyAvailable": "Only {{count}} left.",
+    "addAvailable": "Add the {{count}} available",
+    "genericAddError": "We couldn't add the product.",
+    "stock": {
+      "OUT_OF_STOCK": "Sold out",
+      "LOW_STOCK": "Almost gone",
+      "IN_STOCK": "In stock"
+    }
+  },
+  "related": {
+    "title": "You might also like"
+  },
+  "reviews": {
+    "eyebrow": "Reviews",
+    "countSummary": "{{average}} · {{count}} reviews",
+    "noReviewsYet": "No reviews yet",
+    "writeReview": "Write a review",
+    "loginToReview": "Sign in to write a review.",
+    "starsLabel": "{{count}} stars",
+    "commentPlaceholder": "Tell us what you thought",
+    "publish": "Post",
+    "publishing": "Sending…",
+    "cancel": "Cancel",
+    "loading": "Loading reviews…",
+    "loadError": "We couldn't load the reviews.",
+    "empty": "Be the first to review this product.",
+    "verifiedPurchase": "Verified purchase",
+    "errors": {
+      "duplicate": "You already wrote a review for this product.",
+      "requiresPurchase": "You can only review products you've purchased.",
+      "generic": "We couldn't submit your review. Please try again."
+    }
+  },
+  "filters": {
+    "title": "Filter",
+    "clear": "Clear",
+    "category": "Category",
+    "all": "All",
+    "groups": {
+      "hairType": "Hair type",
+      "line": "Line",
+      "ingredient": "Main ingredient"
+    },
+    "price": "Price",
+    "priceFrom": "From {{amount}}",
+    "priceTo": "Up to {{amount}}"
+  },
+  "products": {
+    "sortOptions": {
+      "NEWEST": "Newest",
+      "BEST_SELLING": "Best selling",
+      "PRICE_ASC": "Price: low to high",
+      "PRICE_DESC": "Price: high to low"
+    },
+    "resultCount_one": "{{count}} product",
+    "resultCount_other": "{{count}} products",
+    "resultCountIn": "{{count}} in {{category}}",
+    "sortBy": "Sort by",
+    "loadError": "We couldn't load the catalog. Please try again in a moment.",
+    "empty": "We couldn't find any products matching these filters.",
+    "all": "All",
+    "filter": "Filter",
+    "close": "Close",
+    "seeResults": "See {{count}} results"
+  },
+  "search": {
+    "close": "esc",
+    "placeholder": "Search products, habits, ingredients…",
+    "noResults": "No results for “{{query}}”",
+    "tryCategories": "Try these categories",
+    "frequent": "Frequent searches",
+    "frequentTerms": ["Anti hair loss", "Sulfate-free", "Argan oil", "Hair mask", "Full kit"]
+  },
+  "page": {
+    "breadcrumbHome": "Home",
+    "breadcrumbShop": "Shop",
+    "title": "Full catalog"
+  }
+}

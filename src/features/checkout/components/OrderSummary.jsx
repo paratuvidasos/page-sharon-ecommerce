@@ -1,12 +1,21 @@
+import { useTranslation } from "react-i18next";
 import { ProductImage } from "@ui/ProductImage";
 import { formatCurrency } from "@shared/i18n/currency";
+
+// Costo de envío + total mostrados en el checkout — informativo (lo que se cobra de
+// verdad lo decide el backend en POST /orders/checkout). Exportado para que la barra
+// fija de móvil en CheckoutPage.jsx use el mismo número sin duplicar la fórmula.
+export const computeCheckoutTotal = (cart, shippingOption) => {
+  const shippingCost = shippingOption ? (shippingOption.freeShippingApplied ? 0 : shippingOption.cost) : null;
+  return { shippingCost, total: cart.total + (shippingCost || 0) };
+};
 
 // Columna derecha del checkout: items + cupón + totales. El costo de envío que se ve
 // acá es el de la opción elegida en ShippingMethodStep (solo informativo — lo que se
 // cobra de verdad lo decide el backend en POST /orders/checkout).
 export const OrderSummary = ({ cart, shippingOption }) => {
-  const shippingCost = shippingOption ? (shippingOption.freeShippingApplied ? 0 : shippingOption.cost) : null;
-  const total = cart.total + (shippingCost || 0);
+  const { t } = useTranslation("checkout");
+  const { shippingCost, total } = computeCheckoutTotal(cart, shippingOption);
 
   return (
     <div
@@ -18,7 +27,7 @@ export const OrderSummary = ({ cart, shippingOption }) => {
       }}
     >
       <div className="eyebrow" style={{ marginBottom: 16, fontSize: 10 }}>
-        Resumen del pedido
+        {t("orderSummary.title")}
       </div>
 
       {cart.items.map((it) => (
@@ -38,7 +47,7 @@ export const OrderSummary = ({ cart, shippingOption }) => {
           </div>
           <div>
             <div style={{ fontWeight: 500, fontSize: 14 }}>{it.productName}</div>
-            <div style={{ color: "var(--ink-soft)", fontSize: 12 }}>Cantidad: {it.quantity}</div>
+            <div style={{ color: "var(--ink-soft)", fontSize: 12 }}>{t("orderSummary.quantity", { count: it.quantity })}</div>
           </div>
           <div className="display" style={{ fontSize: 16 }}>
             {formatCurrency(it.subtotal)}
@@ -48,21 +57,21 @@ export const OrderSummary = ({ cart, shippingOption }) => {
 
       <div style={{ paddingTop: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13, marginBottom: 4 }}>
-          <span>Subtotal</span><span>{formatCurrency(cart.subtotal)}</span>
+          <span>{t("orderSummary.subtotal")}</span><span>{formatCurrency(cart.subtotal)}</span>
         </div>
         {cart.discount > 0 && (
           <div style={{ display: "flex", justifyContent: "space-between", color: "var(--botanic-deep)", fontSize: 13, marginBottom: 4 }}>
-            <span>Descuento{cart.couponCode ? ` (${cart.couponCode})` : ""}</span><span>-{formatCurrency(cart.discount)}</span>
+            <span>{cart.couponCode ? t("orderSummary.discountWithCode", { code: cart.couponCode }) : t("orderSummary.discount")}</span><span>-{formatCurrency(cart.discount)}</span>
           </div>
         )}
         <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13 }}>
-          <span>Envío</span>
-          <span>{shippingCost == null ? "Por definir" : shippingCost === 0 ? "Gratis" : formatCurrency(shippingCost)}</span>
+          <span>{t("orderSummary.shipping")}</span>
+          <span>{shippingCost == null ? t("orderSummary.shippingTBD") : shippingCost === 0 ? t("orderSummary.free") : formatCurrency(shippingCost)}</span>
         </div>
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 14, marginTop: 10, borderTop: "1px solid var(--line)" }}>
-        <span className="display" style={{ fontSize: 20 }}>Total</span>
+        <span className="display" style={{ fontSize: 20 }}>{t("orderSummary.total")}</span>
         <span className="display" style={{ fontSize: 26 }}>{formatCurrency(total)}</span>
       </div>
     </div>

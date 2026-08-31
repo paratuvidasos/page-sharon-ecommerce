@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
@@ -17,6 +18,7 @@ const SHIPPING_COST = 9900;
 // un ConfirmDialog compartido) — así cada línea reintenta su propia mutación sin
 // pisar el estado de las demás.
 const CartLine = ({ item }) => {
+  const { t } = useTranslation("cart");
   const { updateItem, removeItem } = useCart();
   const [pending, setPending] = useState(false);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
@@ -53,6 +55,7 @@ const CartLine = ({ item }) => {
           {item.variantLabel && <div style={{ color: "var(--ink-soft)", fontSize: 12 }}>{item.variantLabel}</div>}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 8, border: "1px solid var(--line)", borderRadius: 999, padding: "2px" }}>
             <button
+              className="cart-qty-btn"
               onClick={() => changeQty(item.quantity - 1)}
               disabled={pending || item.unavailable}
               style={{ width: 26, height: 26, borderRadius: 999, border: 0, background: "transparent", cursor: pending ? "not-allowed" : "pointer", display: "grid", placeItems: "center" }}
@@ -61,6 +64,7 @@ const CartLine = ({ item }) => {
             </button>
             <span className="mono" style={{ minWidth: 16, textAlign: "center" }}>{item.quantity}</span>
             <button
+              className="cart-qty-btn"
               onClick={() => changeQty(item.quantity + 1)}
               disabled={pending || item.unavailable}
               style={{ width: 26, height: 26, borderRadius: 999, border: 0, background: "transparent", cursor: pending ? "not-allowed" : "pointer", display: "grid", placeItems: "center" }}
@@ -77,28 +81,28 @@ const CartLine = ({ item }) => {
               disabled={pending}
               style={{ background: "transparent", border: 0, color: "var(--ink-soft)", fontSize: 11, cursor: "pointer", marginTop: 6, textDecoration: "underline" }}
             >
-              Quitar
+              {t("line.remove")}
             </button>
           )}
         </div>
       </div>
 
       {item.priceChanged && !item.unavailable && (
-        <div style={{ fontSize: 11.5, color: "#9C4A4A", marginTop: 6 }}>El precio de este producto cambió desde que lo agregaste.</div>
+        <div style={{ fontSize: 11.5, color: "#9C4A4A", marginTop: 6 }}>{t("line.priceChanged")}</div>
       )}
       {item.unavailable && (
-        <div style={{ fontSize: 11.5, color: "#9C4A4A", marginTop: 6 }}>Ya no está disponible. Puedes quitarlo del carrito.</div>
+        <div style={{ fontSize: 11.5, color: "#9C4A4A", marginTop: 6 }}>{t("line.unavailable")}</div>
       )}
       {stockNotice != null && (
         <div style={{ fontSize: 11.5, color: "#9C4A4A", marginTop: 6 }}>
-          Solo quedan {stockNotice} disponibles.{" "}
+          {t("line.onlyAvailable", { count: stockNotice })}{" "}
           {stockNotice > 0 && (
             <button
               type="button"
               onClick={() => changeQty(stockNotice)}
               style={{ background: "none", border: 0, padding: 0, color: "inherit", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}
             >
-              Usar cantidad máxima
+              {t("line.useMaxQuantity")}
             </button>
           )}
         </div>
@@ -106,13 +110,13 @@ const CartLine = ({ item }) => {
 
       {confirmingRemove && (
         <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 12 }}>
-          <p style={{ fontSize: 12, color: "#7A3535" }}>¿Quitar este producto del carrito?</p>
+          <p style={{ fontSize: 12, color: "#7A3535" }}>{t("line.confirmRemove")}</p>
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <Button type="button" size="sm" onClick={handleRemove} disabled={pending}>
-              {pending ? "Quitando…" : "Sí, quitar"}
+              {pending ? t("line.removing") : t("line.confirmYes")}
             </Button>
             <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingRemove(false)} disabled={pending}>
-              Cancelar
+              {t("line.cancel")}
             </Button>
           </div>
         </div>
@@ -232,6 +236,12 @@ export const CartDrawer = ({ open, onClose }) => {
           </div>
         )}
       </aside>
+
+      <style>{`
+        @media (max-width: 480px){
+          .cart-qty-btn{width: 38px !important; height: 38px !important}
+        }
+      `}</style>
     </>
   );
 };

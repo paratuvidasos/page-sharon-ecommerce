@@ -1,0 +1,37 @@
+{
+  "historyMenuLabel": "Order history",
+  "statusLabels": {
+    "PENDING": "Pending",
+    "PAID": "Paid",
+    "PAYMENT_FAILED": "Payment failed",
+    "IN_PREPARATION": "In preparation",
+    "SHIPPED": "Shipped",
+    "DELIVERED": "Delivered",
+    "CANCELLED": "Cancelled",
+    "REFUNDED": "Refunded"
+  },
+  "history": {
+    "eyebrow": "Your account",
+    "title": "Order history",
+    "subtitle": "Check the status, contents, and total of your past orders.",
+    "close": "Close",
+    "filters": { "from": "From", "to": "To", "status": "Status", "all": "All", "clear": "Clear filters" },
+    "empty": "You don't have any orders yet.",
+    "noResults": "We couldn't find any orders matching these filters."
+  },
+  "row": { "viewDetail": "View detail", "guide": "Tracking {{trackingNumber}}" },
+  "detail": {
+    "eyebrowOrder": "Order {{orderNumber}}",
+    "close": "Close",
+    "products": "Products",
+    "quantity": "Quantity: {{count}}",
+    "total": "Total",
+    "shippingAddress": "Shipping address",
+    "paymentMethod": "Payment method",
+    "shipping": "Shipping",
+    "trackShipment": "Track shipment",
+    "shippedOn": "Shipped on {{date}}",
+    "deliveredOn": "Delivered on {{date}}",
+    "tracking": "Order tracking"
+  }
+}

@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export const AnnouncementBar = ({ show }) => {
+  const { t } = useTranslation("home");
   if (!show) return null;
   return (
     <div style={{
@@ -7,8 +10,8 @@ export const AnnouncementBar = ({ show }) => {
       textAlign: "center", fontWeight: 400
     }}>
       <span style={{ color: "var(--gold-soft)" }}>✦</span>{" "}
-      Envío gratis en pedidos · Devoluciones en 30 días ·{" "}
-      <a href="#" style={{ textDecoration: "underline", textUnderlineOffset: 3 }}>Únete al club Sharon</a>
+      {t("announcementBar.message")}{" "}
+      <a href="#" style={{ textDecoration: "underline", textUnderlineOffset: 3 }}>{t("announcementBar.cta")}</a>
     </div>
   );
 };

@@ -24,6 +24,7 @@ import { OrderDetailModal } from "@features/orders/components/OrderDetailModal";
 import { OrderHistoryModal } from "@features/orders/components/OrderHistoryModal";
 import { Z } from "@ui/zIndex";
 import { MobileMenu } from "@ui/MobileMenu";
+import { CartFab } from "@ui/CartFab";
 import { AnnouncementBar } from "@ui/AnnouncementBar";
 import { TweaksPanel, TweakSection, TweakToggle, TweakSelect } from "@ui/TweaksPanel";
 import { AdminLayout } from "@features/admin/components/AdminLayout";
@@ -420,7 +421,17 @@ function App() {
         onOpenProduct={setDetailSlug}
         onRemove={handleWish}
       />
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        user={user}
+        wishlistCount={wishlist.length}
+        onOpenWishlist={openWishlist}
+        onOpenProfile={() => setProfileOpen(true)}
+        onOpenAuth={() => openAuth("register")}
+        onOpenOrder={setTrackedOrderNumber}
+      />
+      <CartFab onOpenCart={() => setCartOpen(true)} />
       <SsoCallbackHandler />
       <AuthModal
         open={accountOpen}

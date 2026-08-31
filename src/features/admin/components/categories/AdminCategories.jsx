@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import {
@@ -14,6 +15,7 @@ import { Pagination } from "../Pagination";
 const fieldStyle = { width: "100%", boxSizing: "border-box", padding: "10px 12px", border: "1px solid var(--line)", borderRadius: 10, background: "#fff", fontSize: 13, fontFamily: "var(--sans)" };
 
 const CategoriesSection = () => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [categories, setCategories] = useState([]);
   const [meta, setMeta] = useState(null);

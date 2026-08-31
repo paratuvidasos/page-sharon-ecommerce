@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import FotoModeloAntes from "@assets/img/sharon_img_2.jpg";
 
 export const BeforeAfter = () => {
+  const { t } = useTranslation("home");
   const [pos, setPos] = useState(50);
   const wrapRef = useRef(null);
   const dragging = useRef(false);
@@ -38,39 +40,37 @@ export const BeforeAfter = () => {
         }} className="ba-grid">
           <div>
             <Reveal>
-              <div className="eyebrow">Resultados reales</div>
+              <div className="eyebrow">{t("beforeAfter.eyebrow")}</div>
               <h2 className="display" style={{ fontSize: "clamp(40px, 5vw, 60px)", margin: "10px 0 22px" }}>
-                Antes &<br /><span className="script" style={{ color: "var(--botanic-deep)" }}>después</span>
+                {t("beforeAfter.title1")}<br /><span className="script" style={{ color: "var(--botanic-deep)" }}>{t("beforeAfter.titleScript")}</span>
               </h2>
               <p style={{ color: "var(--ink-soft)", fontSize: 16, lineHeight: 1.65, maxWidth: 460, marginBottom: 28 }}>
-                4 semanas de hábitos Sharon: tónico anti-caída, mascarilla reparadora y aceite de argán.
-                Sin retoques, sin filtros, sin promesas vacías.
+                {t("beforeAfter.description")}
               </p>
             </Reveal>
 
             <Reveal delay={150}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-                {[
-                  ["+38%", "más brillo medido en laboratorio", false],
-                  ["−72%", "rotura al cepillar", true],
-                  ["+24%", "densidad capilar percibida", false],
-                ].map(([k, v, dark]) => (
-                  <div key={k} style={{
-                    flex: 1, minWidth: 150, borderRadius: 16, padding: "18px 20px",
-                    background: dark ? "var(--ink)" : "#fff",
-                    border: dark ? "none" : "1px dashed rgba(27,24,21,.3)",
-                    color: dark ? "var(--cream)" : "var(--ink)",
-                  }}>
-                    <div className="display" style={{ fontSize: 26, color: dark ? "var(--cream)" : "var(--botanic-deep)" }}>{k}</div>
-                    <div style={{ fontSize: 11.5, color: dark ? "rgba(255,255,255,.75)" : "var(--ink-soft)", marginTop: 4 }}>{v}</div>
-                  </div>
-                ))}
+                {t("beforeAfter.stats", { returnObjects: true }).map(({ value: k, label: v }, i) => {
+                  const dark = i === 1;
+                  return (
+                    <div key={k} style={{
+                      flex: 1, minWidth: 150, borderRadius: 16, padding: "18px 20px",
+                      background: dark ? "var(--ink)" : "#fff",
+                      border: dark ? "none" : "1px dashed rgba(27,24,21,.3)",
+                      color: dark ? "var(--cream)" : "var(--ink)",
+                    }}>
+                      <div className="display" style={{ fontSize: 26, color: dark ? "var(--cream)" : "var(--botanic-deep)" }}>{k}</div>
+                      <div style={{ fontSize: 11.5, color: dark ? "rgba(255,255,255,.75)" : "var(--ink-soft)", marginTop: 4 }}>{v}</div>
+                    </div>
+                  );
+                })}
               </div>
             </Reveal>
 
             <Reveal delay={300}>
               <div style={{ marginTop: 28, fontSize: 11, letterSpacing: ".08em", color: "var(--ink-soft)", textTransform: "uppercase" }}>
-                Arrastra el deslizador →
+                {t("beforeAfter.dragHint")}
               </div>
             </Reveal>
           </div>
@@ -82,12 +82,12 @@ export const BeforeAfter = () => {
                    overflow: "hidden", boxShadow: "var(--shadow-lg)",
                    userSelect: "none", touchAction: "none"
                  }}>
-              <div 
-              // className="ph-hair" 
+              <div
+              // className="ph-hair"
               style={{ position: "absolute", inset: 0 }}>
-                <img src={FotoModeloAntes} alt="Foto modelo Antes" />
+                <img src={FotoModeloAntes} alt={t("beforeAfter.altPhoto")} />
                 <div style={{ position: "absolute", top: 20, right: 20, background: "rgba(27,24,21,.85)", color: "#fff", padding: "6px 14px", borderRadius: 999, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase" }}>
-                  Después · 4 semanas
+                  {t("beforeAfter.afterLabel")}
                 </div>
               </div>
 
@@ -99,9 +99,9 @@ export const BeforeAfter = () => {
                 <div style={{ position: "absolute", inset: 0,
                   // backgroundImage: "repeating-linear-gradient(95deg, rgba(27,24,21,.15) 0 1px, transparent 1px 4px)",
                   mixBlendMode: "multiply" }} />
-                  <img src={FotoModeloAntes} alt="Foto modelo Antes" />
+                  <img src={FotoModeloAntes} alt={t("beforeAfter.altPhoto")} />
                 <div style={{ position: "absolute", top: 20, left: 20, background: "rgba(255,255,255,.85)", color: "var(--ink)", padding: "6px 14px", borderRadius: 999, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase" }}>
-                  Antes
+                  {t("beforeAfter.beforeLabel")}
                 </div>
               </div>
 
@@ -114,7 +114,7 @@ export const BeforeAfter = () => {
                 <button
                   onMouseDown={() => dragging.current = true}
                   onTouchStart={() => dragging.current = true}
-                  aria-label="Deslizar"
+                  aria-label={t("beforeAfter.sliderAriaLabel")}
                   style={{
                     position: "absolute", top: "50%", left: "50%",
                     transform: "translate(-50%,-50%)",

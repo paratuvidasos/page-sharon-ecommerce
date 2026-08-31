@@ -1,0 +1,126 @@
+{
+  "hero": {
+    "badge": "New Collection · Fall",
+    "title1": "Transform",
+    "title2": "your hair with",
+    "titleScript": "professional products",
+    "description": "Botanical, sulfate-free formulas developed by specialists. Sharon is the daily habit your hair has been waiting for.",
+    "ctaShop": "Shop now",
+    "ctaDiscover": "Discover habits",
+    "stats": {
+      "customers": "Happy customers",
+      "rating": "Average rating",
+      "sulfateFree": "Sulfates & parabens"
+    },
+    "bestSeller": "Best seller",
+    "bestSellerProduct": "Thickening & Anti-Hair Loss",
+    "freeShipping": "Free shipping",
+    "freeShippingDesc": "Across the Medellin metro area, in 24h",
+    "badges": ["Certified vegan", "Cruelty-free", "Made in Spain", "PH balanced", "Dermatologically tested"]
+  },
+  "benefits": {
+    "eyebrow": "Product sheet",
+    "title": "Five reasons to",
+    "titleScript": "stay",
+    "items": {
+      "b1": { "title": "Natural ingredients", "desc": "Certified botanicals, paraben-free." },
+      "b2": { "title": "Sulfate-free", "desc": "Gentle formulas for everyday use." },
+      "b3": { "title": "Deep repair", "desc": "Visible results from the first week." },
+      "b4": { "title": "Intense shine", "desc": "Silky, luminous, manageable hair." },
+      "b5": { "title": "24h delivery", "desc": "Free across the Medellin metro area." }
+    }
+  },
+  "beforeAfter": {
+    "eyebrow": "Real results",
+    "title1": "Before &",
+    "titleScript": "after",
+    "description": "4 weeks of Sharon habits: anti-hair-loss tonic, repairing mask and argan oil. No touch-ups, no filters, no empty promises.",
+    "stats": [
+      { "value": "+38%", "label": "more shine, lab measured" },
+      { "value": "−72%", "label": "less breakage while brushing" },
+      { "value": "+24%", "label": "perceived hair density" }
+    ],
+    "dragHint": "Drag the slider →",
+    "afterLabel": "After · 4 weeks",
+    "beforeLabel": "Before",
+    "sliderAriaLabel": "Drag",
+    "altPhoto": "Model photo before and after the hair treatment"
+  },
+  "testimonials": {
+    "eyebrow": "In their words",
+    "title": "Stories of",
+    "titleScript": "transformation",
+    "items": {
+      "t1": { "quote": "I'd spent years looking for something that actually worked for my fine hair. Sharon's mask changed everything in three weeks." },
+      "t2": { "quote": "The full kit is wonderful. The scent, the texture, the packaging — it all feels premium. My favorite part of the day." },
+      "t3": { "quote": "After an aggressive straightening treatment, the argan oil brought back my shine. My stylist asked what I was using." },
+      "t4": { "quote": "The anti-hair-loss tonic works, but what won me over were the habits. It's a pleasure taking care of yourself with products like these." }
+    }
+  },
+  "offerBanner": {
+    "eyebrow": "Special Offer · This week only",
+    "title1": "The complete",
+    "titleScript": "Sharon",
+    "title2": "kit",
+    "description": "Tonic, mask, thickening treatment and massaging brush. The premium routine in a single gesture.",
+    "ctaBuy": "Get the kit",
+    "ctaView": "See what's included",
+    "freeShipping": "Free shipping",
+    "freeReturn": "30-day returns",
+    "limitedStock": "Limited stock",
+    "altMask": "Hair mask being applied by hand",
+    "altTonic": "Hair growth booster tonic",
+    "altFerns": "Hair mask among ferns",
+    "community": {
+      "eyebrow": "Sharon Community",
+      "headingPrefix": "Join and get",
+      "headingDiscount": "-10%",
+      "headingSuffix": "on your first order"
+    }
+  },
+  "newsletterInline": {
+    "headingPrefix": "Join",
+    "headingScript": "Sharon",
+    "placeholder": "Your email",
+    "sent": "Done! ✧",
+    "submit": "Subscribe"
+  },
+  "newsletter": {
+    "eyebrow": "Sharon Community",
+    "titleLine1": "Get hair habits and",
+    "titleScript": "-10%",
+    "titleLine2": "on your first order",
+    "description": "Once a month, no spam. Just launches, guides and discounts for our community.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@email.com",
+    "submitSent": "Subscription confirmed ✦",
+    "submitDefault": "I want my -10%",
+    "privacyNote": "By subscribing you accept our privacy policy."
+  },
+  "announcementBar": {
+    "message": "Free shipping on orders · 30-day returns ·",
+    "cta": "Join the Sharon club"
+  },
+  "footer": {
+    "description": "Professional hair care, made in small batches in Colombia. Botanicals · science · habits.",
+    "columns": {
+      "shop": { "title": "Shop", "links": ["All products", "Shampoos", "Masks", "Treatments", "Oils", "Kits & bundles"] },
+      "help": { "title": "Help", "links": ["Shipping & delivery", "Returns", "Hair type guide", "Contact", "FAQ"] },
+      "brand": { "title": "Sharon", "links": ["About us", "Ingredients", "Sustainability", "Professional program", "Journal / Blog"] }
+    },
+    "copyright": "© 2026 Sharon Hair Co. · All rights reserved",
+    "securePayments": "Secure payments:"
+  },
+  "campaignCarousel": {
+    "activeUntil": "Active until {{date}}",
+    "viewCampaign": "View campaign →",
+    "goToCampaign": "Go to campaign {{number}}",
+    "prevCampaign": "Previous campaign",
+    "nextCampaign": "Next campaign"
+  },
+  "cartFab": {
+    "ariaLabel": "View bag"
+  }
+}

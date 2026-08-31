@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Z } from "@ui/zIndex";
 import { useAuth } from "@shared/auth/AuthContext";
@@ -37,7 +38,11 @@ const PrefToggle = ({ label, checked, onChange }) => (
 // SUPUESTO A CONFIRMAR CON BACKEND: el shape de cada item de GET /notifications no está
 // documentado más allá de linkUrl — se asume { id, title, message, read, createdAt,
 // linkUrl } (nombres típicos de un buzón), tolerando variantes con fallbacks.
-export const NotificationsBell = ({ onOpenOrder, triggerStyle }) => {
+// `variant="row"` reutiliza toda la lógica/estado tal cual (misma sesión, mismo
+// GET /notifications, mismo marcar-leída) pero cambia el trigger de ícono circular a
+// una fila completa de menú — usado dentro de MobileMenu.jsx, donde el ícono normal
+// del header no está montado (ver Nav.jsx .nav-icons-desktop, oculto bajo 900px).
+export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" }) => {
   const { user, getAccessToken } = useAuth();
   const [open, setOpen] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
@@ -132,28 +137,51 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle }) => {
 
   if (!user) return null;
 
+  const toggle = () => {
+    setOpen((v) => !v);
+    setPrefsOpen(false);
+  };
+
   return (
     <div ref={rootRef} style={{ position: "relative" }}>
-      <IconButton
-        icon="bell"
-        iconSize={18}
-        onClick={() => {
-          setOpen((v) => !v);
-          setPrefsOpen(false);
-        }}
-        aria-label="Notificaciones"
-        badge={unreadCount}
-        badgeColor="var(--terracotta)"
-        style={triggerStyle}
-      />
+      {variant === "row" ? (
+        <button
+          type="button"
+          onClick={toggle}
+          aria-expanded={open}
+          className="foc"
+          style={{
+            display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+            background: "transparent", border: 0, borderRadius: 14, padding: "14px",
+            fontSize: 15, fontWeight: 500, color: "var(--ink)", cursor: "pointer", fontFamily: "var(--sans)",
+          }}
+        >
+          <Icon name="bell" size={17} color="var(--ink-soft)" />
+          Notificaciones
+          {unreadCount > 0 && (
+            <span className="mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--terracotta)" }}>{unreadCount}</span>
+          )}
+        </button>
+      ) : (
+        <IconButton
+          icon="bell"
+          iconSize={18}
+          onClick={toggle}
+          aria-label="Notificaciones"
+          badge={unreadCount}
+          badgeColor="var(--terracotta)"
+          style={triggerStyle}
+        />
+      )}
 
       {open && (
         <div
           style={{
             position: "absolute",
             top: "calc(100% + 10px)",
+            left: variant === "row" ? 0 : "auto",
             right: 0,
-            width: 340,
+            width: variant === "row" ? "auto" : 340,
             background: "#fff",
             borderRadius: 16,
             border: ".5px solid var(--line)",

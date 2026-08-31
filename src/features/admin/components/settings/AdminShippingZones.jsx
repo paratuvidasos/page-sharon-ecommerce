@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
+import { AdminFormSheet } from "../AdminFormSheet";
 import {
   listShippingZones,
   createShippingZone,
@@ -17,6 +19,7 @@ const emptyForm = () => ({ id: null, name: "", description: "" });
 // payload (name/description) es la mejor suposición a partir del mockup — a
 // confirmar contra el contrato real del backend en la primera prueba end-to-end.
 export const AdminShippingZones = () => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [zones, setZones] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -129,7 +132,7 @@ export const AdminShippingZones = () => {
       )}
 
       <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1.6fr 140px 90px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
+        <div className="admin-table-head" style={{ display: "grid", gridTemplateColumns: "1.4fr 1.6fr 140px 90px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
           <span>Zona</span><span>Descripción</span><span>Restricciones</span><span></span>
         </div>
 
@@ -141,9 +144,9 @@ export const AdminShippingZones = () => {
         )}
 
         {zones.map((z) => (
-          <div key={z.id} className="admin-row" style={{ display: "grid", gridTemplateColumns: "1.4fr 1.6fr 140px 90px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+          <div key={z.id} className="admin-row admin-list-row" style={{ display: "grid", gridTemplateColumns: "1.4fr 1.6fr 140px 90px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
             <span style={{ fontWeight: 600, fontSize: 13.5 }}>{z.name}</span>
-            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>{z.description || "—"}</span>
+            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}><span className="cell-label">Descripción</span>{z.description || "—"}</span>
             <button onClick={() => openRestrictions(z)} className="foc" style={{ background: "none", border: 0, padding: 0, fontSize: 12.5, color: "var(--botanic-deep)", textDecoration: "underline", cursor: "pointer", justifySelf: "start" }}>
               {(z.restrictedProductIds?.length || 0)} producto(s)
             </button>
@@ -160,62 +163,55 @@ export const AdminShippingZones = () => {
       </div>
 
       {modalOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(27,24,21,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-          <div style={{ width: "100%", maxWidth: 440, background: "var(--cream)", borderRadius: 24, padding: 32, boxShadow: "var(--shadow-lg)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-              <div className="display" style={{ fontSize: 24 }}>{form.id ? "Editar zona" : "Nueva zona"}</div>
-              <button onClick={() => setModalOpen(false)} className="foc" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--cream-2)", border: 0, cursor: "pointer", display: "grid", placeItems: "center" }}>
-                <Icon name="close" size={13} />
-              </button>
+        <AdminFormSheet onClose={() => setModalOpen(false)} eyebrow="Configuración" title={form.id ? "Editar zona" : "Nueva zona"} maxWidth={440}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Nombre de la zona</label>
+              <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="foc" placeholder="Medellín · área metropolitana" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" }} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Nombre de la zona</label>
-                <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="foc" placeholder="Medellín · área metropolitana" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" }} />
-              </div>
-              <div>
-                <label style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Descripción</label>
-                <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} className="foc" placeholder="Cobertura, tiempo estimado…" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" }} />
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 26 }}>
-              <button onClick={save} className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>Guardar zona</button>
-              <button onClick={() => setModalOpen(false)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+            <div>
+              <label style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Descripción</label>
+              <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} className="foc" placeholder="Cobertura, tiempo estimado…" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" }} />
             </div>
           </div>
-        </div>
+          <div className="admin-sheet-actions" style={{ display: "flex", gap: 10, marginTop: 26 }}>
+            <button onClick={save} className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}>Guardar zona</button>
+            <button onClick={() => setModalOpen(false)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+          </div>
+        </AdminFormSheet>
       )}
 
       {restrictionsZone && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(27,24,21,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-          <div style={{ width: "100%", maxWidth: 460, maxHeight: "80vh", overflowY: "auto", background: "var(--cream)", borderRadius: 24, padding: 32, boxShadow: "var(--shadow-lg)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <div className="display" style={{ fontSize: 22 }}>Restringir productos</div>
-              <button onClick={() => setRestrictionsZone(null)} className="foc" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--cream-2)", border: 0, cursor: "pointer", display: "grid", placeItems: "center" }}>
-                <Icon name="close" size={13} />
-              </button>
-            </div>
-            <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 18 }}>
-              Estos productos no se podrán enviar a "{restrictionsZone.name}".
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {products.map((p) => (
-                <label key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 6px", borderRadius: 10, cursor: "pointer", fontSize: 13.5 }}>
-                  <input type="checkbox" checked={restrictedIds.has(p.id)} onChange={() => toggleRestricted(p.id)} />
-                  {p.name}
-                </label>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-              <button onClick={saveRestrictions} disabled={savingRestrictions} className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: savingRestrictions ? "wait" : "pointer" }}>
-                {savingRestrictions ? "Guardando…" : "Guardar restricciones"}
-              </button>
-              <button onClick={() => setRestrictionsZone(null)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
-            </div>
+        <AdminFormSheet onClose={() => setRestrictionsZone(null)} eyebrow="Configuración" title="Restringir productos" maxWidth={460}>
+          <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 18 }}>
+            Estos productos no se podrán enviar a "{restrictionsZone.name}".
           </div>
-        </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {products.map((p) => (
+              <label key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 6px", borderRadius: 10, cursor: "pointer", fontSize: 13.5 }}>
+                <input type="checkbox" checked={restrictedIds.has(p.id)} onChange={() => toggleRestricted(p.id)} />
+                {p.name}
+              </label>
+            ))}
+          </div>
+          <div className="admin-sheet-actions" style={{ display: "flex", gap: 10, marginTop: 22 }}>
+            <button onClick={saveRestrictions} disabled={savingRestrictions} className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: savingRestrictions ? "wait" : "pointer" }}>
+              {savingRestrictions ? "Guardando…" : "Guardar restricciones"}
+            </button>
+            <button onClick={() => setRestrictionsZone(null)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+          </div>
+        </AdminFormSheet>
       )}
-      <style>{`.admin-row:hover{background:#FAF7F0}`}</style>
+      <style>{`
+        .admin-row:hover{background:#FAF7F0}
+        .cell-label{display:none}
+        @media (max-width: 720px){
+          .admin-table-head{display:none}
+          .admin-list-row{grid-template-columns:1fr !important; gap:6px; align-items:flex-start !important}
+          .admin-list-row .cell-label{display:block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px}
+          .admin-list-row > *{justify-self:start !important}
+        }
+      `}</style>
     </div>
   );
 };

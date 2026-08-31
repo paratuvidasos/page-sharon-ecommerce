@@ -1,0 +1,105 @@
+{
+  "featured": {
+    "eyebrow": "Destacados y ofertas",
+    "title": "Lo que más nos piden",
+    "viewAll": "Ver catálogo completo"
+  },
+  "card": {
+    "outOfStock": "Agotado",
+    "lowStock": "Últimas unidades",
+    "wishlist": "Favorito",
+    "noReviews": "Sin reseñas",
+    "add": "Añadir"
+  },
+  "detail": {
+    "close": "Cerrar",
+    "loading": "Cargando producto…",
+    "notFound": "No encontramos este producto.",
+    "error": "No pudimos cargar el producto. Intenta de nuevo en un momento.",
+    "wishlist": "Favorito",
+    "noReviews": "Sin reseñas",
+    "chooseOption": "Elige una opción",
+    "ingredients": "Ingredientes",
+    "adding": "Añadiendo…",
+    "addToBag": "Añadir a la bolsa",
+    "addedToBag": "Añadido a tu bolsa.",
+    "viewBag": "Ver bolsa",
+    "onlyAvailable": "Solo quedan {{count}} disponibles.",
+    "addAvailable": "Añadir las {{count}} disponibles",
+    "genericAddError": "No pudimos agregar el producto.",
+    "stock": {
+      "OUT_OF_STOCK": "Agotado",
+      "LOW_STOCK": "Últimas unidades",
+      "IN_STOCK": "En stock"
+    }
+  },
+  "related": {
+    "title": "También te puede interesar"
+  },
+  "reviews": {
+    "eyebrow": "Reseñas",
+    "countSummary": "{{average}} · {{count}} reseñas",
+    "noReviewsYet": "Sin reseñas todavía",
+    "writeReview": "Escribir reseña",
+    "loginToReview": "Inicia sesión para escribir una reseña.",
+    "starsLabel": "{{count}} estrellas",
+    "commentPlaceholder": "Cuéntanos qué te pareció",
+    "publish": "Publicar",
+    "publishing": "Enviando…",
+    "cancel": "Cancelar",
+    "loading": "Cargando reseñas…",
+    "loadError": "No pudimos cargar las reseñas.",
+    "empty": "Sé la primera persona en reseñar este producto.",
+    "verifiedPurchase": "Compra verificada",
+    "errors": {
+      "duplicate": "Ya escribiste una reseña para este producto.",
+      "requiresPurchase": "Solo puedes reseñar productos que hayas comprado.",
+      "generic": "No pudimos enviar tu reseña. Intenta de nuevo."
+    }
+  },
+  "filters": {
+    "title": "Filtrar",
+    "clear": "Limpiar",
+    "category": "Categoría",
+    "all": "Todo",
+    "groups": {
+      "hairType": "Tipo de cabello",
+      "line": "Línea",
+      "ingredient": "Ingrediente principal"
+    },
+    "price": "Precio",
+    "priceFrom": "Desde {{amount}}",
+    "priceTo": "Hasta {{amount}}"
+  },
+  "products": {
+    "sortOptions": {
+      "NEWEST": "Más nuevo",
+      "BEST_SELLING": "Más vendido",
+      "PRICE_ASC": "Precio: menor a mayor",
+      "PRICE_DESC": "Precio: mayor a menor"
+    },
+    "resultCount_one": "{{count}} producto",
+    "resultCount_other": "{{count}} productos",
+    "resultCountIn": "{{count}} en {{category}}",
+    "sortBy": "Ordenar por",
+    "loadError": "No pudimos cargar el catálogo. Intenta de nuevo en un momento.",
+    "empty": "No encontramos productos con estos filtros.",
+    "all": "Todo",
+    "filter": "Filtrar",
+    "close": "Cerrar",
+    "seeResults": "Ver {{count}} resultados"
+  },
+  "search": {
+    "close": "esc",
+    "placeholder": "Buscar productos, hábitos, ingredientes…",
+    "noResults": "Sin resultados para “{{query}}”",
+    "tryCategories": "Prueba con estas categorías",
+    "frequent": "Búsquedas frecuentes",
+    "frequentTerms": ["Anti-caída", "Sin sulfatos", "Aceite de argán", "Mascarilla", "Kit completo"]
+  },
+  "page": {
+    "breadcrumbHome": "Inicio",
+    "breadcrumbShop": "Tienda",
+    "title": "Catálogo completo"
+  }
+}

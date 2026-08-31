@@ -1,0 +1,37 @@
+{
+  "historyMenuLabel": "Historial de pedidos",
+  "statusLabels": {
+    "PENDING": "Pendiente",
+    "PAID": "Pagado",
+    "PAYMENT_FAILED": "Pago fallido",
+    "IN_PREPARATION": "En preparación",
+    "SHIPPED": "Enviado",
+    "DELIVERED": "Entregado",
+    "CANCELLED": "Cancelado",
+    "REFUNDED": "Reembolsado"
+  },
+  "history": {
+    "eyebrow": "Tu cuenta",
+    "title": "Historial de pedidos",
+    "subtitle": "Consulta el estado, contenido y monto de tus pedidos anteriores.",
+    "close": "Cerrar",
+    "filters": { "from": "Desde", "to": "Hasta", "status": "Estado", "all": "Todos", "clear": "Limpiar filtros" },
+    "empty": "Todavía no tienes pedidos.",
+    "noResults": "No encontramos pedidos con estos filtros."
+  },
+  "row": { "viewDetail": "Ver detalle", "guide": "Guía {{trackingNumber}}" },
+  "detail": {
+    "eyebrowOrder": "Pedido {{orderNumber}}",
+    "close": "Cerrar",
+    "products": "Productos",
+    "quantity": "Cantidad: {{count}}",
+    "total": "Total",
+    "shippingAddress": "Dirección de envío",
+    "paymentMethod": "Método de pago",
+    "shipping": "Envío",
+    "trackShipment": "Rastrear envío",
+    "shippedOn": "Enviado el {{date}}",
+    "deliveredOn": "Entregado el {{date}}",
+    "tracking": "Seguimiento del pedido"
+  }
+}

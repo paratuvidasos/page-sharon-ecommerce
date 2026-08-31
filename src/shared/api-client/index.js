@@ -108,3 +108,9 @@ export {
   downloadSalesReportCsv,
 } from "./adminMarketing";
 export { listPublicBanners, listPublicFeaturedProducts } from "./homepage";
+export {
+  getLocales,
+  getCurrencies,
+  getLocalizationPreferences,
+  updateLocalizationPreferences,
+} from "./localization";

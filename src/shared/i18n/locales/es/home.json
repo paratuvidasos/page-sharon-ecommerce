@@ -1,0 +1,126 @@
+{
+  "hero": {
+    "badge": "Nueva colección · Otoño",
+    "title1": "Transforma",
+    "title2": "tu cabello con",
+    "titleScript": "productos profesionales",
+    "description": "Fórmulas botánicas, libres de sulfatos y desarrolladas por especialistas. Sharon es el hábito diario que tu cabello pidió desde siempre.",
+    "ctaShop": "Comprar ahora",
+    "ctaDiscover": "Descubrir hábitos",
+    "stats": {
+      "customers": "Clientas felices",
+      "rating": "Valoración media",
+      "sulfateFree": "Sulfatos & parabenos"
+    },
+    "bestSeller": "Más vendido",
+    "bestSellerProduct": "Engrosante & Anticaída",
+    "freeShipping": "Envío gratis",
+    "freeShippingDesc": "En toda el area metropolitana de Medellin, en 24h",
+    "badges": ["Vegano certificado", "Cruelty-free", "Made in Spain", "PH neutro", "Dermatológicamente testado"]
+  },
+  "benefits": {
+    "eyebrow": "Ficha técnica",
+    "title": "Cinco razones para",
+    "titleScript": "quedarte",
+    "items": {
+      "b1": { "title": "Ingredientes naturales", "desc": "Botánicos certificados, sin parabenos." },
+      "b2": { "title": "Libre de sulfatos", "desc": "Fórmulas suaves para uso diario." },
+      "b3": { "title": "Reparación profunda", "desc": "Resultados visibles desde la primera semana." },
+      "b4": { "title": "Brillo intenso", "desc": "Cabello sedoso, luminoso y manejable." },
+      "b5": { "title": "Envíos en 24h", "desc": "Gratis en toda el area metropolitana de Medellin." }
+    }
+  },
+  "beforeAfter": {
+    "eyebrow": "Resultados reales",
+    "title1": "Antes &",
+    "titleScript": "después",
+    "description": "4 semanas de hábitos Sharon: tónico anti-caída, mascarilla reparadora y aceite de argán. Sin retoques, sin filtros, sin promesas vacías.",
+    "stats": [
+      { "value": "+38%", "label": "más brillo medido en laboratorio" },
+      { "value": "−72%", "label": "rotura al cepillar" },
+      { "value": "+24%", "label": "densidad capilar percibida" }
+    ],
+    "dragHint": "Arrastra el deslizador →",
+    "afterLabel": "Después · 4 semanas",
+    "beforeLabel": "Antes",
+    "sliderAriaLabel": "Deslizar",
+    "altPhoto": "Foto modelo antes y después del tratamiento capilar"
+  },
+  "testimonials": {
+    "eyebrow": "Lo dicen ellas",
+    "title": "Historias de",
+    "titleScript": "transformación",
+    "items": {
+      "t1": { "quote": "Llevaba años buscando algo que de verdad funcionara para mi cabello fino. La mascarilla de Sharon lo cambió todo en tres semanas." },
+      "t2": { "quote": "El kit completo es una maravilla. El olor, la textura, el packaging — todo se siente premium. Mi rutina favorita del día." },
+      "t3": { "quote": "Tras un alisado agresivo, el aceite de argán me devolvió el brillo. Mi peluquera me preguntó qué estaba usando." },
+      "t4": { "quote": "El tónico anticaída funciona, pero lo que me enamoró fueron los hábitos. Da gusto cuidarse con productos así." }
+    }
+  },
+  "offerBanner": {
+    "eyebrow": "Oferta Especial · Solo esta semana",
+    "title1": "Kit",
+    "titleScript": "Sharon",
+    "title2": "completo",
+    "description": "Tónico, mascarilla, engrosante y cepillo masajeador. La rutina premium en un solo gesto.",
+    "ctaBuy": "Llevar el kit",
+    "ctaView": "Ver qué incluye",
+    "freeShipping": "Envío gratis",
+    "freeReturn": "Devolución en 30 días",
+    "limitedStock": "Stock limitado",
+    "altMask": "Mascarilla capilar en manos",
+    "altTonic": "Tónico capilar acelerador de crecimiento",
+    "altFerns": "Mascarilla capilar entre helechos",
+    "community": {
+      "eyebrow": "Comunidad Sharon",
+      "headingPrefix": "Súmate y recibe un",
+      "headingDiscount": "-10%",
+      "headingSuffix": "en tu primera orden"
+    }
+  },
+  "newsletterInline": {
+    "headingPrefix": "Únete a",
+    "headingScript": "Sharon",
+    "placeholder": "Tu correo",
+    "sent": "¡Listo! ✧",
+    "submit": "Suscribirme"
+  },
+  "newsletter": {
+    "eyebrow": "Comunidad Sharon",
+    "titleLine1": "Recibe hábitos y un",
+    "titleScript": "-10%",
+    "titleLine2": "en tu primera orden",
+    "description": "Una vez al mes, sin spam. Solo lanzamientos, guías y descuentos para nuestra comunidad.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "Correo",
+    "emailPlaceholder": "tu@email.com",
+    "submitSent": "¡Suscripción confirmada ✦",
+    "submitDefault": "Quiero mi -10%",
+    "privacyNote": "Al suscribirte aceptas nuestra política de privacidad."
+  },
+  "announcementBar": {
+    "message": "Envío gratis en pedidos · Devoluciones en 30 días ·",
+    "cta": "Únete al club Sharon"
+  },
+  "footer": {
+    "description": "Cuidado capilar profesional, formulado en pequeños lotes en Colombia. Botánica · ciencia · hábitos.",
+    "columns": {
+      "shop": { "title": "Tienda", "links": ["Todos los productos", "Shampoos", "Mascarillas", "Tratamientos", "Aceites", "Kits & combos"] },
+      "help": { "title": "Ayuda", "links": ["Envíos y entregas", "Devoluciones", "Guía de tipo capilar", "Contacto", "Preguntas frecuentes"] },
+      "brand": { "title": "Sharon", "links": ["Sobre nosotras", "Ingredientes", "Sostenibilidad", "Programa profesional", "Diario / Blog"] }
+    },
+    "copyright": "© 2026 Sharon Hair Co. · Todos los derechos reservados",
+    "securePayments": "Pagos seguros:"
+  },
+  "campaignCarousel": {
+    "activeUntil": "Activo hasta el {{date}}",
+    "viewCampaign": "Ver la campaña →",
+    "goToCampaign": "Ir a la campaña {{number}}",
+    "prevCampaign": "Campaña anterior",
+    "nextCampaign": "Siguiente campaña"
+  },
+  "cartFab": {
+    "ariaLabel": "Ver bolsa"
+  }
+}

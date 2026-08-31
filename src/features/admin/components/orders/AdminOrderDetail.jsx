@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { getAdminOrder } from "@shared/api-client";
@@ -12,6 +13,7 @@ const formatDateTime = (iso) =>
 // del OrderDetailModal del cliente (features/orders) — trae changedByAdminLabel en la
 // línea de tiempo, que el cliente no necesita ver.
 export const AdminOrderDetail = ({ orderNumber, onClose }) => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [order, setOrder] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -44,8 +46,8 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
           </button>
         </div>
 
-        {status === "loading" && <div style={{ padding: "30px 0", color: "var(--ink-soft)", fontSize: 13.5 }}>Cargando pedido…</div>}
-        {status === "error" && <div style={{ padding: "30px 0", color: "var(--terracotta-deep)", fontSize: 13.5 }}>No se pudo cargar el pedido.</div>}
+        {status === "loading" && <div style={{ padding: "30px 0", color: "var(--ink-soft)", fontSize: 13.5 }}>{t("orders.detail.loading")}</div>}
+        {status === "error" && <div style={{ padding: "30px 0", color: "var(--terracotta-deep)", fontSize: 13.5 }}>{t("orders.detail.loadError")}</div>}
 
         {status === "ready" && order && (
           <>
@@ -53,7 +55,7 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
               {getStatus(order.status).label}
             </span>
 
-            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>Productos</div>
+            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>{t("orders.detail.products")}</div>
             {order.items.map((item, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, padding: "8px 0", borderBottom: "1px dashed rgba(27,24,21,.16)", fontSize: 13.5 }}>
                 <span>{item.productName} <span style={{ color: "var(--ink-soft)" }}>× {item.quantity}</span></span>
@@ -62,26 +64,26 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
             ))}
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "14px 16px", margin: "16px 0 20px", background: "var(--cream-2)", borderRadius: 14 }}>
-              <span className="display" style={{ fontSize: 18 }}>Total</span>
+              <span className="display" style={{ fontSize: 18 }}>{t("orders.detail.total")}</span>
               <span className="display" style={{ fontSize: 24 }}>{formatCurrency(order.total)}</span>
             </div>
 
-            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Dirección de envío</div>
+            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>{t("orders.detail.shippingAddress")}</div>
             <p style={{ fontSize: 13.5, lineHeight: 1.6, marginBottom: 20 }}>
               <strong>{order.shippingAddress?.recipientName}</strong><br />
               {order.shippingAddress?.streetLine1}{order.shippingAddress?.streetLine2 ? `, ${order.shippingAddress.streetLine2}` : ""}<br />
               {order.shippingAddress?.city}, {order.shippingAddress?.stateProvince} · {order.shippingAddress?.countryCode}
             </p>
 
-            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Pago y envío</div>
+            <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>{t("orders.detail.paymentAndShipping")}</div>
             <p style={{ fontSize: 13.5, marginBottom: 20 }}>
               {order.paymentMethodLabel || order.paymentMethod}
-              {order.shipment?.trackingNumber && <> · Guía {order.shipment.trackingNumber} ({order.shipment.carrierName})</>}
+              {order.shipment?.trackingNumber && <> · {t("orders.detail.shipmentTracking", { trackingNumber: order.shipment.trackingNumber, carrierName: order.shipment.carrierName })}</>}
             </p>
 
             {order.statusHistory?.length > 0 && (
               <>
-                <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>Historial de estado</div>
+                <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>{t("orders.detail.statusHistory")}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {order.statusHistory.map((entry, i) => {
                     const entryStatus = getStatus(entry.status);

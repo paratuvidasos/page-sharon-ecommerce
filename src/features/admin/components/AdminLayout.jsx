@@ -1,27 +1,43 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, Navigate, Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
+import { Modal } from "@ui/components/Modal";
+import { Z } from "@ui/zIndex";
 import { useAuth } from "@shared/auth/AuthContext";
 
-const NAV_ITEMS = [
-  { to: "/admin", label: "Dashboard", icon: "grid", end: true, subtitle: "Reportes de ventas del período" },
-  { to: "/admin/orders", label: "Pedidos", icon: "cart", subtitle: "Gestión de pedidos y envíos" },
-  { to: "/admin/products", label: "Productos", icon: "box", subtitle: "Crea, edita y elimina productos del catálogo" },
-  { to: "/admin/categories", label: "Categorías", icon: "layers", subtitle: "Categorías y atributos del catálogo" },
-  { to: "/admin/inventory", label: "Inventario", icon: "warehouse", subtitle: "Variantes con stock bajo" },
-  { to: "/admin/customers", label: "Clientes (CRM)", icon: "people", subtitle: "Historial y valor de cada cliente" },
-  { to: "/admin/coupons", label: "Cupones", icon: "tag", subtitle: "Códigos de descuento activos" },
-  { to: "/admin/reviews", label: "Reseñas", icon: "star", subtitle: "Moderación de reseñas de producto" },
-  { to: "/admin/banners", label: "Banners", icon: "megaphone", subtitle: "Banners y destacados de la home" },
-  { to: "/admin/team", label: "Empleados", icon: "team", subtitle: "Accesos y roles del equipo" },
-  { to: "/admin/settings", label: "Configuración", icon: "gear", subtitle: "Zonas de envío y destacados de home" },
+const NAV_ITEM_DEFS = [
+  { to: "/admin", key: "dashboard", icon: "grid", end: true },
+  { to: "/admin/orders", key: "orders", icon: "cart" },
+  { to: "/admin/products", key: "products", icon: "box" },
+  { to: "/admin/categories", key: "categories", icon: "layers" },
+  { to: "/admin/inventory", key: "inventory", icon: "warehouse" },
+  { to: "/admin/customers", key: "customers", icon: "people" },
+  { to: "/admin/coupons", key: "coupons", icon: "tag" },
+  { to: "/admin/reviews", key: "reviews", icon: "star" },
+  { to: "/admin/banners", key: "banners", icon: "megaphone" },
+  { to: "/admin/team", key: "team", icon: "team" },
+  { to: "/admin/settings", key: "settings", icon: "gear" },
 ];
 
 export const AdminLayout = () => {
+  const { t } = useTranslation("admin");
   const { user, status, isAdmin, logout } = useAuth();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const rootRef = useRef(null);
+
+  const NAV_ITEMS = NAV_ITEM_DEFS.map((item) => ({
+    ...item,
+    label: t(`layout.nav.${item.key}.label`),
+    subtitle: t(`layout.nav.${item.key}.subtitle`),
+  }));
+
+  // Los primeros 4 accesos van directo en la barra inferior de móvil (mismo orden que
+  // el sidebar); el resto vive detrás de "Más" (sheet), junto con logout/volver a la tienda.
+  const MOBILE_NAV_ITEMS = NAV_ITEMS.slice(0, 4);
+  const MOBILE_MORE_ITEMS = NAV_ITEMS.slice(4);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -47,11 +63,11 @@ export const AdminLayout = () => {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--cream-2)", fontFamily: "var(--sans)", color: "var(--ink)" }}>
-      <aside style={{ width: 250, flexShrink: 0, background: "var(--cream)", borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", padding: "26px 0" }}>
+      <aside className="admin-sidebar" style={{ width: 250, flexShrink: 0, background: "var(--cream)", borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", padding: "26px 0" }}>
         <div style={{ padding: "0 24px 26px" }}>
           <span className="script" style={{ fontSize: 28 }}>Sharon</span>
           <span className="mono" style={{ fontSize: 10, color: "var(--ink-soft)", display: "block", textTransform: "uppercase", marginTop: 2 }}>
-            Panel administrativo
+            {t("layout.brandSubtitle")}
           </span>
         </div>
 
@@ -99,9 +115,9 @@ export const AdminLayout = () => {
               {(user?.name?.trim()[0] || "S").toUpperCase()}
             </div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700 }}>{user?.name || "Sharon Hair Co."}</div>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{user?.name || t("layout.defaultAdminName")}</div>
               <div style={{ fontSize: 11.5, color: "var(--ink-soft)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {user?.email || "admin@sharon.com"}
+                {user?.email || t("layout.defaultAdminEmail")}
               </div>
             </div>
             <svg width="14" height="14" viewBox="0 0 12 12" style={{ flexShrink: 0, transform: menuOpen ? "rotate(180deg)" : "none", transition: "transform .15s" }}>
@@ -116,7 +132,7 @@ export const AdminLayout = () => {
                 className="foc"
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, textDecoration: "none", color: "var(--ink)", fontSize: 13, fontWeight: 600 }}
               >
-                <Icon name="cart" size={16} /> Volver a la tienda
+                <Icon name="cart" size={16} /> {t("layout.backToStore")}
               </Link>
               <button
                 type="button"
@@ -124,14 +140,14 @@ export const AdminLayout = () => {
                 className="foc"
                 style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", borderRadius: 10, border: 0, background: "transparent", cursor: "pointer", color: "#9C4A4A", fontSize: 13, fontWeight: 600, textAlign: "left" }}
               >
-                <Icon name="logout" size={16} color="#9C4A4A" /> Cerrar sesión
+                <Icon name="logout" size={16} color="#9C4A4A" /> {t("layout.logout")}
               </button>
             </div>
           )}
         </div>
       </aside>
 
-      <main style={{ flex: 1, padding: "36px 44px", minWidth: 0 }}>
+      <main className="admin-main" style={{ flex: 1, padding: "36px 44px", minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 className="display" style={{ fontSize: 34, margin: 0 }}>{active.label}</h1>
@@ -154,11 +170,112 @@ export const AdminLayout = () => {
             resuelva, ese primer request siempre sale con el token ya listo — arregla la
             carrera para todas las pantallas del panel de una sola vez, no solo Banners. */}
         {status === "loading" ? (
-          <div style={{ padding: "60px 0", textAlign: "center", color: "var(--ink-soft)", fontSize: 13.5 }}>Cargando…</div>
+          <div style={{ padding: "60px 0", textAlign: "center", color: "var(--ink-soft)", fontSize: 13.5 }}>{t("layout.loading")}</div>
         ) : (
           <Outlet />
         )}
       </main>
+
+      {/* Móvil: nav inferior fija con los 4 accesos más usados + "Más" (sheet con el
+          resto de NAV_ITEMS y logout/volver a la tienda). Solo visible bajo 900px
+          (ver .admin-bottom-nav más abajo) — en escritorio el sidebar ya cubre esto. */}
+      <nav className="admin-bottom-nav" style={{
+        display: "none", position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 30,
+        background: "var(--cream)", borderTop: "1px solid var(--line)",
+        padding: "6px 4px calc(6px + env(safe-area-inset-bottom))",
+      }}>
+        {MOBILE_NAV_ITEMS.map((item) => {
+          const isActive = item.end ? location.pathname === item.to : location.pathname.startsWith(item.to);
+          return (
+            <Link key={item.to} to={item.to} style={bottomNavItemStyle(isActive)}>
+              <Icon name={item.icon} size={19} color={isActive ? "var(--botanic-deep)" : "var(--ink-soft)"} />
+              {item.label}
+            </Link>
+          );
+        })}
+        <button type="button" onClick={() => setMoreOpen(true)} style={bottomNavItemStyle(moreOpen)}>
+          <Icon name="menu" size={19} color={moreOpen ? "var(--botanic-deep)" : "var(--ink-soft)"} />
+          {t("layout.more")}
+        </button>
+      </nav>
+
+      <Modal
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        zIndex={Z.adminNav}
+        variant="sheet"
+        closeOnEscape
+        labelledBy="admin-more-sheet-title"
+        panelStyle={{
+          background: "var(--cream)",
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          boxShadow: "0 -20px 60px rgba(27,24,21,.25)",
+          maxHeight: "80vh",
+          overflowY: "auto",
+          padding: "20px 20px calc(20px + env(safe-area-inset-bottom))",
+        }}
+      >
+        <span id="admin-more-sheet-title" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden" }}>{t("layout.more")}</span>
+        {MOBILE_MORE_ITEMS.map((item) => {
+          const isActive = item.end ? location.pathname === item.to : location.pathname.startsWith(item.to);
+          return (
+            <Link key={item.to} to={item.to} onClick={() => setMoreOpen(false)} className="admin-more-item" style={moreItemStyle(isActive)}>
+              <Icon name={item.icon} size={17} color={isActive ? "var(--botanic-deep)" : "var(--ink)"} />
+              {item.label}
+            </Link>
+          );
+        })}
+        <div style={{ height: 1, background: "var(--line)", margin: "8px -4px" }} />
+        <Link to="/" onClick={() => setMoreOpen(false)} className="admin-more-item" style={moreItemStyle(false)}>
+          <Icon name="cart" size={17} /> {t("layout.backToStore")}
+        </Link>
+        <button
+          type="button"
+          onClick={() => { setMoreOpen(false); logout(); }}
+          className="admin-more-item"
+          style={{ ...moreItemStyle(false), color: "#9C4A4A", width: "100%", border: 0, background: "transparent", cursor: "pointer", textAlign: "left" }}
+        >
+          <Icon name="logout" size={17} color="#9C4A4A" /> {t("layout.logout")}
+        </button>
+      </Modal>
+
+      <style>{`
+        .admin-more-item:hover{background: var(--cream-2)}
+        @media (max-width: 900px){
+          .admin-sidebar{display: none !important}
+          .admin-main{padding: 20px 16px 90px !important}
+          .admin-bottom-nav{display: flex !important}
+        }
+      `}</style>
     </div>
   );
 };
+
+const bottomNavItemStyle = (active) => ({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 3,
+  padding: "8px 4px",
+  border: 0,
+  background: "transparent",
+  cursor: "pointer",
+  textDecoration: "none",
+  fontSize: 10.5,
+  fontWeight: 600,
+  color: active ? "var(--botanic-deep)" : "var(--ink-soft)",
+});
+
+const moreItemStyle = (active) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "13px 10px",
+  borderRadius: 12,
+  textDecoration: "none",
+  fontSize: 14,
+  fontWeight: 600,
+  color: active ? "var(--botanic-deep)" : "var(--ink)",
+});

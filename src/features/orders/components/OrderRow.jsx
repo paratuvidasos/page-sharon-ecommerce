@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@shared/i18n/currency";
 import { getStatus } from "../data/statuses";
 
@@ -7,6 +8,7 @@ const formatDate = (isoDate) =>
 // Una fila del historial: fecha, número de orden, estado y total (los cuatro datos
 // que pide el AC), con un link a "Ver detalle" que el padre resuelve con onViewDetail.
 export const OrderRow = ({ order, onViewDetail }) => {
+  const { t } = useTranslation("orders");
   const status = getStatus(order.status);
 
   return (
@@ -36,7 +38,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
               borderRadius: 999,
             }}
           >
-            {status.label}
+            {t(`statusLabels.${status.value}`)}
           </span>
         </div>
         <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>
@@ -45,7 +47,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
         </div>
         {order.shipment?.trackingNumber && (
           <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>
-            Guía {order.shipment.trackingNumber}
+            {t("row.guide", { trackingNumber: order.shipment.trackingNumber })}
             {order.shipment.carrierName && <> ({order.shipment.carrierName})</>}
           </div>
         )}
@@ -66,7 +68,7 @@ export const OrderRow = ({ order, onViewDetail }) => {
             cursor: "pointer",
           }}
         >
-          Ver detalle
+          {t("row.viewDetail")}
         </button>
       </div>
     </div>

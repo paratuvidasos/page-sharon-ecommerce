@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { COUNTRIES } from "@shared/data/countries";
 import { selectStyle, inputStyle, fieldLabelStyle, fieldErrorStyle, fieldHintStyle } from "../fieldStyles";
 
@@ -7,6 +8,7 @@ import { selectStyle, inputStyle, fieldLabelStyle, fieldErrorStyle, fieldHintSty
 // (streetLine1/streetLine2) son el contrato que espera POST /orders/checkout, distinto
 // a propósito de line1/line2 que usa la libreta de direcciones del perfil.
 export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlur }) => {
+  const { t } = useTranslation("checkout");
   const country = COUNTRIES.find((c) => c.code === values.countryCode) || COUNTRIES[0];
 
   const set = (field) => (e) => onChange(field, e.target.value);
@@ -16,7 +18,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
     <div>
       <div>
         <label htmlFor="checkout-recipientName" className="eyebrow" style={fieldLabelStyle}>
-          Nombre de quien recibe
+          {t("shippingAddressFields.recipientName")}
         </label>
         <input
           id="checkout-recipientName"
@@ -24,7 +26,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
           onChange={set("recipientName")}
           onBlur={blur("recipientName")}
           type="text"
-          placeholder="Quién recibe el pedido"
+          placeholder={t("shippingAddressFields.recipientNamePlaceholder")}
           autoComplete="name"
           style={inputStyle(touched.recipientName && errors.recipientName)}
         />
@@ -37,7 +39,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="checkout-grid">
         <div>
-          <label htmlFor="checkout-country" className="eyebrow" style={fieldLabelStyle}>País</label>
+          <label htmlFor="checkout-country" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.country")}</label>
           <select
             id="checkout-country"
             value={values.countryCode}
@@ -53,7 +55,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
           </select>
         </div>
         <div>
-          <label htmlFor="checkout-phone" className="eyebrow" style={fieldLabelStyle}>Teléfono</label>
+          <label htmlFor="checkout-phone" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.phone")}</label>
           <input
             id="checkout-phone"
             value={values.phone}
@@ -71,14 +73,14 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
       </div>
 
       <div style={{ marginTop: 14 }}>
-        <label htmlFor="checkout-streetLine1" className="eyebrow" style={fieldLabelStyle}>Dirección</label>
+        <label htmlFor="checkout-streetLine1" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.address")}</label>
         <input
           id="checkout-streetLine1"
           value={values.streetLine1}
           onChange={set("streetLine1")}
           onBlur={blur("streetLine1")}
           type="text"
-          placeholder="Calle, número…"
+          placeholder={t("shippingAddressFields.addressPlaceholder")}
           autoComplete="address-line1"
           style={inputStyle(touched.streetLine1 && errors.streetLine1)}
         />
@@ -89,14 +91,14 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="checkout-streetLine2" className="eyebrow" style={fieldLabelStyle}>
-          Apto, interior o referencia (opcional)
+          {t("shippingAddressFields.addressLine2")}
         </label>
         <input
           id="checkout-streetLine2"
           value={values.streetLine2}
           onChange={set("streetLine2")}
           type="text"
-          placeholder="Apto 501, torre 2…"
+          placeholder={t("shippingAddressFields.addressLine2Placeholder")}
           autoComplete="address-line2"
           style={inputStyle(false)}
         />
@@ -104,7 +106,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="checkout-stateProvince" className="eyebrow" style={fieldLabelStyle}>
-          Departamento / estado
+          {t("shippingAddressFields.stateProvince")}
         </label>
         <input
           id="checkout-stateProvince"
@@ -112,7 +114,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
           onChange={set("stateProvince")}
           onBlur={blur("stateProvince")}
           type="text"
-          placeholder="Tu departamento o estado"
+          placeholder={t("shippingAddressFields.stateProvincePlaceholder")}
           autoComplete="address-level1"
           style={inputStyle(touched.stateProvince && errors.stateProvince)}
         />
@@ -123,14 +125,14 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }} className="checkout-grid">
         <div>
-          <label htmlFor="checkout-city" className="eyebrow" style={fieldLabelStyle}>Ciudad</label>
+          <label htmlFor="checkout-city" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.city")}</label>
           <input
             id="checkout-city"
             value={values.city}
             onChange={set("city")}
             onBlur={blur("city")}
             type="text"
-            placeholder="Tu ciudad"
+            placeholder={t("shippingAddressFields.cityPlaceholder")}
             autoComplete="address-level2"
             style={inputStyle(touched.city && errors.city)}
           />
@@ -139,7 +141,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
           </div>
         </div>
         <div>
-          <label htmlFor="checkout-postalCode" className="eyebrow" style={fieldLabelStyle}>Código postal</label>
+          <label htmlFor="checkout-postalCode" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.postalCode")}</label>
           <input
             id="checkout-postalCode"
             value={values.postalCode}
@@ -154,7 +156,7 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
             {touched.postalCode && errors.postalCode ? (
               <span role="alert" style={fieldErrorStyle}>{errors.postalCode}</span>
             ) : (
-              <span style={fieldHintStyle}>Ej. {country.postalCodeExample}</span>
+              <span style={fieldHintStyle}>{t("shippingAddressFields.postalCodeHint", { example: country.postalCodeExample })}</span>
             )}
           </div>
         </div>

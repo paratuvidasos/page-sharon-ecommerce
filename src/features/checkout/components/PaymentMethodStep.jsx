@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { listPaymentMethods, ApiError } from "@shared/api-client";
 import { Icon, ICONS } from "@ui/Icon";
 import { fieldLabelStyle, optionCardStyle, optionRowStyle } from "../fieldStyles";
@@ -8,11 +9,7 @@ import { CardBrandIcons } from "./CardBrandIcons";
 // camino alterno puramente de frontend. La persona arma el pedido en el checkout normal
 // y, en vez de pagar con tarjeta/Bold, confirma y coordina el pago directo por WhatsApp
 // (ver features/checkout/whatsapp.js). Se agrega siempre como última opción de la lista.
-const WHATSAPP_METHOD = {
-  method: "WHATSAPP",
-  uiLabel: "Pagar por WhatsApp",
-  uiDescription: "Te armamos el resumen de tu pedido, listo para enviarnos por chat.",
-};
+const WHATSAPP_METHOD = { method: "WHATSAPP" };
 
 const WhatsAppBadge = () => (
   <span style={{
@@ -37,6 +34,7 @@ const CARD_CODES = ["CREDIT_CARD", "DEBIT_CARD"];
 // desactiva `allowWhatsApp`: ese panel llama POST /orders/{orderNumber}/retry-payment,
 // que espera uno de los códigos reales del backend — "WHATSAPP" no es uno de ellos.
 export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, compact = false, allowWhatsApp = true }) => {
+  const { t } = useTranslation("checkout");
   const [state, setState] = useState({ loading: true, methods: [], error: null });
 
   useEffect(() => {
@@ -54,7 +52,7 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
       })
       .catch((e) => {
         if (cancelled) return;
-        setState({ loading: false, methods: [], error: e instanceof ApiError ? e.message : "No pudimos cargar los métodos de pago." });
+        setState({ loading: false, methods: [], error: e instanceof ApiError ? e.message : t("paymentMethodStep.loadError") });
       });
     return () => {
       cancelled = true;
@@ -65,23 +63,23 @@ export const PaymentMethodStep = ({ countryCode, currency, value, onSelect, comp
   const cardMethod = CARD_CODES.map((code) => state.methods.find((m) => m.method === code)).find(Boolean);
   const boldMethod = state.methods.find((m) => !CARD_CODES.includes(m.method));
   const options = [
-    cardMethod && { ...cardMethod, uiLabel: "Tarjeta de crédito o débito", uiDescription: "Visa, Mastercard, American Express y Diners." },
-    boldMethod && { ...boldMethod, uiLabel: "Paga con Bold", uiDescription: "Serás redirigido a Bold para completar el pago de forma segura." },
-    allowWhatsApp && !state.loading && !state.error && WHATSAPP_METHOD,
+    cardMethod && { ...cardMethod, uiLabel: t("paymentMethodStep.card.label"), uiDescription: t("paymentMethodStep.card.description") },
+    boldMethod && { ...boldMethod, uiLabel: t("paymentMethodStep.bold.label"), uiDescription: t("paymentMethodStep.bold.description") },
+    allowWhatsApp && !state.loading && !state.error && { ...WHATSAPP_METHOD, uiLabel: t("paymentMethodStep.whatsapp.label"), uiDescription: t("paymentMethodStep.whatsapp.description") },
   ].filter(Boolean);
 
   return (
     <div>
       {!compact && (
         <>
-          <div className="eyebrow" style={fieldLabelStyle}>Método de pago</div>
+          <div className="eyebrow" style={fieldLabelStyle}>{t("paymentMethodStep.title")}</div>
           <p style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 14 }}>
-            Los pagos con tarjeta o Bold se procesan de forma encriptada. También puedes coordinar tu pago directo por WhatsApp.
+            {t("paymentMethodStep.description")}
           </p>
         </>
       )}
 
-      {state.loading && <p style={{ fontSize: 13, color: "var(--ink-soft)" }}>Cargando métodos de pago…</p>}
+      {state.loading && <p style={{ fontSize: 13, color: "var(--ink-soft)" }}>{t("paymentMethodStep.loading")}</p>}
       {state.error && (
         <div role="alert" style={{ background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 14, padding: "12px 18px", fontSize: 13, color: "#7A3535" }}>
           {state.error}

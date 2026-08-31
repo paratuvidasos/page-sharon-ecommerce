@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listCoupons, createCoupon, updateCoupon } from "@shared/api-client";
@@ -16,6 +17,7 @@ const discountLabel = (c) => (c.discountType === "PERCENTAGE" ? `${c.discountVal
 // startsAt?, endsAt?, maxRedemptions?, applicableProductIds?} — el que se había
 // adivinado ({code, percentOff}) no correspondía al contrato real del backend.
 export const AdminCoupons = () => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [coupons, setCoupons] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -59,7 +61,7 @@ export const AdminCoupons = () => {
       setPage(1);
       load();
     } catch (err) {
-      setError(err?.message || "No se pudo crear el cupón. Intenta de nuevo.");
+      setError(err?.message || t("coupons.form.errorGeneric"));
     } finally {
       setSaving(false);
     }
@@ -81,24 +83,24 @@ export const AdminCoupons = () => {
   return (
     <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-start" }}>
       <div style={{ flex: "1 1 460px", minWidth: 320, background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr 90px 90px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
-          <span>Código</span><span>Descuento</span><span>Usos</span><span>Estado</span><span></span>
+        <div className="admin-table-head" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr 90px 90px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
+          <span>{t("coupons.tableHead.code")}</span><span>{t("coupons.tableHead.discount")}</span><span>{t("coupons.tableHead.uses")}</span><span>{t("coupons.tableHead.status")}</span><span></span>
         </div>
 
-        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Cargando cupones…</div>}
-        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>No se pudieron cargar los cupones.</div>}
-        {status === "ready" && coupons.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Todavía no hay cupones creados.</div>}
+        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("coupons.loading")}</div>}
+        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>{t("coupons.error")}</div>}
+        {status === "ready" && coupons.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("coupons.empty")}</div>}
 
         {coupons.map((c) => (
-          <div key={c.code} className="admin-row" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr 90px 90px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+          <div key={c.code} className="admin-row admin-list-row" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr 90px 90px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
             <span className="mono" style={{ fontWeight: 700, fontSize: 13 }}>{c.code}</span>
-            <span className="display" style={{ fontSize: 15 }}>{discountLabel(c)}</span>
-            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>{c.redemptionsCount}{c.maxRedemptions ? ` / ${c.maxRedemptions}` : ""}</span>
+            <span className="display" style={{ fontSize: 15 }}><span className="cell-label">{t("coupons.tableHead.discount")}</span>{discountLabel(c)}</span>
+            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}><span className="cell-label">{t("coupons.tableHead.uses")}</span>{c.redemptionsCount}{c.maxRedemptions ? ` / ${c.maxRedemptions}` : ""}</span>
             <span style={{ padding: "5px 11px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, background: c.isActive ? "var(--botanic-muted)" : "var(--cream-2)", color: c.isActive ? "#3A4A34" : "var(--ink-soft)", justifySelf: "start" }}>
-              {c.isActive ? "Activo" : "Inactivo"}
+              {c.isActive ? t("coupons.statusActive") : t("coupons.statusInactive")}
             </span>
             <button onClick={() => toggleActive(c)} disabled={togglingCode === c.code} className="foc" style={{ background: "none", border: "1px solid var(--line)", borderRadius: 999, padding: "6px 12px", fontSize: 11, fontWeight: 600, cursor: "pointer", justifySelf: "end" }}>
-              {c.isActive ? "Desactivar" : "Activar"}
+              {c.isActive ? t("coupons.deactivate") : t("coupons.activate")}
             </button>
           </div>
         ))}
@@ -106,52 +108,61 @@ export const AdminCoupons = () => {
       </div>
 
       <form onSubmit={submit} style={{ flex: "0 1 340px", minWidth: 300, background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", padding: 24 }}>
-        <div className="display" style={{ fontSize: 19, marginBottom: 18 }}>Nuevo cupón</div>
+        <div className="display" style={{ fontSize: 19, marginBottom: 18 }}>{t("coupons.form.title")}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={labelStyle}>Código</label>
-            <input value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))} placeholder="OTONO15" style={fieldStyle} />
+            <label style={labelStyle}>{t("coupons.form.code")}</label>
+            <input value={form.code} onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))} placeholder={t("coupons.form.codePlaceholder")} style={fieldStyle} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label style={labelStyle}>Tipo</label>
+              <label style={labelStyle}>{t("coupons.form.type")}</label>
               <select value={form.discountType} onChange={(e) => setForm((f) => ({ ...f, discountType: e.target.value }))} style={fieldStyle}>
-                <option value="PERCENTAGE">% Porcentaje</option>
-                <option value="FIXED_AMOUNT">Monto fijo</option>
+                <option value="PERCENTAGE">{t("coupons.form.typePercentage")}</option>
+                <option value="FIXED_AMOUNT">{t("coupons.form.typeFixed")}</option>
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Valor</label>
+              <label style={labelStyle}>{t("coupons.form.value")}</label>
               <input value={form.discountValue} onChange={(e) => setForm((f) => ({ ...f, discountValue: e.target.value }))} type="number" min="1" style={fieldStyle} />
             </div>
           </div>
           <div>
-            <label style={labelStyle}>Compra mínima (opcional)</label>
+            <label style={labelStyle}>{t("coupons.form.minPurchase")}</label>
             <input value={form.minPurchaseAmount} onChange={(e) => setForm((f) => ({ ...f, minPurchaseAmount: e.target.value }))} type="number" min="0" style={fieldStyle} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label style={labelStyle}>Desde</label>
+              <label style={labelStyle}>{t("coupons.form.startsAt")}</label>
               <input value={form.startsAt} onChange={(e) => setForm((f) => ({ ...f, startsAt: e.target.value }))} type="date" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>Hasta</label>
+              <label style={labelStyle}>{t("coupons.form.endsAt")}</label>
               <input value={form.endsAt} onChange={(e) => setForm((f) => ({ ...f, endsAt: e.target.value }))} type="date" style={fieldStyle} />
             </div>
           </div>
           <div>
-            <label style={labelStyle}>Máx. de usos (opcional)</label>
+            <label style={labelStyle}>{t("coupons.form.maxRedemptions")}</label>
             <input value={form.maxRedemptions} onChange={(e) => setForm((f) => ({ ...f, maxRedemptions: e.target.value }))} type="number" min="1" style={fieldStyle} />
           </div>
         </div>
         {error && <div style={{ fontSize: 12.5, color: "var(--terracotta-deep)", marginTop: 12 }}>{error}</div>}
         <button type="submit" disabled={saving} className="foc" style={{ width: "100%", marginTop: 18, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: saving ? "wait" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
           <Icon name="plus" size={15} color="var(--cream)" />
-          {saving ? "Creando…" : "Crear cupón"}
+          {saving ? t("coupons.form.creating") : t("coupons.form.submit")}
         </button>
       </form>
 
-      <style>{`.admin-row:hover{background:#FAF7F0}`}</style>
+      <style>{`
+        .admin-row:hover{background:#FAF7F0}
+        .cell-label{display:none}
+        @media (max-width: 720px){
+          .admin-table-head{display:none}
+          .admin-list-row{grid-template-columns:1fr !important; gap:6px; align-items:flex-start !important}
+          .admin-list-row .cell-label{display:block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px}
+          .admin-list-row > *{justify-self:start !important}
+        }
+      `}</style>
     </div>
   );
 };

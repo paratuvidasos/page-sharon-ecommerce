@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon, Stars } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAdminReviews, approveReview, rejectReview, hideReview } from "@shared/api-client";
 import { Pagination } from "../Pagination";
 
-const TABS = [
-  { value: "PENDING", label: "Pendientes" },
-  { value: "APPROVED", label: "Aprobadas" },
-  { value: "REJECTED", label: "Rechazadas" },
-  { value: "HIDDEN", label: "Ocultas" },
+const TAB_VALUES = [
+  { value: "PENDING", key: "pending" },
+  { value: "APPROVED", key: "approved" },
+  { value: "REJECTED", key: "rejected" },
+  { value: "HIDDEN", key: "hidden" },
 ];
 
 const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
@@ -18,6 +19,8 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-
 // una variable del backend, no algo que el frontend controle) — este panel sirve para
 // cuando esa variable se active, o para ocultar/rechazar reseñas ya publicadas.
 export const AdminReviews = () => {
+  const { t } = useTranslation("admin");
+  const TABS = TAB_VALUES.map((tab) => ({ ...tab, label: t(`reviews.tabs.${tab.key}`) }));
   const { getAccessToken } = useAuth();
   const [tab, setTab] = useState("PENDING");
   const [reviews, setReviews] = useState([]);
@@ -93,9 +96,9 @@ export const AdminReviews = () => {
       </div>
 
       <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
-        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Cargando reseñas…</div>}
-        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>No se pudieron cargar las reseñas.</div>}
-        {status === "ready" && reviews.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>No hay reseñas en este estado.</div>}
+        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("reviews.loading")}</div>}
+        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>{t("reviews.error")}</div>}
+        {status === "ready" && reviews.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("reviews.empty")}</div>}
 
         {reviews.map((r) => (
           <div key={r.id} style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)" }}>
@@ -104,29 +107,29 @@ export const AdminReviews = () => {
               <span style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{formatDate(r.createdAt)}</span>
             </div>
             <p style={{ fontSize: 13.5, marginBottom: 10 }}>{r.comment}</p>
-            {r.rejectionReason && <p style={{ fontSize: 12, color: "var(--terracotta-deep)", marginBottom: 10 }}>Motivo: {r.rejectionReason}</p>}
+            {r.rejectionReason && <p style={{ fontSize: 12, color: "var(--terracotta-deep)", marginBottom: 10 }}>{t("reviews.reasonLabel", { reason: r.rejectionReason })}</p>}
 
             {rejectingId === r.id ? (
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Motivo del rechazo" style={{ flex: 1, padding: "9px 12px", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13 }} />
-                <button onClick={() => confirmReject(r.id)} className="foc" style={{ border: 0, borderRadius: 999, padding: "9px 16px", background: "var(--terracotta-deep)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Confirmar</button>
-                <button onClick={() => { setRejectingId(null); setRejectReason(""); }} className="foc" style={{ border: 0, background: "none", fontSize: 12, cursor: "pointer" }}>Cancelar</button>
+                <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder={t("reviews.rejectPlaceholder")} style={{ flex: 1, padding: "9px 12px", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13 }} />
+                <button onClick={() => confirmReject(r.id)} className="foc" style={{ border: 0, borderRadius: 999, padding: "9px 16px", background: "var(--terracotta-deep)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>{t("reviews.confirm")}</button>
+                <button onClick={() => { setRejectingId(null); setRejectReason(""); }} className="foc" style={{ border: 0, background: "none", fontSize: 12, cursor: "pointer" }}>{t("reviews.cancel")}</button>
               </div>
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 {tab === "PENDING" && (
                   <>
                     <button onClick={() => approve(r.id)} className="foc" style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid var(--line)", borderRadius: 999, padding: "8px 14px", background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                      <Icon name="check" size={13} color="var(--botanic-deep)" /> Aprobar
+                      <Icon name="check" size={13} color="var(--botanic-deep)" /> {t("reviews.approve")}
                     </button>
                     <button onClick={() => setRejectingId(r.id)} className="foc" style={{ border: "1px solid rgba(193,99,63,.25)", borderRadius: 999, padding: "8px 14px", background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                      Rechazar
+                      {t("reviews.reject")}
                     </button>
                   </>
                 )}
                 {tab === "APPROVED" && (
                   <button onClick={() => hide(r.id)} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "8px 14px", background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                    Ocultar
+                    {t("reviews.hide")}
                   </button>
                 )}
               </div>

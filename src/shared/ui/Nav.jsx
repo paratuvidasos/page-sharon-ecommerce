@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Icon } from "./Icon";
 import { IconButton } from "./components/IconButton";
 import { ProductImage } from "./ProductImage";
@@ -7,6 +8,7 @@ import { useCart } from "@shared/cart/CartContext";
 import { formatCurrency } from "@shared/i18n/currency";
 import { NotificationsBell } from "@features/notifications/components/NotificationsBell";
 import { AccountMenu } from "@features/profile/components/AccountMenu";
+import { LocalizationSwitcher } from "./LocalizationSwitcher";
 
 const MAX_MINI_CART_LINES = 3;
 
@@ -18,12 +20,13 @@ const MAX_MINI_CART_LINES = 3;
 // página real (/tienda, ver CatalogPage) desde que el catálogo dejó de vivir
 // embebido en la landing.
 const SECTION_LINKS = [
-  { label: "Hábitos", hash: "#beneficios" },
-  { label: "Resultados", hash: "#antes-despues" },
-  { label: "Historia", hash: "#testimonios" },
+  { key: "habits", hash: "#beneficios" },
+  { key: "results", hash: "#antes-despues" },
+  { key: "story", hash: "#testimonios" },
 ];
 
 export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenProfile, onOpenOrderHistory, onLogout, onOpenWishlist, wishlistCount, onOpenOrder }) => {
+  const { t } = useTranslation("nav");
   const [scrolled, setScrolled] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const { cart, itemCount } = useCart();
@@ -59,7 +62,7 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
       transition: "background .35s ease, border-color .35s ease, backdrop-filter .35s ease"
     }}>
       <div className="wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 78 }}>
-        <button onClick={onOpenMenu} aria-label="Menú" className="nav-burger"
+        <button onClick={onOpenMenu} aria-label={t("menu")} className="nav-burger"
           style={{ background: "transparent", border: 0, cursor: "pointer", display: "none" }}>
           <Icon name="menu" size={22} />
         </button>
@@ -75,33 +78,39 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
         </Link>
 
         <nav className="nav-links" style={{ display: "flex", gap: 36, alignItems: "center" }}>
-          <Link to="/tienda" style={linkStyle(isTienda)} {...linkHover(isTienda)}>Shop</Link>
+          <Link to="/tienda" style={linkStyle(isTienda)} {...linkHover(isTienda)}>{t("shop")}</Link>
           {SECTION_LINKS.map(l => (
             isHome
-              ? <a key={l.label} href={l.hash} style={linkStyle(false)} {...linkHover(false)}>{l.label}</a>
-              : <Link key={l.label} to={`/${l.hash}`} style={linkStyle(false)} {...linkHover(false)}>{l.label}</Link>
+              ? <a key={l.key} href={l.hash} style={linkStyle(false)} {...linkHover(false)}>{t(`sections.${l.key}`)}</a>
+              : <Link key={l.key} to={`/${l.hash}`} style={linkStyle(false)} {...linkHover(false)}>{t(`sections.${l.key}`)}</Link>
           ))}
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label="Buscar" style={iconBtnStyle} />
-          <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label="Favoritos" badge={wishlistCount} badgeColor="var(--terracotta)" style={iconBtnStyle} />
-          <NotificationsBell onOpenOrder={onOpenOrder} triggerStyle={iconBtnStyle} />
-          <AccountMenu onOpenAuth={onOpenAuth} onOpenProfile={onOpenProfile} onOpenOrderHistory={onOpenOrderHistory} onLogout={onLogout} triggerStyle={iconBtnStyle} />
+          <IconButton icon="search" iconSize={18} onClick={onOpenSearch} aria-label={t("search")} style={iconBtnStyle} />
 
-          {/* [0030][FE] Mini-carrito: hover/focus sobre el mismo ícono que abre el
-              drawer completo, reutilizando el `cart` que ya trajo CartProvider (GET
-              /cart) — no dispara ninguna llamada propia. */}
-          <div
-            style={{ position: "relative" }}
-            onMouseEnter={() => setMiniCartOpen(true)}
-            onMouseLeave={() => setMiniCartOpen(false)}
-            onFocus={() => setMiniCartOpen(true)}
-            onBlur={(e) => {
-              if (!e.currentTarget.contains(e.relatedTarget)) setMiniCartOpen(false);
-            }}
-          >
-            <IconButton icon="cart" iconSize={18} onClick={onOpenCart} aria-label="Bolsa" badge={itemCount} />
+          {/* Bajo 900px estos se ocultan: favoritos/notificaciones/cuenta se mueven
+              dentro de MobileMenu, y la bolsa pasa a ser CartFab (botón flotante) —
+              en el header móvil solo quedan menú + logo + buscar (ver mockup). */}
+          <div className="nav-icons-desktop" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <LocalizationSwitcher triggerStyle={iconBtnStyle} />
+            <IconButton icon="heart" iconSize={18} onClick={onOpenWishlist} aria-label={t("wishlist")} badge={wishlistCount} badgeColor="var(--terracotta)" style={iconBtnStyle} />
+            <NotificationsBell onOpenOrder={onOpenOrder} triggerStyle={iconBtnStyle} />
+            <AccountMenu onOpenAuth={onOpenAuth} onOpenProfile={onOpenProfile} onOpenOrderHistory={onOpenOrderHistory} onLogout={onLogout} triggerStyle={iconBtnStyle} />
+
+            {/* [0030][FE] Mini-carrito: hover/focus sobre el mismo ícono que abre el
+                drawer completo, reutilizando el `cart` que ya trajo CartProvider (GET
+                /cart) — no dispara ninguna llamada propia. */}
+            <div
+              style={{ position: "relative" }}
+              onMouseEnter={() => setMiniCartOpen(true)}
+              onMouseLeave={() => setMiniCartOpen(false)}
+              onFocus={() => setMiniCartOpen(true)}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) setMiniCartOpen(false);
+              }}
+            >
+              <IconButton icon="cart" iconSize={18} onClick={onOpenCart} aria-label={t("bag")} badge={itemCount} />
 
             {miniCartOpen && cart.items.length > 0 && (
               <div
@@ -132,11 +141,11 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
                 ))}
                 {cart.items.length > MAX_MINI_CART_LINES && (
                   <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>
-                    +{cart.items.length - MAX_MINI_CART_LINES} más
+                    {t("miniCart.more", { count: cart.items.length - MAX_MINI_CART_LINES })}
                   </div>
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--line)" }}>
-                  <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>Total</span>
+                  <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{t("miniCart.total")}</span>
                   <span className="display" style={{ fontSize: 18 }}>{formatCurrency(cart.total)}</span>
                 </div>
                 <button
@@ -154,10 +163,11 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
                     cursor: "pointer",
                   }}
                 >
-                  Ver carrito
+                  {t("miniCart.viewCart")}
                 </button>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -167,6 +177,7 @@ export const Nav = ({ onOpenCart, onOpenSearch, onOpenMenu, onOpenAuth, onOpenPr
           .nav-links{display:none !important}
           .nav-burger{display:grid !important; place-items:center; width:40px; height:40px}
           .nav-user{display:none !important}
+          .nav-icons-desktop{display:none !important}
         }
       `}</style>
     </header>
