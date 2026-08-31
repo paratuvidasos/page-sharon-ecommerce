@@ -152,7 +152,51 @@
     "tableHead": {
       "name": "Nombre",
       "email": "Correo",
-      "role": "Rol"
+      "jobTitle": "Puesto",
+      "role": "Rol",
+      "status": "Estado"
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "EMPLOYEE": "Empleado"
+    },
+    "status": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo",
+      "SUSPENDED": "Suspendido",
+      "DELETED": "Eliminado"
+    },
+    "searchPlaceholder": "Buscar por nombre o correo…",
+    "search": "Buscar",
+    "newEmployee": "Nuevo empleado",
+    "loading": "Cargando empleados…",
+    "error": "No se pudieron cargar los empleados.",
+    "empty": "Todavía no hay empleados creados.",
+    "editAria": "Editar empleado",
+    "deleteAria": "Eliminar empleado",
+    "confirmDelete": "¿Eliminar el acceso de \"{{name}}\"? No se puede deshacer.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "form": {
+      "eyebrow": "Empleados",
+      "editTitle": "Editar empleado",
+      "newTitle": "Nuevo empleado",
+      "firstNameLabel": "Nombre",
+      "lastNameLabel": "Apellido",
+      "emailLabel": "Correo",
+      "passwordLabel": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "roleLabel": "Rol de acceso",
+      "jobTitleLabel": "Puesto",
+      "jobTitlePlaceholder": "Ej. Gerente de tienda",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "requiredNameError": "Nombre y apellido son obligatorios.",
+      "requiredCreateError": "Correo y una contraseña de al menos 8 caracteres son obligatorios.",
+      "emailExistsError": "Ese correo ya está registrado.",
+      "saveErrorGeneric": "No se pudo guardar el empleado."
     }
   },
   "banners": {

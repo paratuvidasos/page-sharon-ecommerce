@@ -152,7 +152,51 @@
     "tableHead": {
       "name": "Name",
       "email": "Email",
-      "role": "Role"
+      "jobTitle": "Title",
+      "role": "Role",
+      "status": "Status"
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "EMPLOYEE": "Employee"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended",
+      "DELETED": "Deleted"
+    },
+    "searchPlaceholder": "Search by name or email…",
+    "search": "Search",
+    "newEmployee": "New employee",
+    "loading": "Loading employees…",
+    "error": "Couldn't load employees.",
+    "empty": "No employees created yet.",
+    "editAria": "Edit employee",
+    "deleteAria": "Delete employee",
+    "confirmDelete": "Delete \"{{name}}\"'s access? This cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "form": {
+      "eyebrow": "Employees",
+      "editTitle": "Edit employee",
+      "newTitle": "New employee",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "roleLabel": "Access role",
+      "jobTitleLabel": "Job title",
+      "jobTitlePlaceholder": "e.g. Store manager",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "requiredNameError": "First and last name are required.",
+      "requiredCreateError": "Email and a password of at least 8 characters are required.",
+      "emailExistsError": "That email is already registered.",
+      "saveErrorGeneric": "Couldn't save the employee."
     }
   },
   "banners": {
