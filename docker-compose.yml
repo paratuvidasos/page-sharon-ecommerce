@@ -1,0 +1,23 @@
+# Uso: docker compose up
+# Levanta el frontend (Vite dev server) en http://localhost:5190 con la misma
+# versión de Node para todo el equipo (ver Dockerfile). No incluye Postgres:
+# este repo es solo el frontend, la base de datos vive en el repo del backend
+# (page-sharon-api) y se levanta con su propio docker-compose allá.
+services:
+  frontend:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "5190:5190"
+    env_file:
+      - .env
+    volumes:
+      # Código fuente montado para hot reload al editar en el host.
+      - .:/app
+      # Evita que el bind mount de arriba pise el node_modules instalado
+      # dentro de la imagen (importante si el host es de otro OS/arquitectura,
+      # p. ej. macOS/Windows vs. Linux del contenedor).
+      - /app/node_modules
+    stdin_open: true
+    tty: true
