@@ -40,19 +40,25 @@ const InventoryRow = ({ item, onSaved }) => {
   };
 
   return (
-    <div className="admin-row" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 140px 170px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
+    <div className="admin-row admin-list-row" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 140px 170px", padding: "14px 22px", alignItems: "center", borderBottom: "1px solid var(--line)" }}>
       <div>
         <div style={{ fontWeight: 600, fontSize: 13.5 }}>{item.productName}</div>
         <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{item.variantLabel}</div>
       </div>
-      <span className="mono" style={{ fontSize: 12 }}>{item.sku}</span>
-      <div style={{ display: "flex", gap: 6 }}>
-        <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" min="0" style={{ width: 70, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
-        <button onClick={saveStock} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+      <span className="mono" style={{ fontSize: 12 }}><span className="cell-label">SKU</span>{item.sku}</span>
+      <div>
+        <span className="cell-label">Stock</span>
+        <div style={{ display: "flex", gap: 6 }}>
+          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" min="0" style={{ width: 70, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
+          <button onClick={saveStock} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+        </div>
       </div>
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-        <input value={threshold} onChange={(e) => setThreshold(e.target.value)} type="number" min="0" placeholder="Auto" style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
-        <button onClick={saveThreshold} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+      <div>
+        <span className="cell-label">Umbral</span>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <input value={threshold} onChange={(e) => setThreshold(e.target.value)} type="number" min="0" placeholder="Auto" style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
+          <button onClick={saveThreshold} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+        </div>
       </div>
     </div>
   );
@@ -131,7 +137,7 @@ export const AdminInventory = () => {
       </div>
 
       <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 140px 170px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
+        <div className="admin-table-head" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 140px 170px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
           <span>Producto</span><span>SKU</span><span>Stock</span>
           <span>
             Umbral
@@ -154,7 +160,15 @@ export const AdminInventory = () => {
         ))}
         <Pagination meta={meta} page={page} onPageChange={setPage} />
       </div>
-      <style>{`.admin-row:hover{background:#FAF7F0}`}</style>
+      <style>{`
+        .admin-row:hover{background:#FAF7F0}
+        .cell-label{display:none}
+        @media (max-width: 720px){
+          .admin-table-head{display:none}
+          .admin-list-row{grid-template-columns:1fr !important; gap:8px; align-items:flex-start !important}
+          .admin-list-row .cell-label{display:block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:2px}
+        }
+      `}</style>
     </div>
   );
 };

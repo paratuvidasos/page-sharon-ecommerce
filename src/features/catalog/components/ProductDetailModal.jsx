@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon, Stars } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
@@ -10,12 +11,6 @@ import { useCart } from "@shared/cart/CartContext";
 import { ProductRelated } from "./ProductRelated";
 import { ProductReviews } from "./ProductReviews";
 
-const STOCK_LABEL = {
-  OUT_OF_STOCK: "Agotado",
-  LOW_STOCK: "Últimas unidades",
-  IN_STOCK: "En stock",
-};
-
 const variantLabel = (v) => [v.size, v.scent, v.color].filter(Boolean).join(" · ") || v.sku;
 
 // [0014][BE] Detalle de producto por slug, abierto desde ProductCard (click en la
@@ -23,6 +18,7 @@ const variantLabel = (v) => [v.size, v.scent, v.color].filter(Boolean).join(" ·
 // variante: vive sobre la misma respuesta de GET /products/:slug, sin otra llamada
 // — cambiar de variante solo actualiza precio/stock/imagen mostrados localmente.
 export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders, onSlugChange, onViewCart }) => {
+  const { t } = useTranslation("catalog");
   const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error | not-found
@@ -103,28 +99,28 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
           flexShrink: 0,
         }}
       >
-        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("detail.close")} />
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "0 30px 30px" }}>
         {status === "loading" && (
           <div style={{ textAlign: "center", padding: "60px 8px", color: "var(--ink-soft)" }}>
-            <p style={{ fontSize: 13 }}>Cargando producto…</p>
+            <p style={{ fontSize: 13 }}>{t("detail.loading")}</p>
           </div>
         )}
         {status === "not-found" && (
           <div style={{ textAlign: "center", padding: "60px 8px", color: "var(--ink-soft)" }}>
-            <p style={{ fontSize: 13 }}>No encontramos este producto.</p>
+            <p style={{ fontSize: 13 }}>{t("detail.notFound")}</p>
           </div>
         )}
         {status === "error" && (
           <div style={{ textAlign: "center", padding: "60px 8px", color: "var(--ink-soft)" }}>
-            <p style={{ fontSize: 13 }}>No pudimos cargar el producto. Intenta de nuevo en un momento.</p>
+            <p style={{ fontSize: 13 }}>{t("detail.error")}</p>
           </div>
         )}
 
         {status === "ready" && product && (
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 260px) 1fr", gap: 28 }}>
+          <div className="product-detail-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 260px) 1fr", gap: 28 }}>
             <div style={{ position: "relative" }}>
               <ProductImage image={image} thumbnail={image} name={product.name} big />
               <IconButton
@@ -133,7 +129,7 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
                 iconSize={16}
                 color={wished ? "var(--botanic-deep)" : "var(--ink-soft)"}
                 onClick={() => onWish && onWish({ productId: product.id, slug: product.slug, name: product.name })}
-                aria-label="Favorito"
+                aria-label={t("detail.wishlist")}
                 style={{
                   position: "absolute",
                   top: 10,
@@ -154,7 +150,7 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                 <Stars value={product.rating?.average ?? 0} />
                 <span className="mono" style={{ color: "var(--ink-soft)" }}>
-                  {product.rating?.average != null ? `${product.rating.average.toFixed(1)} · ${product.rating.count}` : "Sin reseñas"}
+                  {product.rating?.average != null ? `${product.rating.average.toFixed(1)} · ${product.rating.count}` : t("detail.noReviews")}
                 </span>
               </div>
 
@@ -173,7 +169,7 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
 
               {product.variants?.length > 1 && (
                 <div style={{ marginBottom: 18 }}>
-                  <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Elige una opción</div>
+                  <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>{t("detail.chooseOption")}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {product.variants.map((v) => (
                       <button
@@ -201,13 +197,13 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
 
               {stockStatus && (
                 <div style={{ fontSize: 12.5, color: outOfStock ? "var(--ink-soft)" : "var(--botanic-deep)", marginBottom: 18 }}>
-                  {STOCK_LABEL[stockStatus] || stockStatus}
+                  {t(`detail.stock.${stockStatus}`, { defaultValue: stockStatus })}
                 </div>
               )}
 
               {product.ingredients && (
                 <div style={{ marginBottom: 18 }}>
-                  <div className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>Ingredientes</div>
+                  <div className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>{t("detail.ingredients")}</div>
                   <p style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.6 }}>{product.ingredients}</p>
                 </div>
               )}
@@ -251,19 +247,19 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
                   }}
                 >
                   <Icon name="plus" size={15} />
-                  {addState === "adding" ? "Añadiendo…" : "Añadir a la bolsa"}
+                  {addState === "adding" ? t("detail.adding") : t("detail.addToBag")}
                 </button>
               </div>
 
               {addState?.ok && (
                 <div role="status" style={{ marginTop: 12, fontSize: 12.5, color: "var(--botanic-deep)" }}>
-                  Añadido a tu bolsa.{" "}
+                  {t("detail.addedToBag")}{" "}
                   <button
                     type="button"
                     onClick={() => onViewCart && onViewCart()}
                     style={{ background: "none", border: 0, padding: 0, color: "inherit", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}
                   >
-                    Ver bolsa
+                    {t("detail.viewBag")}
                   </button>
                 </div>
               )}
@@ -271,8 +267,8 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
               {addState && addState.ok === false && (
                 <div role="alert" style={{ marginTop: 12, fontSize: 12.5, color: "#9C4A4A" }}>
                   {addState.code === "INSUFFICIENT_STOCK"
-                    ? `Solo quedan ${addState.availableQuantity} disponibles.`
-                    : addState.message || "No pudimos agregar el producto."}
+                    ? t("detail.onlyAvailable", { count: addState.availableQuantity })
+                    : addState.message || t("detail.genericAddError")}
                   {addState.code === "INSUFFICIENT_STOCK" && addState.availableQuantity > 0 && (
                     <>
                       {" "}
@@ -284,7 +280,7 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
                         }}
                         style={{ background: "none", border: 0, padding: 0, color: "inherit", textDecoration: "underline", cursor: "pointer", fontSize: "inherit" }}
                       >
-                        Añadir las {addState.availableQuantity} disponibles
+                        {t("detail.addAvailable", { count: addState.availableQuantity })}
                       </button>
                     </>
                   )}
@@ -306,6 +302,12 @@ export const ProductDetailModal = ({ slug, onClose, onWish, wishlistIds, orders,
           </>
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 640px){
+          .product-detail-grid{grid-template-columns: 1fr !important}
+        }
+      `}</style>
     </Modal>
   );
 };

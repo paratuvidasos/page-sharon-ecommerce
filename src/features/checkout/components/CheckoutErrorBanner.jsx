@@ -1,15 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@ui/components/Button";
 import { formatCurrency } from "@shared/i18n/currency";
-
-const CODE_LABELS = {
-  CHECKOUT_PRICE_CHANGED: "El precio de algunos productos cambió",
-  CHECKOUT_ITEM_UNAVAILABLE: "Algunos productos ya no están disponibles",
-  VARIANT_OUT_OF_STOCK: "Un producto se agotó mientras confirmábamos tu pedido",
-  NO_SHIPPING_COVERAGE: "No hacemos envíos a esa dirección",
-  SHIPPING_METHOD_NOT_AVAILABLE: "Ese método de envío ya no está disponible",
-  PAYMENT_METHOD_NOT_AVAILABLE: "Ese método de pago ya no está disponible",
-  PRODUCTS_RESTRICTED_FOR_ZONE: "Algunos productos no se pueden enviar a esa zona",
-};
 
 // Mapea los códigos de error documentados en el handoff de checkout con Bold a un
 // mensaje + acción de recuperación. `error` es { code, message, lines?, restrictedProducts? }
@@ -17,6 +8,7 @@ const CODE_LABELS = {
 // `cartItems` sirve solo para resolver el nombre de los productos restringidos (el
 // backend únicamente manda productId + reason).
 export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveCoupon }) => {
+  const { t } = useTranslation("checkout");
   if (!error) return null;
 
   const isCouponError = typeof error.code === "string" && error.code.startsWith("COUPON_");
@@ -36,7 +28,7 @@ export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveC
       }}
     >
       <div style={{ fontWeight: 600, marginBottom: 4 }}>
-        {CODE_LABELS[error.code] || "No pudimos procesar tu pedido"}
+        {error.code && t(`errorBanner.codes.${error.code}`, { defaultValue: "" }) || t("errorBanner.genericTitle")}
       </div>
       <div>{error.message}</div>
 
@@ -44,11 +36,11 @@ export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveC
         <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
           {error.lines.map((line, i) => (
             <li key={i} style={{ fontSize: 12 }}>
-              {line.productName || "Producto"}
+              {line.productName || t("errorBanner.productFallback")}
               {line.previousUnitPrice != null && line.currentUnitPrice != null && (
-                <> — antes {formatCurrency(line.previousUnitPrice)}, ahora {formatCurrency(line.currentUnitPrice)}</>
+                <> {t("errorBanner.priceChange", { previous: formatCurrency(line.previousUnitPrice), current: formatCurrency(line.currentUnitPrice) })}</>
               )}
-              {line.availableQuantity != null && <> — quedan {line.availableQuantity} disponibles</>}
+              {line.availableQuantity != null && <> {t("errorBanner.availableQuantity", { count: line.availableQuantity })}</>}
             </li>
           ))}
         </ul>
@@ -58,7 +50,7 @@ export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveC
         <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
           {error.restrictedProducts.map((p) => (
             <li key={p.productId} style={{ fontSize: 12 }}>
-              {cartItems?.find((it) => it.productId === p.productId)?.productName || "Producto"} — {p.reason}
+              {cartItems?.find((it) => it.productId === p.productId)?.productName || t("errorBanner.productFallback")} — {p.reason}
             </li>
           ))}
         </ul>
@@ -67,12 +59,12 @@ export const CheckoutErrorBanner = ({ error, cartItems, onRefreshCart, onRemoveC
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         {needsCartRefresh && (
           <Button type="button" size="sm" onClick={onRefreshCart}>
-            Actualizar carrito y reintentar
+            {t("errorBanner.refreshCartAndRetry")}
           </Button>
         )}
         {isCouponError && (
           <Button type="button" size="sm" onClick={onRemoveCoupon}>
-            Quitar cupón
+            {t("errorBanner.removeCoupon")}
           </Button>
         )}
       </div>

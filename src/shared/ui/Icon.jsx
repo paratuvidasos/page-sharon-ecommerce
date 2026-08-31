@@ -49,6 +49,7 @@ export const ICONS = {
   MEGAPHONE: "megaphone",
   DOWNLOAD: "download",
   WAREHOUSE: "warehouse",
+  GLOBE: "globe",
 };
 
 const VALID_ICON_NAMES = new Set(Object.values(ICONS));
@@ -83,6 +84,8 @@ export const Icon = ({ name, size = 22, stroke = 1.5, color = "currentColor" }) 
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle {...p} cx="12" cy="12" r="3"/></svg>);
     case "eye-slash":
       return (<svg viewBox="0 0 24 24" style={s}><path {...p} d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle {...p} cx="12" cy="12" r="3"/><path {...p} d="M4 4l16 16"/></svg>);
+    case "globe":
+      return (<svg viewBox="0 0 24 24" style={s}><circle {...p} cx="12" cy="12" r="9"/><path {...p} d="M3 12h18M12 3c2.8 2.6 4.2 5.7 4.2 9s-1.4 6.4-4.2 9c-2.8-2.6-4.2-5.7-4.2-9S9.2 5.6 12 3Z"/></svg>);
     case "google":
       return (<svg viewBox="0 0 24 24" style={{ width: size, height: size }}>
         <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82Z"/>

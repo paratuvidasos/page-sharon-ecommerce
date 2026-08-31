@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { quoteShipping, ApiError } from "@shared/api-client";
 import { formatCurrency } from "@shared/i18n/currency";
 import { fieldLabelStyle, optionCardStyle, optionRowStyle } from "../fieldStyles";
@@ -10,6 +11,7 @@ import { fieldLabelStyle, optionCardStyle, optionRowStyle } from "../fieldStyles
 // `items` (variantId + quantity) se manda siempre que haya carrito: sin eso el backend
 // solo devuelve la tarifa de respaldo en vez de cotizar con la transportadora real.
 export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, subtotal, currency, items, hasAddress, value, onSelect }) => {
+  const { t } = useTranslation("checkout");
   const [state, setState] = useState({ loading: false, options: [], zoneName: "", restrictedProducts: [], error: null });
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
         })
         .catch((e) => {
           if (cancelled) return;
-          const message = e instanceof ApiError ? e.message : "No pudimos cotizar el envío. Intenta de nuevo.";
+          const message = e instanceof ApiError ? e.message : t("shippingMethodStep.genericError");
           setState({ loading: false, options: [], zoneName: "", restrictedProducts: [], error: { code: e instanceof ApiError ? e.code : null, message } });
           onSelect(null);
         });
@@ -49,9 +51,9 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
   if (!hasAddress) {
     return (
       <div>
-        <div className="eyebrow" style={fieldLabelStyle}>Método de envío</div>
+        <div className="eyebrow" style={fieldLabelStyle}>{t("shippingMethodStep.title")}</div>
         <p style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-          Ingresa tu dirección de envío para ver los métodos disponibles.
+          {t("shippingMethodStep.noAddress")}
         </p>
       </div>
     );
@@ -59,9 +61,9 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
 
   return (
     <div>
-      <div className="eyebrow" style={fieldLabelStyle}>Método de envío</div>
+      <div className="eyebrow" style={fieldLabelStyle}>{t("shippingMethodStep.title")}</div>
 
-      {state.loading && <p style={{ fontSize: 13, color: "var(--ink-soft)" }}>Cotizando envío…</p>}
+      {state.loading && <p style={{ fontSize: 13, color: "var(--ink-soft)" }}>{t("shippingMethodStep.loading")}</p>}
 
       {state.error && (
         <div
@@ -69,7 +71,7 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
           style={{ background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 14, padding: "12px 18px", fontSize: 13, color: "#7A3535" }}
         >
           {state.error.code === "NO_SHIPPING_COVERAGE"
-            ? "No hacemos envíos a esa dirección todavía."
+            ? t("shippingMethodStep.noShippingCoverage")
             : state.error.message}
         </div>
       )}
@@ -95,13 +97,13 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
                   </div>
                   <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>
                     {opt.estimatedMinDays === opt.estimatedMaxDays
-                      ? `${opt.estimatedMinDays} día${opt.estimatedMinDays === 1 ? "" : "s"}`
-                      : `${opt.estimatedMinDays}-${opt.estimatedMaxDays} días`}
+                      ? t("shippingMethodStep.days", { count: opt.estimatedMinDays })
+                      : t("shippingMethodStep.daysRange", { min: opt.estimatedMinDays, max: opt.estimatedMaxDays })}
                   </div>
                 </span>
               </span>
               <span className="display" style={{ fontSize: 15 }}>
-                {opt.freeShippingApplied || opt.cost === 0 ? "Gratis" : formatCurrency(opt.cost)}
+                {opt.freeShippingApplied || opt.cost === 0 ? t("shippingMethodStep.free") : formatCurrency(opt.cost)}
               </span>
             </label>
           ))}
@@ -113,13 +115,13 @@ export const ShippingMethodStep = ({ countryCode, stateProvince, postalCode, sub
           role="alert"
           style={{ background: "rgba(201,168,118,.14)", border: "1px solid rgba(201,168,118,.4)", borderRadius: 14, padding: "12px 18px", fontSize: 12.5, color: "#7A5E2E", marginTop: 10 }}
         >
-          <div style={{ fontWeight: 600, marginBottom: 4 }}>Algunos productos de tu bolsa no se pueden enviar a esta dirección</div>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>{t("shippingMethodStep.restrictedTitle")}</div>
           <ul style={{ margin: 0, paddingLeft: 18 }}>
             {state.restrictedProducts.map((p) => (
               <li key={p.productId}>{p.reason}</li>
             ))}
           </ul>
-          <div style={{ marginTop: 4 }}>Cambia el destino o quita esos productos de la bolsa antes de pagar.</div>
+          <div style={{ marginTop: 4 }}>{t("shippingMethodStep.restrictedHint")}</div>
         </div>
       )}
     </div>

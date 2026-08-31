@@ -1,12 +1,16 @@
+import { useTranslation } from "react-i18next";
 import { Icon } from "./Icon";
 import { Newsletter } from "./Newsletter";
 
+const COLUMN_KEYS = ["shop", "help", "brand"];
+
 export const Footer = () => {
-  const cols = [
-    { title: "Tienda", links: ["Todos los productos", "Shampoos", "Mascarillas", "Tratamientos", "Aceites", "Kits & combos"] },
-    { title: "Ayuda", links: ["Envíos y entregas", "Devoluciones", "Guía de tipo capilar", "Contacto", "Preguntas frecuentes"] },
-    { title: "Sharon", links: ["Sobre nosotras", "Ingredientes", "Sostenibilidad", "Programa profesional", "Diario / Blog"] },
-  ];
+  const { t } = useTranslation("home");
+  const cols = COLUMN_KEYS.map((key) => ({
+    key,
+    title: t(`footer.columns.${key}.title`),
+    links: t(`footer.columns.${key}.links`, { returnObjects: true }),
+  }));
 
   // Footer de ancho completo (no flotante, sin radio) — misma paleta oscura de
   // Testimonials pero como cierre de página clásico, con la newsletter compacta
@@ -34,8 +38,7 @@ export const Footer = () => {
           <div>
             <div className="script" style={{ fontSize: 48, lineHeight: 1, marginBottom: 18 }}>Sharon</div>
             <p style={{ color: "rgba(255,255,255,.65)", fontSize: 14, lineHeight: 1.65, maxWidth: 320, marginBottom: 24 }}>
-              Cuidado capilar profesional, formulado en pequeños lotes en Colombia.
-              Botánica · ciencia · hábitos.
+              {t("footer.description")}
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               {[["ig", "Instagram"], ["tt", "TikTok"], ["pin", "Pinterest"], ["fb", "Facebook"]].map(([k, label]) => (
@@ -53,7 +56,7 @@ export const Footer = () => {
           </div>
 
           {cols.map(c => (
-            <div key={c.title}>
+            <div key={c.key}>
               <div className="eyebrow" style={{ color: "var(--gold-soft)", marginBottom: 18 }}>{c.title}</div>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
                 {c.links.map(l => (
@@ -69,9 +72,9 @@ export const Footer = () => {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginTop: 60, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.55)", fontSize: 12 }}>
-          <div>© 2026 Sharon Hair Co. · Todos los derechos reservados</div>
+          <div>{t("footer.copyright")}</div>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ marginRight: 6 }}>Pagos seguros:</span>
+            <span style={{ marginRight: 6 }}>{t("footer.securePayments")}</span>
             {["VISA", "MC", "AMEX", "PAYPAL", "APPLE"].map(t => (
               <span key={t} style={{
                 padding: "5px 9px", borderRadius: 6, border: "1px solid rgba(255,255,255,.15)",

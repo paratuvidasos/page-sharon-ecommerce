@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAdminOrders } from "@shared/api-client";
@@ -10,6 +11,7 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-
 // "Ver pedidos de un cliente" reusa GET /admin/orders con el filtro userId agregado
 // (mismo endpoint que AdminOrders.jsx) en vez de un endpoint propio de clientes.
 export const CustomerOrdersModal = ({ customer, onClose }) => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [orders, setOrders] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -37,7 +39,7 @@ export const CustomerOrdersModal = ({ customer, onClose }) => {
       <div style={{ width: "100%", maxWidth: 560, maxHeight: "80vh", overflowY: "auto", background: "var(--cream)", borderRadius: 24, padding: 32, boxShadow: "var(--shadow-lg)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
           <div>
-            <div className="display" style={{ fontSize: 22 }}>Pedidos de {customer.firstName} {customer.lastName}</div>
+            <div className="display" style={{ fontSize: 22 }}>{t("customers.ordersModal.title", { name: `${customer.firstName} ${customer.lastName}` })}</div>
             <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{customer.email}</div>
           </div>
           <button type="button" onClick={onClose} className="foc" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--cream-2)", border: 0, cursor: "pointer", display: "grid", placeItems: "center" }}>
@@ -45,9 +47,9 @@ export const CustomerOrdersModal = ({ customer, onClose }) => {
           </button>
         </div>
 
-        {status === "loading" && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>Cargando pedidos…</div>}
-        {status === "error" && <div style={{ fontSize: 13, color: "var(--terracotta-deep)" }}>No se pudieron cargar los pedidos.</div>}
-        {status === "ready" && orders.length === 0 && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>Este cliente no tiene pedidos.</div>}
+        {status === "loading" && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{t("customers.ordersModal.loading")}</div>}
+        {status === "error" && <div style={{ fontSize: 13, color: "var(--terracotta-deep)" }}>{t("customers.ordersModal.error")}</div>}
+        {status === "ready" && orders.length === 0 && <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{t("customers.ordersModal.empty")}</div>}
 
         {orders.map((o) => {
           const st = getStatus(o.status);

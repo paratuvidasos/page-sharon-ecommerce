@@ -1,0 +1,14 @@
+{
+  "bell": {
+    "ariaLabel": "Notificaciones",
+    "title": "Notificaciones",
+    "markAll": "Marcar todas",
+    "preferences": "Preferencias",
+    "back": "Volver",
+    "loading": "Cargando…",
+    "empty": "No tienes notificaciones.",
+    "defaultTitle": "Notificación",
+    "menuRowLabel": "Notificaciones",
+    "prefs": { "email": "Avisarme por correo", "inApp": "Avisarme en la app" }
+  }
+}

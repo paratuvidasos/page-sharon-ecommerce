@@ -1,0 +1,43 @@
+{
+  "line": {
+    "remove": "Quitar",
+    "priceChanged": "El precio de este producto cambió desde que lo agregaste.",
+    "unavailable": "Ya no está disponible. Puedes quitarlo del carrito.",
+    "onlyAvailable": "Solo quedan {{count}} disponibles.",
+    "useMaxQuantity": "Usar cantidad máxima",
+    "confirmRemove": "¿Quitar este producto del carrito?",
+    "removing": "Quitando…",
+    "confirmYes": "Sí, quitar",
+    "cancel": "Cancelar"
+  },
+  "drawer": {
+    "title": "Tu bolsa",
+    "itemCount_one": "{{count}} artículo",
+    "itemCount_other": "{{count}} artículos",
+    "clear": "Vaciar carrito",
+    "close": "Cerrar bolsa",
+    "confirmClear": "¿Vaciar todo el carrito? No se puede deshacer.",
+    "clearing": "Vaciando…",
+    "confirmClearYes": "Sí, vaciar",
+    "cancel": "Cancelar",
+    "emptyTitle": "Tu bolsa está vacía",
+    "emptySubtitle": "Añade algún producto para empezar tus hábitos.",
+    "exploreProducts": "Explorar productos",
+    "subtotal": "Subtotal",
+    "discount": "Descuento",
+    "shipping": "Envío",
+    "shippingFree": "Gratis",
+    "total": "Total",
+    "checkout": "Finalizar compra",
+    "freeShippingRemaining": "Te faltan {{amount}} para envío gratis",
+    "freeShippingApplied": "Envío gratis aplicado ✦"
+  },
+  "coupon": {
+    "label": "Cupón",
+    "invalid": "ya no es válido",
+    "remove": "Quitar",
+    "placeholder": "Código de descuento",
+    "apply": "Aplicar",
+    "genericError": "No pudimos aplicar este cupón."
+  }
+}

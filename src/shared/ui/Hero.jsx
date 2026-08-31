@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { Icon, Stars } from "./Icon";
 import { ProductImage } from "./ProductImage";
@@ -6,6 +7,7 @@ import { PRODUCTS } from "@features/catalog/data/products";
 import FotoModelo from "@assets/img/sharon_img_2_square.jpg"
 
 export const Hero = ({ onShop }) => {
+  const { t } = useTranslation("home");
   return (
     <section style={{ position: "relative", overflow: "hidden", paddingBottom: 60 }}>
       <div aria-hidden="true" style={{
@@ -29,29 +31,28 @@ export const Hero = ({ onShop }) => {
             <Reveal>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 999, background: "rgba(255,255,255,.7)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,.6)", marginBottom: 28 }}>
                 <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }}></span>
-                <span className="eyebrow" style={{ letterSpacing: ".18em", fontSize: 10 }}>Nueva colección · Otoño</span>
+                <span className="eyebrow" style={{ letterSpacing: ".18em", fontSize: 10 }}>{t("hero.badge")}</span>
               </div>
             </Reveal>
 
             <Reveal delay={120}>
               <h1 className="display" style={{ fontSize: "clamp(48px, 7vw, 96px)", margin: 0 }}>
-                Transforma<br />
-                tu cabello con<br />
-                <span className="script" style={{ color: "var(--botanic-deep)" }}>productos profesionales</span>
+                {t("hero.title1")}<br />
+                {t("hero.title2")}<br />
+                <span className="script" style={{ color: "var(--botanic-deep)" }}>{t("hero.titleScript")}</span>
               </h1>
             </Reveal>
 
             <Reveal delay={260}>
               <p style={{ fontSize: 17, lineHeight: 1.65, color: "var(--ink-soft)", maxWidth: 520, margin: "28px 0 36px" }}>
-                Fórmulas botánicas, libres de sulfatos y desarrolladas por especialistas.
-                Sharon es el hábito diario que tu cabello pidió desde siempre.
+                {t("hero.description")}
               </p>
             </Reveal>
 
             <Reveal delay={400}>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-                <Button onClick={onShop}>Comprar ahora <Icon name="arrow" size={16} /></Button>
-                <Button as="a" href="#beneficios" variant="ghost">Descubrir hábitos</Button>
+                <Button onClick={onShop}>{t("hero.ctaShop")} <Icon name="arrow" size={16} /></Button>
+                <Button as="a" href="#beneficios" variant="ghost">{t("hero.ctaDiscover")}</Button>
               </div>
             </Reveal>
 
@@ -59,21 +60,22 @@ export const Hero = ({ onShop }) => {
               <div style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap" }}>
                 <div>
                   <div className="display" style={{ fontSize: 34 }}>+12k</div>
-                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>Clientas felices</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>{t("hero.stats.customers")}</div>
                 </div>
                 <div>
                   <div className="display" style={{ fontSize: 34 }}>4.9<span style={{ fontSize: 18, color: "var(--gold)" }}> ★</span></div>
-                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>Valoración media</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>{t("hero.stats.rating")}</div>
                 </div>
                 <div>
                   <div className="display" style={{ fontSize: 34 }}>0%</div>
-                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>Sulfatos & parabenos</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)", letterSpacing: ".06em" }}>{t("hero.stats.sulfateFree")}</div>
                 </div>
               </div>
             </Reveal>
           </div>
 
-          <Reveal delay={200} style={{ position: "relative", minHeight: 560 }}>
+          <Reveal delay={200}>
+          <div className="hero-orbit-box" style={{ position: "relative", minHeight: 560 }}>
             <div style={{
               position: "absolute", inset: 0,
               borderRadius: 280,
@@ -102,19 +104,19 @@ export const Hero = ({ onShop }) => {
                 tarjeta viaja alrededor de la imagen sin girar sobre sí misma. */}
             <div style={{ position: "absolute", inset: 0, animation: "heroOrbitA 70s linear infinite", pointerEvents: "none", zIndex: 2 }}>
               <div style={{ position: "absolute", top: "1%", left: "50%", transform: "translate(-50%,-50%)", animation: "heroOrbitACounter 70s linear infinite", pointerEvents: "auto" }}>
-                <div style={{
+                <div className="hero-badge hero-badge-a" style={{
                   background: "rgba(255,255,255,.85)", backdropFilter: "blur(18px)",
                   border: ".5px solid rgba(255,255,255,.7)",
                   borderRadius: 18, padding: 14, width: 220,
                   boxShadow: "var(--shadow)",
                   display: "flex", alignItems: "center", gap: 12,
                 }}>
-                  <div style={{ width: 50, height: 60, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+                  <div className="hero-badge-a-thumb" style={{ width: 50, height: 60, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
                     <ProductImage product={PRODUCTS[2]} />
                   </div>
-                  <div>
-                    <div className="eyebrow" style={{ fontSize: 9 }}>Más vendido</div>
-                    <div style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.2 }}>Engrosante & Anticaída</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="eyebrow" style={{ fontSize: 9 }}>{t("hero.bestSeller")}</div>
+                    <div className="hero-badge-a-name" style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.2 }}>{t("hero.bestSellerProduct")}</div>
                     <div style={{ marginTop: 4 }}><Stars value={5} size={10} /></div>
                   </div>
                 </div>
@@ -123,16 +125,17 @@ export const Hero = ({ onShop }) => {
 
             <div style={{ position: "absolute", inset: 0, animation: "heroOrbitB 70s linear infinite", pointerEvents: "none", zIndex: 2 }}>
               <div style={{ position: "absolute", top: "1%", left: "50%", transform: "translate(-50%,-50%)", animation: "heroOrbitBCounter 70s linear infinite", pointerEvents: "auto" }}>
-                <div style={{
+                <div className="hero-badge hero-badge-b" style={{
                   background: "rgba(27,24,21,.92)", color: "var(--cream)",
                   borderRadius: 18, padding: "16px 18px", width: 200,
                   boxShadow: "var(--shadow-lg)",
                 }}>
-                  <div className="eyebrow" style={{ color: "var(--gold-soft)", fontSize: 9 }}>Envío gratis</div>
-                  <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>En toda el area metropolitana de Medellin, en 24h</div>
+                  <div className="eyebrow" style={{ color: "var(--gold-soft)", fontSize: 9 }}>{t("hero.freeShipping")}</div>
+                  <div style={{ fontSize: 11, opacity: .7, marginTop: 2 }}>{t("hero.freeShippingDesc")}</div>
                 </div>
               </div>
             </div>
+          </div>
           </Reveal>
         </div>
 
@@ -143,9 +146,9 @@ export const Hero = ({ onShop }) => {
             display: "flex", justifyContent: "space-between", gap: 24, flexWrap: "wrap",
             color: "var(--ink-soft)"
           }}>
-            {["Vegano certificado", "Cruelty-free", "Made in Spain", "PH neutro", "Dermatológicamente testado"].map(t => (
-              <span key={t} className="mono" style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase" }}>
-                ✦ {t}
+            {t("hero.badges", { returnObjects: true }).map(badge => (
+              <span key={badge} className="mono" style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase" }}>
+                ✦ {badge}
               </span>
             ))}
           </div>
@@ -159,6 +162,19 @@ export const Hero = ({ onShop }) => {
         @keyframes heroOrbitBCounter { from { transform: translate(-50%,-50%) rotate(-180deg); } to { transform: translate(-50%,-50%) rotate(-540deg); } }
         @media (max-width: 900px){
           .hero-grid{grid-template-columns: 1fr !important; gap: 40px !important}
+          /* Las insignias orbitan a un radio proporcional a la altura de esta caja
+             (heroOrbitA/B parten del borde superior y giran 360°) — en desktop la
+             caja es ancha y el radio cabe de sobra, pero a lo angosto de un celular
+             ese mismo radio las saca del viewport en la mitad del recorrido y
+             quedan "desaparecidas" detrás del overflow:hidden de la sección. Se
+             reduce la caja (baja el radio) y el ancho de las tarjetas para que el
+             círculo completo quepa dentro del viewport móvil. */
+          .hero-orbit-box{min-height: 240px !important}
+          .hero-badge-a{width: 130px !important; padding: 9px !important; gap: 8px !important}
+          .hero-badge-a-thumb{width: 34px !important; height: 42px !important}
+          .hero-badge-a-name{font-size: 11.5px !important}
+          .hero-badge-b{width: 118px !important; padding: 10px 12px !important}
+          .hero-badge-b div:last-child{font-size: 9.5px !important}
         }
       `}</style>
     </section>

@@ -1,0 +1,372 @@
+{
+  "layout": {
+    "brandSubtitle": "Admin panel",
+    "nav": {
+      "dashboard": { "label": "Dashboard", "subtitle": "Sales reports for the period" },
+      "orders": { "label": "Orders", "subtitle": "Manage orders and shipments" },
+      "products": { "label": "Products", "subtitle": "Create, edit, and delete catalog products" },
+      "categories": { "label": "Categories", "subtitle": "Catalog categories and attributes" },
+      "inventory": { "label": "Inventory", "subtitle": "Low-stock variants" },
+      "customers": { "label": "Customers (CRM)", "subtitle": "History and value of each customer" },
+      "coupons": { "label": "Coupons", "subtitle": "Active discount codes" },
+      "reviews": { "label": "Reviews", "subtitle": "Product review moderation" },
+      "banners": { "label": "Banners", "subtitle": "Home page banners and highlights" },
+      "team": { "label": "Staff", "subtitle": "Team access and roles" },
+      "settings": { "label": "Settings", "subtitle": "Shipping zones and home highlights" }
+    },
+    "defaultAdminName": "Sharon Hair Co.",
+    "defaultAdminEmail": "admin@sharon.com",
+    "backToStore": "Back to store",
+    "logout": "Log out",
+    "loading": "Loading…",
+    "more": "More"
+  },
+  "customers": {
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended",
+      "DELETED": "Deleted"
+    },
+    "searchPlaceholder": "Search by name or email…",
+    "allStatuses": "All statuses",
+    "search": "Search",
+    "tableHead": {
+      "customer": "Customer",
+      "contact": "Contact",
+      "orders": "Orders",
+      "totalSpent": "Total spent",
+      "status": "Status"
+    },
+    "loading": "Loading customers…",
+    "error": "Couldn't load customers.",
+    "empty": "No customers match these filters.",
+    "reactivate": "Reactivate",
+    "suspend": "Suspend",
+    "ordersModal": {
+      "title": "Orders from {{name}}",
+      "loading": "Loading orders…",
+      "error": "Couldn't load orders.",
+      "empty": "This customer has no orders."
+    }
+  },
+  "coupons": {
+    "tableHead": {
+      "code": "Code",
+      "discount": "Discount",
+      "uses": "Uses",
+      "status": "Status"
+    },
+    "loading": "Loading coupons…",
+    "error": "Couldn't load coupons.",
+    "empty": "No coupons created yet.",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "form": {
+      "title": "New coupon",
+      "code": "Code",
+      "codePlaceholder": "FALL15",
+      "type": "Type",
+      "typePercentage": "% Percentage",
+      "typeFixed": "Fixed amount",
+      "value": "Value",
+      "minPurchase": "Minimum purchase (optional)",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "maxRedemptions": "Max uses (optional)",
+      "creating": "Creating…",
+      "submit": "Create coupon",
+      "errorGeneric": "Couldn't create the coupon. Please try again."
+    }
+  },
+  "reviews": {
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "hidden": "Hidden"
+    },
+    "loading": "Loading reviews…",
+    "error": "Couldn't load reviews.",
+    "empty": "No reviews in this status.",
+    "reasonLabel": "Reason: {{reason}}",
+    "rejectPlaceholder": "Reason for rejection",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "approve": "Approve",
+    "reject": "Reject",
+    "hide": "Hide"
+  },
+  "settings": {
+    "featured": {
+      "loading": "Loading featured settings…",
+      "error": "Couldn't load featured settings.",
+      "title": "Home page highlights",
+      "manual": "Manual",
+      "automatic": "Automatic",
+      "ruleBestSellers": "Best sellers",
+      "ruleNewest": "Newest",
+      "saving": "Saving…",
+      "saved": "Saved! ✦",
+      "save": "Save settings",
+      "errorSave": "Couldn't save the settings."
+    }
+  },
+  "shippingZones": {
+    "title": "Shipping coverage zones",
+    "newZone": "New zone",
+    "loadError": "Couldn't load shipping zones. Check the connection with the backend.",
+    "tableHead": {
+      "zone": "Zone",
+      "description": "Description",
+      "restrictions": "Restrictions"
+    },
+    "loading": "Loading zones…",
+    "empty": "No shipping zones created yet.",
+    "noDescription": "—",
+    "productsCount": "{{count}} product(s)",
+    "editAria": "Edit",
+    "deleteAria": "Delete",
+    "form": {
+      "eyebrow": "Settings",
+      "editTitle": "Edit zone",
+      "newTitle": "New zone",
+      "nameLabel": "Zone name",
+      "namePlaceholder": "Medellín · metro area",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Coverage, estimated time…",
+      "save": "Save zone",
+      "cancel": "Cancel"
+    },
+    "restrictionsForm": {
+      "title": "Restrict products",
+      "description": "These products won't be shippable to \"{{zone}}\".",
+      "saving": "Saving…",
+      "save": "Save restrictions",
+      "cancel": "Cancel"
+    }
+  },
+  "team": {
+    "tableHead": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role"
+    }
+  },
+  "banners": {
+    "newBanner": "New banner",
+    "loading": "Loading banners…",
+    "error": "Couldn't load banners.",
+    "empty": "No banners created yet.",
+    "toggleAria": "Activate/deactivate banner",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "editAria": "Edit banner",
+    "deleteAria": "Delete banner",
+    "confirmDelete": "Delete the banner \"{{title}}\"? This cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "uploadErrorGeneric": "Couldn't upload the image.",
+    "requiredFieldsError": "Image and title are required.",
+    "saveErrorGeneric": "Couldn't save the banner.",
+    "form": {
+      "eyebrow": "Banners",
+      "editTitle": "Edit banner",
+      "newTitle": "New banner",
+      "imageLabel": "Image",
+      "uploading": "Uploading…",
+      "uploadButton": "Upload image",
+      "titleLabel": "Title",
+      "linkLabel": "Link (optional)",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "activeLabel": "Active",
+      "save": "Save banner",
+      "cancel": "Cancel"
+    }
+  },
+  "pagination": {
+    "summary": "Page {{page}} of {{totalPages}} · {{total}} total"
+  },
+  "formSheet": {
+    "back": "Back",
+    "close": "Close"
+  },
+  "dashboard": {
+    "dateRangeSeparator": "to",
+    "exportCsv": "Export CSV",
+    "exporting": "Generating…",
+    "loading": "Loading report…",
+    "loadError": "Couldn't load the sales report.",
+    "exportError": "Couldn't generate the CSV.",
+    "stats": {
+      "totalSales": "Sales this period",
+      "averageTicket": "Average order value",
+      "orderCount": "Orders"
+    },
+    "topProducts": {
+      "title": "Best-selling products",
+      "columns": {
+        "product": "Product",
+        "units": "Units",
+        "revenue": "Revenue"
+      },
+      "empty": "No sales in this period."
+    }
+  },
+  "orders": {
+    "filters": {
+      "allStatuses": "All statuses"
+    },
+    "columns": {
+      "order": "Order",
+      "date": "Date",
+      "total": "Total",
+      "status": "Status"
+    },
+    "loading": "Loading orders…",
+    "loadError": "Couldn't load the orders.",
+    "empty": "No orders match these filters.",
+    "changeStatus": "Change status",
+    "detail": {
+      "loading": "Loading order…",
+      "loadError": "Couldn't load the order.",
+      "products": "Products",
+      "total": "Total",
+      "shippingAddress": "Shipping address",
+      "paymentAndShipping": "Payment & shipping",
+      "shipmentTracking": "Tracking {{trackingNumber}} ({{carrierName}})",
+      "statusHistory": "Status history"
+    },
+    "statusModal": {
+      "eyebrow": "Orders",
+      "title": "Change status",
+      "newStatus": "New status",
+      "carrierCode": "Carrier (code)",
+      "carrierCodePlaceholder": "COORDINADORA",
+      "carrierName": "Carrier (name)",
+      "carrierNamePlaceholder": "Coordinadora",
+      "trackingNumber": "Tracking number",
+      "reason": "Reason",
+      "errors": {
+        "carrierRequired": "Fill in the carrier, name, and tracking number.",
+        "reasonRequired": "A reason is required to cancel or refund.",
+        "updateFailed": "Couldn't update the order status."
+      },
+      "saving": "Saving…",
+      "save": "Save status",
+      "cancel": "Cancel"
+    }
+  },
+  "products": {
+    "new": "New product",
+    "columns": {
+      "product": "Product",
+      "price": "Price",
+      "featured": "Featured"
+    },
+    "loading": "Loading products…",
+    "loadError": "Couldn't load the products.",
+    "toggleFeaturedAria": "Toggle featured",
+    "editAria": "Edit",
+    "deleteAria": "Delete",
+    "confirmDelete": "Delete \"{{name}}\"? If it has past orders it will be archived instead of deleted.",
+    "confirmDeleteButton": "Delete",
+    "cancelButton": "Cancel",
+    "archivedNotice": "This product has past orders — it was archived instead of deleted.",
+    "form": {
+      "eyebrow": "Products",
+      "editTitle": "Edit product",
+      "newTitle": "New product",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "Anti-Hair-Loss Shampoo 300ml",
+        "category": "Category",
+        "categoryPlaceholder": "Select…",
+        "description": "Description",
+        "brand": "Brand",
+        "brandPlaceholder": "Sharon",
+        "price": "Price",
+        "pricePlaceholder": "49900",
+        "images": "Images",
+        "stock": "Stock",
+        "stockPlaceholder": "20",
+        "size": "Size (optional)",
+        "sizePlaceholder": "300ml",
+        "scent": "Scent (optional)",
+        "scentPlaceholder": "Lavender",
+        "color": "Color (optional)"
+      },
+      "presentationSection": "Variant",
+      "presentationsSection": "Variants",
+      "presentationUnique": "Single variant",
+      "addImages": "Add images",
+      "removeImageAria": "Remove image",
+      "uploading": "Uploading…",
+      "uploadImages": "Upload images",
+      "addVariant": "+ Add another variant",
+      "saving": "Saving…",
+      "saveChanges": "Save changes",
+      "create": "Create product",
+      "cancel": "Cancel",
+      "errors": {
+        "initialStockRequired": "Enter the initial stock.",
+        "filePreviewFailed": "Couldn't read the file",
+        "previewGenerationFailed": "Couldn't generate the image preview.",
+        "imagesUploadFailedAfterCreate": "The product was created, but the images couldn't be uploaded. You can retry below.",
+        "saveFailed": "Couldn't save the product.",
+        "uploadFailed": "Couldn't upload the images.",
+        "removeImageFailed": "Couldn't remove the image.",
+        "createVariantFailed": "Couldn't create the variant.",
+        "removeVariantFailed": "Couldn't remove the variant.",
+        "lastVariant": "You can't remove the product's last variant."
+      }
+    }
+  },
+  "categories": {
+    "categoriesSection": {
+      "title": "Categories",
+      "namePlaceholder": "Name",
+      "slugPlaceholder": "slug",
+      "add": "Add",
+      "loading": "Loading categories…",
+      "createError": "Couldn't create the category.",
+      "deleteErrorHasProducts": "This category has active products — reassign them before deleting it.",
+      "deleteErrorGeneric": "Couldn't delete the category."
+    },
+    "attributesSection": {
+      "title": "Attributes",
+      "keyPlaceholder": "key (e.g. hairType)",
+      "labelPlaceholder": "Label",
+      "valuesPlaceholder": "Comma-separated values",
+      "add": "Add",
+      "loading": "Loading attributes…",
+      "createError": "Couldn't create the attribute."
+    }
+  },
+  "inventory": {
+    "sortOptions": {
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "stockAsc": "Lowest stock first",
+      "stockDesc": "Highest stock first"
+    },
+    "searchPlaceholder": "Search by product or SKU…",
+    "allCategories": "All categories",
+    "onlyLowStock": "Low stock only",
+    "columns": {
+      "product": "Product",
+      "sku": "SKU",
+      "stock": "Stock",
+      "threshold": "Threshold",
+      "thresholdHint": "stock level that triggers \"low stock\""
+    },
+    "loading": "Loading inventory…",
+    "loadError": "Couldn't load the inventory.",
+    "empty": "No variants match these filters.",
+    "thresholdPlaceholder": "Auto",
+    "save": "OK"
+  }
+}

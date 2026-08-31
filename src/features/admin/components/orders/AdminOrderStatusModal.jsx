@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Icon } from "@ui/Icon";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@shared/auth/AuthContext";
 import { setOrderStatus } from "@shared/api-client";
 import { ORDER_STATUSES } from "@features/orders/data/statuses";
+import { AdminFormSheet } from "../AdminFormSheet";
 
 // El backend ahora acepta IN_PREPARATION|SHIPPED|DELIVERED|CANCELLED|REFUNDED en
 // PATCH /admin/orders/:orderNumber/status — SHIPPED exige datos de guía, CANCELLED/
@@ -18,6 +19,7 @@ const fieldStyle = {
 const labelStyle = { fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 };
 
 export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const currentIsTransitionable = NEXT_STATUSES.some((s) => s.value === order.status);
   const [nextStatus, setNextStatus] = useState(currentIsTransitionable ? order.status : NEXT_STATUSES[0].value);
@@ -34,11 +36,11 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
   const submit = async (e) => {
     e.preventDefault();
     if (needsCarrier && (!carrierCode.trim() || !carrierName.trim() || !trackingNumber.trim())) {
-      setError("Completa transportadora, nombre y número de guía.");
+      setError(t("orders.statusModal.errors.carrierRequired"));
       return;
     }
     if (needsReason && !reason.trim()) {
-      setError("El motivo es obligatorio para cancelar o reembolsar.");
+      setError(t("orders.statusModal.errors.reasonRequired"));
       return;
     }
     setSubmitting(true);
@@ -55,26 +57,20 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
       onUpdated(updated);
       onClose();
     } catch (err) {
-      setError(err?.message || "No se pudo actualizar el estado del pedido.");
+      setError(err?.message || t("orders.statusModal.errors.updateFailed"));
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(27,24,21,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 24 }}>
-      <form onSubmit={submit} style={{ width: "100%", maxWidth: 440, background: "var(--cream)", borderRadius: 24, padding: 32, boxShadow: "var(--shadow-lg)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <div className="display" style={{ fontSize: 22 }}>Cambiar estado</div>
-          <button type="button" onClick={onClose} className="foc" style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--cream-2)", border: 0, cursor: "pointer", display: "grid", placeItems: "center" }}>
-            <Icon name="close" size={13} />
-          </button>
-        </div>
+    <AdminFormSheet onClose={onClose} eyebrow={t("orders.statusModal.eyebrow")} title={t("orders.statusModal.title")} maxWidth={440}>
+      <form onSubmit={submit}>
         <div className="mono" style={{ fontSize: 11.5, color: "var(--ink-soft)", marginBottom: 20 }}>{order.orderNumber}</div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={labelStyle}>Nuevo estado</label>
+            <label style={labelStyle}>{t("orders.statusModal.newStatus")}</label>
             <select value={nextStatus} onChange={(e) => setNextStatus(e.target.value)} style={fieldStyle}>
               {NEXT_STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -85,15 +81,15 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
           {needsCarrier && (
             <>
               <div>
-                <label style={labelStyle}>Transportadora (código)</label>
-                <input value={carrierCode} onChange={(e) => setCarrierCode(e.target.value)} placeholder="COORDINADORA" style={fieldStyle} />
+                <label style={labelStyle}>{t("orders.statusModal.carrierCode")}</label>
+                <input value={carrierCode} onChange={(e) => setCarrierCode(e.target.value)} placeholder={t("orders.statusModal.carrierCodePlaceholder")} style={fieldStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Transportadora (nombre)</label>
-                <input value={carrierName} onChange={(e) => setCarrierName(e.target.value)} placeholder="Coordinadora" style={fieldStyle} />
+                <label style={labelStyle}>{t("orders.statusModal.carrierName")}</label>
+                <input value={carrierName} onChange={(e) => setCarrierName(e.target.value)} placeholder={t("orders.statusModal.carrierNamePlaceholder")} style={fieldStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Número de guía</label>
+                <label style={labelStyle}>{t("orders.statusModal.trackingNumber")}</label>
                 <input value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} style={fieldStyle} />
               </div>
             </>
@@ -101,7 +97,7 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
 
           {needsReason && (
             <div>
-              <label style={labelStyle}>Motivo</label>
+              <label style={labelStyle}>{t("orders.statusModal.reason")}</label>
               <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} style={{ ...fieldStyle, resize: "vertical", fontFamily: "var(--sans)" }} />
             </div>
           )}
@@ -109,13 +105,13 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
 
         {error && <div style={{ fontSize: 12.5, color: "var(--terracotta-deep)", marginTop: 14 }}>{error}</div>}
 
-        <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
+        <div className="admin-sheet-actions" style={{ display: "flex", gap: 10, marginTop: 22 }}>
           <button type="submit" disabled={submitting} className="foc" style={{ flex: 1, border: 0, borderRadius: 999, padding: 14, background: "var(--ink)", color: "var(--cream)", fontSize: 13.5, fontWeight: 700, cursor: submitting ? "wait" : "pointer" }}>
-            {submitting ? "Guardando…" : "Guardar estado"}
+            {submitting ? t("orders.statusModal.saving") : t("orders.statusModal.save")}
           </button>
-          <button type="button" onClick={onClose} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+          <button type="button" onClick={onClose} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 999, padding: "14px 20px", background: "transparent", color: "var(--ink)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>{t("orders.statusModal.cancel")}</button>
         </div>
       </form>
-    </div>
+    </AdminFormSheet>
   );
 };

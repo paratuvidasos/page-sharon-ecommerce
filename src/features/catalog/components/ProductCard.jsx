@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon, Stars } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { IconButton } from "@ui/components/IconButton";
@@ -7,9 +8,9 @@ import { formatCurrency } from "@shared/i18n/currency";
 // [0013][BE] stockStatus viene real del backend (agregado entre variantes) —
 // se usa para la píldora de estado y para deshabilitar "Añadir" cuando no hay
 // stock, en vez del "badge" (Nuevo/Más vendido) que antes era dato de mentira.
-const STOCK_BADGE = {
-  OUT_OF_STOCK: { label: "Agotado", bg: "var(--ink-soft)" },
-  LOW_STOCK: { label: "Últimas unidades", bg: "var(--ink)" },
+const STOCK_BADGE_KEY = {
+  OUT_OF_STOCK: { key: "card.outOfStock", bg: "var(--ink-soft)" },
+  LOW_STOCK: { key: "card.lowStock", bg: "var(--ink)" },
 };
 
 // [0023][BE] "Añadir" no llama al carrito directo: el listado no trae variantId
@@ -17,10 +18,11 @@ const STOCK_BADGE = {
 // selector de variante/cantidad que ya vive ahí confirme qué se agrega.
 
 export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) => {
+  const { t } = useTranslation("catalog");
   const [hover, setHover] = useState(false);
   const hasGallery = product.gallery && product.gallery.length > 0;
   const outOfStock = product.stockStatus === "OUT_OF_STOCK";
-  const stockBadge = STOCK_BADGE[product.stockStatus];
+  const stockBadge = STOCK_BADGE_KEY[product.stockStatus];
 
   return (
     <div
@@ -56,7 +58,7 @@ export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) =
             fontWeight: 600,
           }}
         >
-          {stockBadge.label}
+          {t(stockBadge.key)}
         </span>
       )}
       <IconButton
@@ -68,7 +70,7 @@ export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) =
           e.stopPropagation();
           onWish && onWish(product);
         }}
-        aria-label="Favorito"
+        aria-label={t("card.wishlist")}
         style={{
           position: "absolute",
           top: 12,
@@ -116,7 +118,7 @@ export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) =
         >
           <Stars value={product.ratingAverage ?? 0} />
           <span className="mono" style={{ color: "var(--ink-soft)" }}>
-            {product.ratingAverage != null ? `${product.ratingAverage.toFixed(1)} · ${product.ratingCount}` : "Sin reseñas"}
+            {product.ratingAverage != null ? `${product.ratingAverage.toFixed(1)} · ${product.ratingCount}` : t("card.noReviews")}
           </span>
         </div>
 
@@ -168,7 +170,7 @@ export const ProductCard = ({ product, onWish, onViewDetail, wished = false }) =
             }}
           >
             <Icon name="plus" size={14} />
-            Añadir
+            {t("card.add")}
           </button>
         </div>
       </div>

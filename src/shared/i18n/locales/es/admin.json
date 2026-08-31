@@ -1,0 +1,372 @@
+{
+  "layout": {
+    "brandSubtitle": "Panel administrativo",
+    "nav": {
+      "dashboard": { "label": "Dashboard", "subtitle": "Reportes de ventas del período" },
+      "orders": { "label": "Pedidos", "subtitle": "Gestión de pedidos y envíos" },
+      "products": { "label": "Productos", "subtitle": "Crea, edita y elimina productos del catálogo" },
+      "categories": { "label": "Categorías", "subtitle": "Categorías y atributos del catálogo" },
+      "inventory": { "label": "Inventario", "subtitle": "Variantes con stock bajo" },
+      "customers": { "label": "Clientes (CRM)", "subtitle": "Historial y valor de cada cliente" },
+      "coupons": { "label": "Cupones", "subtitle": "Códigos de descuento activos" },
+      "reviews": { "label": "Reseñas", "subtitle": "Moderación de reseñas de producto" },
+      "banners": { "label": "Banners", "subtitle": "Banners y destacados de la home" },
+      "team": { "label": "Empleados", "subtitle": "Accesos y roles del equipo" },
+      "settings": { "label": "Configuración", "subtitle": "Zonas de envío y destacados de home" }
+    },
+    "defaultAdminName": "Sharon Hair Co.",
+    "defaultAdminEmail": "admin@sharon.com",
+    "backToStore": "Volver a la tienda",
+    "logout": "Cerrar sesión",
+    "loading": "Cargando…",
+    "more": "Más"
+  },
+  "customers": {
+    "status": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo",
+      "SUSPENDED": "Suspendido",
+      "DELETED": "Eliminado"
+    },
+    "searchPlaceholder": "Buscar por nombre o correo…",
+    "allStatuses": "Todos los estados",
+    "search": "Buscar",
+    "tableHead": {
+      "customer": "Cliente",
+      "contact": "Contacto",
+      "orders": "Pedidos",
+      "totalSpent": "Gasto total",
+      "status": "Estado"
+    },
+    "loading": "Cargando clientes…",
+    "error": "No se pudieron cargar los clientes.",
+    "empty": "No hay clientes con estos filtros.",
+    "reactivate": "Reactivar",
+    "suspend": "Suspender",
+    "ordersModal": {
+      "title": "Pedidos de {{name}}",
+      "loading": "Cargando pedidos…",
+      "error": "No se pudieron cargar los pedidos.",
+      "empty": "Este cliente no tiene pedidos."
+    }
+  },
+  "coupons": {
+    "tableHead": {
+      "code": "Código",
+      "discount": "Descuento",
+      "uses": "Usos",
+      "status": "Estado"
+    },
+    "loading": "Cargando cupones…",
+    "error": "No se pudieron cargar los cupones.",
+    "empty": "Todavía no hay cupones creados.",
+    "statusActive": "Activo",
+    "statusInactive": "Inactivo",
+    "deactivate": "Desactivar",
+    "activate": "Activar",
+    "form": {
+      "title": "Nuevo cupón",
+      "code": "Código",
+      "codePlaceholder": "OTONO15",
+      "type": "Tipo",
+      "typePercentage": "% Porcentaje",
+      "typeFixed": "Monto fijo",
+      "value": "Valor",
+      "minPurchase": "Compra mínima (opcional)",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "maxRedemptions": "Máx. de usos (opcional)",
+      "creating": "Creando…",
+      "submit": "Crear cupón",
+      "errorGeneric": "No se pudo crear el cupón. Intenta de nuevo."
+    }
+  },
+  "reviews": {
+    "tabs": {
+      "pending": "Pendientes",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "hidden": "Ocultas"
+    },
+    "loading": "Cargando reseñas…",
+    "error": "No se pudieron cargar las reseñas.",
+    "empty": "No hay reseñas en este estado.",
+    "reasonLabel": "Motivo: {{reason}}",
+    "rejectPlaceholder": "Motivo del rechazo",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "hide": "Ocultar"
+  },
+  "settings": {
+    "featured": {
+      "loading": "Cargando configuración de destacados…",
+      "error": "No se pudo cargar la configuración de destacados.",
+      "title": "Destacados de la home",
+      "manual": "Manual",
+      "automatic": "Automático",
+      "ruleBestSellers": "Más vendidos",
+      "ruleNewest": "Más nuevos",
+      "saving": "Guardando…",
+      "saved": "¡Guardado! ✦",
+      "save": "Guardar configuración",
+      "errorSave": "No se pudo guardar la configuración."
+    }
+  },
+  "shippingZones": {
+    "title": "Zonas de cobertura de envío",
+    "newZone": "Nueva zona",
+    "loadError": "No se pudieron cargar las zonas de envío. Verifica la conexión con el backend.",
+    "tableHead": {
+      "zone": "Zona",
+      "description": "Descripción",
+      "restrictions": "Restricciones"
+    },
+    "loading": "Cargando zonas…",
+    "empty": "Todavía no hay zonas de envío creadas.",
+    "noDescription": "—",
+    "productsCount": "{{count}} producto(s)",
+    "editAria": "Editar",
+    "deleteAria": "Eliminar",
+    "form": {
+      "eyebrow": "Configuración",
+      "editTitle": "Editar zona",
+      "newTitle": "Nueva zona",
+      "nameLabel": "Nombre de la zona",
+      "namePlaceholder": "Medellín · área metropolitana",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Cobertura, tiempo estimado…",
+      "save": "Guardar zona",
+      "cancel": "Cancelar"
+    },
+    "restrictionsForm": {
+      "title": "Restringir productos",
+      "description": "Estos productos no se podrán enviar a \"{{zone}}\".",
+      "saving": "Guardando…",
+      "save": "Guardar restricciones",
+      "cancel": "Cancelar"
+    }
+  },
+  "team": {
+    "tableHead": {
+      "name": "Nombre",
+      "email": "Correo",
+      "role": "Rol"
+    }
+  },
+  "banners": {
+    "newBanner": "Nuevo banner",
+    "loading": "Cargando banners…",
+    "error": "No se pudieron cargar los banners.",
+    "empty": "Todavía no hay banners creados.",
+    "toggleAria": "Activar/desactivar banner",
+    "statusActive": "Activo",
+    "statusInactive": "Inactivo",
+    "editAria": "Editar banner",
+    "deleteAria": "Eliminar banner",
+    "confirmDelete": "¿Eliminar el banner \"{{title}}\"? No se puede deshacer.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "uploadErrorGeneric": "No se pudo subir la imagen.",
+    "requiredFieldsError": "La imagen y el título son obligatorios.",
+    "saveErrorGeneric": "No se pudo guardar el banner.",
+    "form": {
+      "eyebrow": "Banners",
+      "editTitle": "Editar banner",
+      "newTitle": "Nuevo banner",
+      "imageLabel": "Imagen",
+      "uploading": "Subiendo…",
+      "uploadButton": "Subir imagen",
+      "titleLabel": "Título",
+      "linkLabel": "Link (opcional)",
+      "startsAt": "Desde",
+      "endsAt": "Hasta",
+      "activeLabel": "Activo",
+      "save": "Guardar banner",
+      "cancel": "Cancelar"
+    }
+  },
+  "pagination": {
+    "summary": "Página {{page}} de {{totalPages}} · {{total}} en total"
+  },
+  "formSheet": {
+    "back": "Volver",
+    "close": "Cerrar"
+  },
+  "dashboard": {
+    "dateRangeSeparator": "a",
+    "exportCsv": "Exportar CSV",
+    "exporting": "Generando…",
+    "loading": "Cargando reporte…",
+    "loadError": "No se pudo cargar el reporte de ventas.",
+    "exportError": "No se pudo generar el CSV.",
+    "stats": {
+      "totalSales": "Ventas del período",
+      "averageTicket": "Ticket promedio",
+      "orderCount": "Pedidos"
+    },
+    "topProducts": {
+      "title": "Productos más vendidos",
+      "columns": {
+        "product": "Producto",
+        "units": "Unidades",
+        "revenue": "Ingresos"
+      },
+      "empty": "Sin ventas en este período."
+    }
+  },
+  "orders": {
+    "filters": {
+      "allStatuses": "Todos los estados"
+    },
+    "columns": {
+      "order": "Pedido",
+      "date": "Fecha",
+      "total": "Total",
+      "status": "Estado"
+    },
+    "loading": "Cargando pedidos…",
+    "loadError": "No se pudieron cargar los pedidos.",
+    "empty": "No hay pedidos con estos filtros.",
+    "changeStatus": "Cambiar estado",
+    "detail": {
+      "loading": "Cargando pedido…",
+      "loadError": "No se pudo cargar el pedido.",
+      "products": "Productos",
+      "total": "Total",
+      "shippingAddress": "Dirección de envío",
+      "paymentAndShipping": "Pago y envío",
+      "shipmentTracking": "Guía {{trackingNumber}} ({{carrierName}})",
+      "statusHistory": "Historial de estado"
+    },
+    "statusModal": {
+      "eyebrow": "Pedidos",
+      "title": "Cambiar estado",
+      "newStatus": "Nuevo estado",
+      "carrierCode": "Transportadora (código)",
+      "carrierCodePlaceholder": "COORDINADORA",
+      "carrierName": "Transportadora (nombre)",
+      "carrierNamePlaceholder": "Coordinadora",
+      "trackingNumber": "Número de guía",
+      "reason": "Motivo",
+      "errors": {
+        "carrierRequired": "Completa transportadora, nombre y número de guía.",
+        "reasonRequired": "El motivo es obligatorio para cancelar o reembolsar.",
+        "updateFailed": "No se pudo actualizar el estado del pedido."
+      },
+      "saving": "Guardando…",
+      "save": "Guardar estado",
+      "cancel": "Cancelar"
+    }
+  },
+  "products": {
+    "new": "Nuevo producto",
+    "columns": {
+      "product": "Producto",
+      "price": "Precio",
+      "featured": "Destacado"
+    },
+    "loading": "Cargando productos…",
+    "loadError": "No se pudieron cargar los productos.",
+    "toggleFeaturedAria": "Alternar destacado",
+    "editAria": "Editar",
+    "deleteAria": "Eliminar",
+    "confirmDelete": "¿Eliminar \"{{name}}\"? Si tiene pedidos históricos se archivará en vez de borrarse.",
+    "confirmDeleteButton": "Eliminar",
+    "cancelButton": "Cancelar",
+    "archivedNotice": "Este producto tiene pedidos históricos — se archivó en vez de eliminarse.",
+    "form": {
+      "eyebrow": "Productos",
+      "editTitle": "Editar producto",
+      "newTitle": "Nuevo producto",
+      "fields": {
+        "name": "Nombre",
+        "namePlaceholder": "Shampoo Anticaída 300ml",
+        "category": "Categoría",
+        "categoryPlaceholder": "Selecciona…",
+        "description": "Descripción",
+        "brand": "Marca",
+        "brandPlaceholder": "Sharon",
+        "price": "Precio",
+        "pricePlaceholder": "49900",
+        "images": "Imágenes",
+        "stock": "Stock",
+        "stockPlaceholder": "20",
+        "size": "Tamaño (opcional)",
+        "sizePlaceholder": "300ml",
+        "scent": "Aroma (opcional)",
+        "scentPlaceholder": "Lavanda",
+        "color": "Color (opcional)"
+      },
+      "presentationSection": "Presentación",
+      "presentationsSection": "Presentaciones",
+      "presentationUnique": "Presentación única",
+      "addImages": "Agregar imágenes",
+      "removeImageAria": "Quitar imagen",
+      "uploading": "Subiendo…",
+      "uploadImages": "Subir imágenes",
+      "addVariant": "+ Agregar otra presentación",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios",
+      "create": "Crear producto",
+      "cancel": "Cancelar",
+      "errors": {
+        "initialStockRequired": "Indica el stock inicial.",
+        "filePreviewFailed": "No se pudo leer el archivo",
+        "previewGenerationFailed": "No se pudo generar la vista previa de la imagen.",
+        "imagesUploadFailedAfterCreate": "El producto se creó, pero no se pudieron subir las imágenes. Puedes reintentarlo abajo.",
+        "saveFailed": "No se pudo guardar el producto.",
+        "uploadFailed": "No se pudieron subir las imágenes.",
+        "removeImageFailed": "No se pudo quitar la imagen.",
+        "createVariantFailed": "No se pudo crear la variante.",
+        "removeVariantFailed": "No se pudo eliminar la variante.",
+        "lastVariant": "No se puede eliminar la última variante del producto."
+      }
+    }
+  },
+  "categories": {
+    "categoriesSection": {
+      "title": "Categorías",
+      "namePlaceholder": "Nombre",
+      "slugPlaceholder": "slug",
+      "add": "Agregar",
+      "loading": "Cargando categorías…",
+      "createError": "No se pudo crear la categoría.",
+      "deleteErrorHasProducts": "Esta categoría tiene productos activos — reasígnalos antes de borrarla.",
+      "deleteErrorGeneric": "No se pudo eliminar la categoría."
+    },
+    "attributesSection": {
+      "title": "Atributos",
+      "keyPlaceholder": "key (ej. hairType)",
+      "labelPlaceholder": "Etiqueta",
+      "valuesPlaceholder": "Valores separados por coma",
+      "add": "Agregar",
+      "loading": "Cargando atributos…",
+      "createError": "No se pudo crear el atributo."
+    }
+  },
+  "inventory": {
+    "sortOptions": {
+      "nameAsc": "Nombre (A-Z)",
+      "nameDesc": "Nombre (Z-A)",
+      "stockAsc": "Menor stock primero",
+      "stockDesc": "Mayor stock primero"
+    },
+    "searchPlaceholder": "Buscar por producto o SKU…",
+    "allCategories": "Todas las categorías",
+    "onlyLowStock": "Solo stock bajo",
+    "columns": {
+      "product": "Producto",
+      "sku": "SKU",
+      "stock": "Stock",
+      "threshold": "Umbral",
+      "thresholdHint": "stock que dispara \"stock bajo\""
+    },
+    "loading": "Cargando inventario…",
+    "loadError": "No se pudo cargar el inventario.",
+    "empty": "No hay variantes con estos filtros.",
+    "thresholdPlaceholder": "Auto",
+    "save": "OK"
+  }
+}

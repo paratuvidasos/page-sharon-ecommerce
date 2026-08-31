@@ -1,10 +1,12 @@
+// La cita (quote) vive en shared/i18n/locales/{es,en}/home.json bajo
+// testimonials.items.<id>.quote — este array solo aporta el id (clave de
+// traducción) y los datos que no dependen del idioma (nombre, ubicación, avatar).
 export const TESTIMONIALS = [
   {
     id: "t1",
     name: "Lucía Méndez",
     role: "Medellin, COL",
     rating: 5,
-    quote: "Llevaba años buscando algo que de verdad funcionara para mi cabello fino. La mascarilla de Sharon lo cambió todo en tres semanas.",
     avatar: "L",
     tone: "rose"
   },
@@ -13,7 +15,6 @@ export const TESTIMONIALS = [
     name: "Ana Pérez",
     role: "Medellin, COL",
     rating: 5,
-    quote: "El kit completo es una maravilla. El olor, la textura, el packaging — todo se siente premium. Mi rutina favorita del día.",
     avatar: "A",
     tone: "botanic"
   },
@@ -22,7 +23,6 @@ export const TESTIMONIALS = [
     name: "Camila Ruiz",
     role: "Medellin, COL",
     rating: 5,
-    quote: "Tras un alisado agresivo, el aceite de argán me devolvió el brillo. Mi peluquera me preguntó qué estaba usando.",
     avatar: "C",
     tone: "gold"
   },
@@ -31,7 +31,6 @@ export const TESTIMONIALS = [
     name: "Marta Solís",
     role: "Medellin, COL",
     rating: 5,
-    quote: "El tónico anticaída funciona, pero lo que me enamoró fueron los hábitos. Da gusto cuidarse con productos así.",
     avatar: "M",
     tone: "rose"
   },

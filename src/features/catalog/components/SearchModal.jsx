@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { ProductImage } from "@ui/ProductImage";
 import { Z } from "@ui/zIndex";
 import { getSearchSuggestions, listCategories } from "@shared/api-client";
-
-const FREQUENT_SEARCHES = ["Anti-caída", "Sin sulfatos", "Aceite de argán", "Mascarilla", "Kit completo"];
 
 // [0018][BE] Búsqueda real: reemplaza el filtro local sobre el array estático por
 // GET /products/search/suggestions (autocomplete, hasta 8, sin paginar — es el
@@ -15,6 +14,8 @@ const FREQUENT_SEARCHES = ["Anti-caída", "Sin sulfatos", "Aceite de argán", "M
 // precio/stock. Para "sin resultados" se sugieren categorías reales (no hay
 // endpoint dedicado para eso, se reusa GET /categories).
 export const SearchModal = ({ open, onClose, onOpenProduct }) => {
+  const { t } = useTranslation("catalog");
+  const FREQUENT_SEARCHES = t("search.frequentTerms", { returnObjects: true });
   const [q, setQ] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -72,18 +73,18 @@ export const SearchModal = ({ open, onClose, onOpenProduct }) => {
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "18px 22px", borderBottom: "1px solid var(--line)" }}>
           <Icon name="search" size={20} color="var(--ink-soft)" />
           <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
-                 placeholder="Buscar productos, hábitos, ingredientes…"
+                 placeholder={t("search.placeholder")}
                  style={{ flex: 1, border: 0, outline: 0, background: "transparent", fontSize: 16, fontFamily: "var(--sans)" }} />
-          <button onClick={onClose} style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-soft)", fontSize: 12, padding: "4px 10px", borderRadius: 6 }}>esc</button>
+          <button onClick={onClose} style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-soft)", fontSize: 12, padding: "4px 10px", borderRadius: 6 }}>{t("search.close")}</button>
         </div>
         {q.trim() && (
           <div style={{ padding: "10px 12px", maxHeight: 420, overflowY: "auto" }}>
             {showEmptyState && (
               <div style={{ padding: "30px 16px", textAlign: "center", color: "var(--ink-soft)" }}>
-                <p>Sin resultados para &ldquo;{q}&rdquo;</p>
+                <p>{t("search.noResults", { query: q })}</p>
                 {categories.length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Prueba con estas categorías</div>
+                    <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>{t("search.tryCategories")}</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
                       {categories.map((c) => (
                         <button key={c.id} onClick={() => setQ(c.name)} style={{ padding: "6px 12px", borderRadius: 999, border: "1px solid var(--line)", background: "transparent", cursor: "pointer", fontSize: 12 }}>{c.name}</button>
@@ -109,7 +110,7 @@ export const SearchModal = ({ open, onClose, onOpenProduct }) => {
         )}
         {!q.trim() && (
           <div style={{ padding: "10px 22px 18px", display: "flex", flexWrap: "wrap", gap: 8 }}>
-            <span className="eyebrow" style={{ width: "100%", marginBottom: 4 }}>Búsquedas frecuentes</span>
+            <span className="eyebrow" style={{ width: "100%", marginBottom: 4 }}>{t("search.frequent")}</span>
             {FREQUENT_SEARCHES.map(t => (
               <button key={t} onClick={() => setQ(t)} style={{ padding: "6px 12px", borderRadius: 999, border: "1px solid var(--line)", background: "transparent", cursor: "pointer", fontSize: 12 }}>{t}</button>
             ))}

@@ -3,7 +3,11 @@
 // Se deja separación de 5–10 entre capas para permitir diálogos anidados sin colisionar.
 export const Z = {
   toast: 70, // App.jsx, notificación "agregado a la bolsa"
-  accountMenu: 79, // AccountMenu, dropdown desde el ícono de cuenta en Nav (no es un <Modal>)
+  catalogFilters: 76, // Products.jsx, bottom sheet de filtros en móvil (ProductFilters)
+  accountMenu: 79, // AccountMenu, dropdown desde el ícono de cuenta en Nav (no es un <Modal>);
+  // en móvil se abre como bottom sheet en esta misma capa.
+  localizationSwitcher: 79, // LocalizationSwitcher, dropdown de idioma/moneda en Nav (no es un <Modal>);
+  // misma capa que accountMenu porque nunca están abiertos los dos a la vez.
   cart: 80, // CartDrawer
   wishlist: 82, // WishlistModal
   search: 90, // SearchModal
@@ -29,4 +33,5 @@ export const Z = {
   // OrderDetailModal que vive dentro de OrderHistoryModal solo se monta si esa modal está abierta).
   // checkout ya no es modal: es una vista dedicada en /checkout (ver src/pages/CheckoutPage.jsx).
   verifyEmail: 121, // EmailVerificationModal (aterrizaje del enlace de verificación de correo)
+  adminNav: 108, // AdminLayout, bottom sheet "Más" del nav inferior de admin en móvil
 };

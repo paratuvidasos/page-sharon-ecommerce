@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Reveal } from "@ui/Reveal";
 import { Icon } from "@ui/Icon";
 import { getFeaturedProducts } from "@shared/api-client";
@@ -14,6 +15,7 @@ import { ProductCard } from "./ProductCard";
 // toggle de destacado (PATCH /admin/products/:id/featured) queda pendiente: no hay
 // desde dónde mostrarlo sin inventar una pantalla admin que nadie pidió.
 export const FeaturedProducts = ({ onWish, wishlistIds, onOpenProduct }) => {
+  const { t } = useTranslation("catalog");
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -38,13 +40,13 @@ export const FeaturedProducts = ({ onWish, wishlistIds, onOpenProduct }) => {
         <Reveal>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 24, marginBottom: 36 }}>
             <div>
-              <div className="eyebrow">Destacados y ofertas</div>
+              <div className="eyebrow">{t("featured.eyebrow")}</div>
               <h2 className="display" style={{ fontSize: "clamp(32px, 4vw, 48px)", margin: "8px 0 0" }}>
-                Lo que más nos piden
+                {t("featured.title")}
               </h2>
             </div>
             <Link to="/tienda" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ink)", borderBottom: "1px solid var(--ink)", paddingBottom: 4, textDecoration: "none" }}>
-              Ver catálogo completo <Icon name="arrow" size={14} />
+              {t("featured.viewAll")} <Icon name="arrow" size={14} />
             </Link>
           </div>
         </Reveal>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@ui/components/Button";
 import { retryPayment, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
@@ -11,6 +12,7 @@ import { BoldPaymentPanel } from "./BoldPaymentPanel";
 // método de pago y llama POST /orders/{orderNumber}/retry-payment, que devuelve una
 // sesión de Bold nueva con el mismo orderNumber.
 export const RetryPaymentPanel = ({ order, countryCode, currency, email }) => {
+  const { t } = useTranslation("checkout");
   const { getAccessToken } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +40,7 @@ export const RetryPaymentPanel = ({ order, countryCode, currency, email }) => {
     } catch (e) {
       setError({
         code: e instanceof ApiError ? e.code : null,
-        message: e instanceof ApiError ? e.message : "No pudimos reintentar el pago. Intenta de nuevo en unos segundos.",
+        message: e instanceof ApiError ? e.message : t("retryPaymentPanel.genericError"),
         lines: e instanceof ApiError ? e.lines : undefined,
       });
     } finally {
@@ -56,7 +58,7 @@ export const RetryPaymentPanel = ({ order, countryCode, currency, email }) => {
         disabled={submitting || !paymentMethod}
         style={{ width: "100%", justifyContent: "center", marginTop: 16 }}
       >
-        {submitting ? "Reintentando…" : "Reintentar pago"}
+        {submitting ? t("retryPaymentPanel.retrying") : t("retryPaymentPanel.retryButton")}
       </Button>
     </div>
   );

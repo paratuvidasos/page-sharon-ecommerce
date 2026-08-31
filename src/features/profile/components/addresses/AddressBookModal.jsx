@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -26,6 +27,7 @@ function withLocalFields(apiAddresses) {
 // para heredar gratis reglas de negocio que ya vive en el backend (primera activa =
 // predeterminada, promoción automática de la predeterminada al borrarla, etc.).
 export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => {
+  const { t } = useTranslation("profile");
   const { getAccessToken } = useAuth();
   const [formOpen, setFormOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
@@ -40,7 +42,7 @@ export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => 
       const list = await listAddresses(getAccessToken());
       setAddresses(withLocalFields(list));
     } catch {
-      setActionError("No pudimos cargar tus direcciones. Intenta de nuevo en unos segundos.");
+      setActionError(t("addresses.book.loadError"));
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => 
       await action();
       await refresh();
     } catch (e) {
-      setActionError(e instanceof ApiError && e.message ? e.message : "No pudimos completar la acción. Intenta de nuevo.");
+      setActionError(e instanceof ApiError && e.message ? e.message : t("addresses.book.actionError"));
     } finally {
       setPendingId(null);
     }
@@ -110,15 +112,15 @@ export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => 
           }}
         >
           <div>
-            <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Envíos</span>
+            <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>{t("addresses.book.eyebrow")}</span>
             <div id="address-book-title" className="display" style={{ fontSize: 24, marginTop: 6 }}>
-              Direcciones guardadas
+              {t("addresses.book.title")}
             </div>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 380 }}>
-              Agrega, edita o marca la dirección que usamos por defecto en tus pedidos.
+              {t("addresses.book.subtitle")}
             </p>
           </div>
-          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("addresses.book.close")} />
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -141,12 +143,12 @@ export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => 
 
           {loading ? (
             <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)", fontSize: 13 }}>
-              Cargando tus direcciones…
+              {t("addresses.book.loading")}
             </div>
           ) : addresses.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
               <Icon name="pin" size={26} />
-              <p style={{ fontSize: 13, marginTop: 10 }}>Todavía no tienes direcciones guardadas.</p>
+              <p style={{ fontSize: 13, marginTop: 10 }}>{t("addresses.book.empty")}</p>
             </div>
           ) : (
             addresses.map((address) => (
@@ -168,7 +170,7 @@ export const AddressBookModal = ({ open, onClose, addresses, setAddresses }) => 
 
         <div style={{ padding: "16px 26px 22px", borderTop: "1px solid var(--line)", background: "#fff", flexShrink: 0 }}>
           <Button type="button" variant="ghost" onClick={openAdd} style={{ width: "100%", justifyContent: "center", gap: 8 }}>
-            <Icon name="plus" size={16} /> Agregar dirección
+            <Icon name="plus" size={16} /> {t("addresses.book.add")}
           </Button>
         </div>
       </Modal>

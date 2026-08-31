@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
 import { BENEFITS } from "./data/benefits";
 
 export const Benefits = () => {
+  const { t } = useTranslation("home");
   return (
     <section id="beneficios" data-screen-label="Beneficios" style={{
       padding: "100px 0",
@@ -19,9 +21,9 @@ export const Benefits = () => {
       <div className="wrap" style={{ position: "relative", zIndex: 2 }}>
         <Reveal>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <div className="eyebrow">Ficha técnica</div>
+            <div className="eyebrow">{t("benefits.eyebrow")}</div>
             <h2 className="display" style={{ fontSize: "clamp(40px, 5vw, 64px)", margin: "10px 0 0" }}>
-              Cinco razones para <span className="script" style={{ color: "var(--botanic-deep)" }}>quedarte</span>
+              {t("benefits.title")} <span className="script" style={{ color: "var(--botanic-deep)" }}>{t("benefits.titleScript")}</span>
             </h2>
           </div>
         </Reveal>
@@ -45,8 +47,8 @@ export const Benefits = () => {
                 <span style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--botanic-muted)", display: "grid", placeItems: "center", flexShrink: 0, color: "var(--botanic-deep)" }}>
                   <Icon name={b.icon} size={20} stroke={1.5} />
                 </span>
-                <span className="display" style={{ fontSize: 22, fontWeight: 600, minWidth: 220 }}>{b.title}</span>
-                <span style={{ color: "var(--ink-soft)", fontSize: 14, flex: 1 }}>{b.desc}</span>
+                <span className="display" style={{ fontSize: 22, fontWeight: 600, minWidth: 220 }}>{t(`benefits.items.${b.id}.title`)}</span>
+                <span style={{ color: "var(--ink-soft)", fontSize: 14, flex: 1 }}>{t(`benefits.items.${b.id}.desc`)}</span>
               </div>
             </Reveal>
           ))}

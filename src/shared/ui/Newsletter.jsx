@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
 import { Button } from "./components/Button";
@@ -31,9 +32,13 @@ export const useEmailSubscribe = () => {
 // "Comunidad Sharon" + mención del -10%).
 export const NewsletterInline = ({
   eyebrow,
-  heading = <>Únete a <span className="script" style={{ color: "var(--botanic)" }}>Sharon</span></>,
+  heading,
 }) => {
+  const { t } = useTranslation("home");
   const { email, setEmail, sent, submit } = useEmailSubscribe();
+  const resolvedHeading = heading ?? (
+    <>{t("newsletterInline.headingPrefix")} <span className="script" style={{ color: "var(--botanic)" }}>{t("newsletterInline.headingScript")}</span></>
+  );
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }} className="nl-inline">
@@ -42,7 +47,7 @@ export const NewsletterInline = ({
           <div className="eyebrow" style={{ color: "var(--botanic)", marginBottom: 6 }}>{eyebrow}</div>
         )}
         <h2 className="display" style={{ fontSize: "clamp(28px, 3.4vw, 40px)", color: "var(--cream)", margin: 0 }}>
-          {heading}
+          {resolvedHeading}
         </h2>
       </div>
       <form onSubmit={submit} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -50,7 +55,7 @@ export const NewsletterInline = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
-          placeholder="Tu correo"
+          placeholder={t("newsletterInline.placeholder")}
           required
           style={{
             padding: "14px 20px", border: "1px solid rgba(255,255,255,.18)", borderRadius: 999,
@@ -59,7 +64,7 @@ export const NewsletterInline = ({
           }}
         />
         <Button type="submit" style={{ whiteSpace: "nowrap" }}>
-          {sent ? "¡Listo! ✧" : "Suscribirme"}
+          {sent ? t("newsletterInline.sent") : t("newsletterInline.submit")}
         </Button>
       </form>
     </div>
@@ -67,6 +72,7 @@ export const NewsletterInline = ({
 };
 
 export const Newsletter = ({ compact = false }) => {
+  const { t } = useTranslation("home");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -98,20 +104,20 @@ export const Newsletter = ({ compact = false }) => {
             }} />
 
             <div style={{ position: "relative" }}>
-              <div className="eyebrow">Comunidad Sharon</div>
+              <div className="eyebrow">{t("newsletter.eyebrow")}</div>
               <h2 className="display" style={{ fontSize: "clamp(36px, 4.5vw, 54px)", margin: "10px 0 16px" }}>
-                Recibe hábitos y un<br />
-                <span className="script" style={{ color: "var(--botanic-deep)" }}>-10%</span> en tu primera orden
+                {t("newsletter.titleLine1")}<br />
+                <span className="script" style={{ color: "var(--botanic-deep)" }}>{t("newsletter.titleScript")}</span> {t("newsletter.titleLine2")}
               </h2>
               <p style={{ color: "var(--ink-soft)", fontSize: 15, lineHeight: 1.65, maxWidth: 440 }}>
-                Una vez al mes, sin spam. Solo lanzamientos, guías y descuentos para nuestra comunidad.
+                {t("newsletter.description")}
               </p>
             </div>
 
             <form onSubmit={submit} style={{ position: "relative", display: "flex", flexDirection: "column", gap: 14 }}>
               <label style={{ display: "block" }}>
-                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Nombre</span>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Tu nombre"
+                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>{t("newsletter.nameLabel")}</span>
+                <input value={name} onChange={e => setName(e.target.value)} placeholder={t("newsletter.namePlaceholder")}
                   style={{
                     width: "100%", padding: "16px 20px", border: ".5px solid var(--line)",
                     borderRadius: 999, background: "#fff", fontSize: 15, fontFamily: "var(--sans)",
@@ -121,8 +127,8 @@ export const Newsletter = ({ compact = false }) => {
                   onBlur={e => e.target.style.borderColor = "var(--line)"} />
               </label>
               <label style={{ display: "block" }}>
-                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Correo</span>
-                <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="tu@email.com" required
+                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>{t("newsletter.emailLabel")}</span>
+                <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder={t("newsletter.emailPlaceholder")} required
                   style={{
                     width: "100%", padding: "16px 20px", border: ".5px solid var(--line)",
                     borderRadius: 999, background: "#fff", fontSize: 15, fontFamily: "var(--sans)",
@@ -132,10 +138,10 @@ export const Newsletter = ({ compact = false }) => {
                   onBlur={e => e.target.style.borderColor = "var(--line)"} />
               </label>
               <Button type="submit" style={{ justifyContent: "center", marginTop: 6 }}>
-                {sent ? "¡Suscripción confirmada ✦" : "Quiero mi -10%"} <Icon name="arrow" size={16} />
+                {sent ? t("newsletter.submitSent") : t("newsletter.submitDefault")} <Icon name="arrow" size={16} />
               </Button>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", textAlign: "center", marginTop: 4 }}>
-                Al suscribirte aceptas nuestra política de privacidad.
+                {t("newsletter.privacyNote")}
               </div>
             </form>
           </div>

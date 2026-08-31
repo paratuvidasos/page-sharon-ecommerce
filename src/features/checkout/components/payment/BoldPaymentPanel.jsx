@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { SimulatedPaymentPanel } from "./SimulatedPaymentPanel";
 
 const LAST_ORDER_KEY = "checkout:lastOrder";
@@ -8,6 +9,7 @@ const LAST_ORDER_KEY = "checkout:lastOrder";
 // el backend con la llave secreta, que nunca sale de ahí). Vuelve a montar cuando
 // cambia payment.referenceId (reintento de pago tras un rechazo, ver RetryPaymentPanel).
 export const BoldPaymentPanel = ({ payment, orderNumber, email }) => {
+  const { t } = useTranslation("checkout");
   const containerRef = useRef(null);
   const session = payment.session;
 
@@ -48,7 +50,7 @@ export const BoldPaymentPanel = ({ payment, orderNumber, email }) => {
     }
     return (
       <div role="alert" style={{ background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 14, padding: "14px 18px", fontSize: 13, color: "#7A3535" }}>
-        La pasarela de pago no está disponible en este momento. Escríbenos para completar tu pedido.
+        {t("boldPaymentPanel.unavailable")}
       </div>
     );
   }

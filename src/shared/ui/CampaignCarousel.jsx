@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { listPublicBanners } from "@shared/api-client";
 
@@ -17,6 +18,7 @@ function formatEndDate(iso) {
 // ver CLAUDE.md regla de no duplicar lógica de negocio). Sin banners, la sección
 // no se monta.
 export const CampaignCarousel = () => {
+  const { t } = useTranslation("home");
   const [banners, setBanners] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(0);
@@ -70,7 +72,7 @@ export const CampaignCarousel = () => {
         {endLabel && (
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }} className="mono" >
             <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic)" }} />
-            <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase" }}>Activo hasta el {endLabel}</span>
+            <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase" }}>{t("campaignCarousel.activeUntil", { date: endLabel })}</span>
           </div>
         )}
         <div className="display" style={{ fontSize: "clamp(32px, 4.5vw, 52px)", lineHeight: 1.02 }}>
@@ -86,7 +88,7 @@ export const CampaignCarousel = () => {
                 padding: "14px 24px", fontSize: 13.5, fontWeight: 600, color: "var(--cream)",
               }}
             >
-              Ver la campaña →
+              {t("campaignCarousel.viewCampaign")}
             </a>
           </div>
         )}
@@ -107,7 +109,7 @@ export const CampaignCarousel = () => {
               <button
                 key={b.id ?? i}
                 type="button"
-                aria-label={`Ir a la campaña ${i + 1}`}
+                aria-label={t("campaignCarousel.goToCampaign", { number: i + 1 })}
                 onClick={() => setIndex(i)}
                 style={{
                   width: i === index ? 34 : 10, height: 4, borderRadius: 999, border: 0, padding: 0, cursor: "pointer",
@@ -121,7 +123,7 @@ export const CampaignCarousel = () => {
           <div style={{ position: "absolute", right: 28, bottom: 26, display: "flex", gap: 10 }}>
             <button
               type="button"
-              aria-label="Campaña anterior"
+              aria-label={t("campaignCarousel.prevCampaign")}
               onClick={goPrev}
               style={{
                 width: 46, height: 46, borderRadius: "50%", cursor: "pointer",
@@ -133,7 +135,7 @@ export const CampaignCarousel = () => {
             </button>
             <button
               type="button"
-              aria-label="Siguiente campaña"
+              aria-label={t("campaignCarousel.nextCampaign")}
               onClick={goNext}
               style={{
                 width: 46, height: 46, borderRadius: "50%", cursor: "pointer",

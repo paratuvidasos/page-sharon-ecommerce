@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { selectStyle, fieldLabelStyle, optionCardStyle } from "../fieldStyles";
 import { ShippingAddressFields } from "./ShippingAddressFields";
 
@@ -11,6 +12,7 @@ const MANUAL_ADDRESS = "manual";
 // formulario en blanco para crear la dirección ahí mismo — nunca un modal (acá el
 // checkout ya es una página aparte, no hace falta anidar).
 export const AddressStep = ({ addresses, selectedAddressId, onSelectAddress, manual, errors, touched, onManualChange, onManualBlur }) => {
+  const { t } = useTranslation("checkout");
   const [changing, setChanging] = useState(false);
   const savedAddresses = useMemo(() => (addresses || []).filter((a) => !a.archived), [addresses]);
   const selected = savedAddresses.find((a) => a.id === selectedAddressId);
@@ -19,7 +21,7 @@ export const AddressStep = ({ addresses, selectedAddressId, onSelectAddress, man
   if (!isManual && selected && !changing) {
     return (
       <div style={{ ...optionCardStyle, padding: "16px 18px" }}>
-        <div className="eyebrow" style={fieldLabelStyle}>Entregar en</div>
+        <div className="eyebrow" style={fieldLabelStyle}>{t("addressStep.deliverTo")}</div>
         <div style={{ fontSize: 14, lineHeight: 1.6 }}>
           <strong>{selected.alias}</strong> — {selected.recipientName}
           <br />
@@ -32,7 +34,7 @@ export const AddressStep = ({ addresses, selectedAddressId, onSelectAddress, man
           onClick={() => setChanging(true)}
           style={{ background: "none", border: 0, padding: 0, marginTop: 10, color: "var(--botanic-deep)", fontSize: 12, fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}
         >
-          Cambiar dirección
+          {t("addressStep.changeAddress")}
         </button>
       </div>
     );
@@ -42,7 +44,7 @@ export const AddressStep = ({ addresses, selectedAddressId, onSelectAddress, man
     <div>
       {savedAddresses.length > 0 && (
         <label style={{ display: "block", marginBottom: 14 }}>
-          <span className="eyebrow" style={fieldLabelStyle}>Dirección guardada</span>
+          <span className="eyebrow" style={fieldLabelStyle}>{t("addressStep.savedAddress")}</span>
           <select
             value={selectedAddressId}
             onChange={(e) => {
@@ -53,10 +55,10 @@ export const AddressStep = ({ addresses, selectedAddressId, onSelectAddress, man
           >
             {savedAddresses.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.alias}{a.isDefault ? " (predeterminada)" : ""}
+                {a.alias}{a.isDefault ? t("addressStep.defaultSuffix") : ""}
               </option>
             ))}
-            <option value={MANUAL_ADDRESS}>+ Agregar una dirección nueva</option>
+            <option value={MANUAL_ADDRESS}>{t("addressStep.addNew")}</option>
           </select>
         </label>
       )}

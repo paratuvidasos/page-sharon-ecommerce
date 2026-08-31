@@ -1,0 +1,153 @@
+{
+  "addressStep": {
+    "deliverTo": "Entregar en",
+    "changeAddress": "Cambiar dirección",
+    "savedAddress": "Dirección guardada",
+    "defaultSuffix": " (predeterminada)",
+    "addNew": "+ Agregar una dirección nueva"
+  },
+  "errorBanner": {
+    "codes": {
+      "CHECKOUT_PRICE_CHANGED": "El precio de algunos productos cambió",
+      "CHECKOUT_ITEM_UNAVAILABLE": "Algunos productos ya no están disponibles",
+      "VARIANT_OUT_OF_STOCK": "Un producto se agotó mientras confirmábamos tu pedido",
+      "NO_SHIPPING_COVERAGE": "No hacemos envíos a esa dirección",
+      "SHIPPING_METHOD_NOT_AVAILABLE": "Ese método de envío ya no está disponible",
+      "PAYMENT_METHOD_NOT_AVAILABLE": "Ese método de pago ya no está disponible",
+      "PRODUCTS_RESTRICTED_FOR_ZONE": "Algunos productos no se pueden enviar a esa zona"
+    },
+    "genericTitle": "No pudimos procesar tu pedido",
+    "productFallback": "Producto",
+    "priceChange": "— antes {{previous}}, ahora {{current}}",
+    "availableQuantity": "— quedan {{count}} disponibles",
+    "refreshCartAndRetry": "Actualizar carrito y reintentar",
+    "removeCoupon": "Quitar cupón"
+  },
+  "contactStep": {
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tucorreo@ejemplo.com",
+    "emailHint": "Ahí te enviamos la confirmación de tu pedido.",
+    "createAccount": "Crear una cuenta con estos datos",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Tu nombre",
+    "lastName": "Apellido",
+    "lastNamePlaceholder": "Tu apellido",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Mínimo 8 caracteres",
+    "passwordHint": "Mínimo 8 caracteres, con una letra y un número.",
+    "showPassword": "Ver",
+    "hidePassword": "Ocultar",
+    "showPasswordAria": "Mostrar contraseña",
+    "hidePasswordAria": "Ocultar contraseña"
+  },
+  "orderSummary": {
+    "title": "Resumen del pedido",
+    "quantity": "Cantidad: {{count}}",
+    "subtotal": "Subtotal",
+    "discount": "Descuento",
+    "discountWithCode": "Descuento ({{code}})",
+    "shipping": "Envío",
+    "shippingTBD": "Por definir",
+    "free": "Gratis",
+    "total": "Total"
+  },
+  "paymentMethodStep": {
+    "title": "Método de pago",
+    "description": "Los pagos con tarjeta o Bold se procesan de forma encriptada. También puedes coordinar tu pago directo por WhatsApp.",
+    "loading": "Cargando métodos de pago…",
+    "loadError": "No pudimos cargar los métodos de pago.",
+    "card": {
+      "label": "Tarjeta de crédito o débito",
+      "description": "Visa, Mastercard, American Express y Diners."
+    },
+    "bold": {
+      "label": "Paga con Bold",
+      "description": "Serás redirigido a Bold para completar el pago de forma segura."
+    },
+    "whatsapp": {
+      "label": "Pagar por WhatsApp",
+      "description": "Te armamos el resumen de tu pedido, listo para enviarnos por chat."
+    }
+  },
+  "shippingAddressFields": {
+    "recipientName": "Nombre de quien recibe",
+    "recipientNamePlaceholder": "Quién recibe el pedido",
+    "country": "País",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "addressPlaceholder": "Calle, número…",
+    "addressLine2": "Apto, interior o referencia (opcional)",
+    "addressLine2Placeholder": "Apto 501, torre 2…",
+    "stateProvince": "Departamento / estado",
+    "stateProvincePlaceholder": "Tu departamento o estado",
+    "city": "Ciudad",
+    "cityPlaceholder": "Tu ciudad",
+    "postalCode": "Código postal",
+    "postalCodeHint": "Ej. {{example}}"
+  },
+  "shippingMethodStep": {
+    "title": "Método de envío",
+    "noAddress": "Ingresa tu dirección de envío para ver los métodos disponibles.",
+    "loading": "Cotizando envío…",
+    "genericError": "No pudimos cotizar el envío. Intenta de nuevo.",
+    "noShippingCoverage": "No hacemos envíos a esa dirección todavía.",
+    "free": "Gratis",
+    "days_one": "{{count}} día",
+    "days_other": "{{count}} días",
+    "daysRange": "{{min}}-{{max}} días",
+    "restrictedTitle": "Algunos productos de tu bolsa no se pueden enviar a esta dirección",
+    "restrictedHint": "Cambia el destino o quita esos productos de la bolsa antes de pagar."
+  },
+  "boldPaymentPanel": {
+    "unavailable": "La pasarela de pago no está disponible en este momento. Escríbenos para completar tu pedido."
+  },
+  "retryPaymentPanel": {
+    "retrying": "Reintentando…",
+    "retryButton": "Reintentar pago",
+    "genericError": "No pudimos reintentar el pago. Intenta de nuevo en unos segundos."
+  },
+  "simulatedPaymentPanel": {
+    "badge": "Pasarela en modo simulado",
+    "description": "Todavía no hay cuenta de Bold conectada. Usa estos botones para probar el flujo.",
+    "simulatingApproved": "Simulando…",
+    "simulatingRejected": "Simulando…",
+    "approveButton": "Simular pago aprobado",
+    "rejectButton": "Simular pago rechazado"
+  },
+  "checkoutPage": {
+    "title": "Finalizar compra",
+    "titlePaying": "Completa tu pago",
+    "steps": {
+      "contact": "Contacto",
+      "delivery": "Entrega",
+      "shipping": "Envío",
+      "payment": "Pago"
+    },
+    "selectShippingMethod": "Selecciona un método de envío antes de continuar.",
+    "selectPaymentMethod": "Selecciona un método de pago antes de continuar.",
+    "processing": "Procesando…",
+    "payNow": "Pagar ahora",
+    "continueWhatsapp": "Continuar por WhatsApp",
+    "whatsappNotice": "Abrimos WhatsApp con tu pedido listo — solo dale enviar. Si no se abrió, revisa que tu navegador no haya bloqueado la ventana emergente.",
+    "termsNotice": "Al confirmar aceptas nuestros términos y condiciones.",
+    "genericError": "No pudimos procesar tu pedido. Intenta de nuevo en unos segundos.",
+    "orderRegistered": "Tu pedido <strong>{{orderNumber}}</strong> quedó registrado. Completa el pago para confirmarlo.",
+    "total": "Total"
+  },
+  "checkoutResultPage": {
+    "confirming": "Estamos confirmando tu pago…",
+    "dontClose": "Esto puede tardar unos segundos. No cierres esta ventana.",
+    "timeoutTitle": "Tu pago puede tardar unos minutos más",
+    "timeoutDescription": "Te avisamos por correo apenas se confirme, o puedes comprobar de nuevo.",
+    "checkAgain": "Comprobar de nuevo",
+    "notFoundTitle": "No encontramos ese pedido",
+    "notFoundDescription": "Revisa el enlace o contáctanos si el problema persiste.",
+    "goToStore": "Ir a la tienda",
+    "paidTitle": "¡Pedido confirmado!",
+    "paidDescription": "Tu pedido <strong>{{orderNumber}}</strong> quedó registrado por <strong2>{{total}}</strong2>. Te avisamos por correo cuando cambie de estado.",
+    "keepShopping": "Seguir comprando",
+    "failedTitle": "No pudimos procesar tu pago",
+    "failedFallback": "Intenta con otro método de pago.",
+    "boldReported": "Bold reportó: {{status}}. Confirmando con nuestro servidor…"
+  }
+}

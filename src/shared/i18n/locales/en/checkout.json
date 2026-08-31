@@ -1,0 +1,153 @@
+{
+  "addressStep": {
+    "deliverTo": "Deliver to",
+    "changeAddress": "Change address",
+    "savedAddress": "Saved address",
+    "defaultSuffix": " (default)",
+    "addNew": "+ Add a new address"
+  },
+  "errorBanner": {
+    "codes": {
+      "CHECKOUT_PRICE_CHANGED": "The price of some products changed",
+      "CHECKOUT_ITEM_UNAVAILABLE": "Some products are no longer available",
+      "VARIANT_OUT_OF_STOCK": "A product sold out while we were confirming your order",
+      "NO_SHIPPING_COVERAGE": "We don't ship to that address",
+      "SHIPPING_METHOD_NOT_AVAILABLE": "That shipping method is no longer available",
+      "PAYMENT_METHOD_NOT_AVAILABLE": "That payment method is no longer available",
+      "PRODUCTS_RESTRICTED_FOR_ZONE": "Some products can't be shipped to that area"
+    },
+    "genericTitle": "We couldn't process your order",
+    "productFallback": "Product",
+    "priceChange": "— was {{previous}}, now {{current}}",
+    "availableQuantity": "— {{count}} left in stock",
+    "refreshCartAndRetry": "Refresh cart and retry",
+    "removeCoupon": "Remove coupon"
+  },
+  "contactStep": {
+    "email": "Email address",
+    "emailPlaceholder": "youremail@example.com",
+    "emailHint": "We'll send your order confirmation there.",
+    "createAccount": "Create an account with this info",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Your first name",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Your last name",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "passwordHint": "At least 8 characters, with a letter and a number.",
+    "showPassword": "Show",
+    "hidePassword": "Hide",
+    "showPasswordAria": "Show password",
+    "hidePasswordAria": "Hide password"
+  },
+  "orderSummary": {
+    "title": "Order summary",
+    "quantity": "Quantity: {{count}}",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "discountWithCode": "Discount ({{code}})",
+    "shipping": "Shipping",
+    "shippingTBD": "To be determined",
+    "free": "Free",
+    "total": "Total"
+  },
+  "paymentMethodStep": {
+    "title": "Payment method",
+    "description": "Card and Bold payments are processed securely. You can also arrange payment directly over WhatsApp.",
+    "loading": "Loading payment methods…",
+    "loadError": "We couldn't load the payment methods.",
+    "card": {
+      "label": "Credit or debit card",
+      "description": "Visa, Mastercard, American Express, and Diners."
+    },
+    "bold": {
+      "label": "Pay with Bold",
+      "description": "You'll be redirected to Bold to complete your payment securely."
+    },
+    "whatsapp": {
+      "label": "Pay via WhatsApp",
+      "description": "We'll put together your order summary, ready to send us over chat."
+    }
+  },
+  "shippingAddressFields": {
+    "recipientName": "Recipient's name",
+    "recipientNamePlaceholder": "Who will receive the order",
+    "country": "Country",
+    "phone": "Phone",
+    "address": "Address",
+    "addressPlaceholder": "Street, number…",
+    "addressLine2": "Apartment, unit, or reference (optional)",
+    "addressLine2Placeholder": "Apt 501, building 2…",
+    "stateProvince": "State / province",
+    "stateProvincePlaceholder": "Your state or province",
+    "city": "City",
+    "cityPlaceholder": "Your city",
+    "postalCode": "Postal code",
+    "postalCodeHint": "E.g. {{example}}"
+  },
+  "shippingMethodStep": {
+    "title": "Shipping method",
+    "noAddress": "Enter your shipping address to see the available methods.",
+    "loading": "Getting shipping quotes…",
+    "genericError": "We couldn't get a shipping quote. Please try again.",
+    "noShippingCoverage": "We don't ship to that address yet.",
+    "free": "Free",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "daysRange": "{{min}}-{{max}} days",
+    "restrictedTitle": "Some products in your bag can't be shipped to this address",
+    "restrictedHint": "Change the destination or remove those products from your bag before checking out."
+  },
+  "boldPaymentPanel": {
+    "unavailable": "The payment gateway isn't available right now. Contact us to complete your order."
+  },
+  "retryPaymentPanel": {
+    "retrying": "Retrying…",
+    "retryButton": "Retry payment",
+    "genericError": "We couldn't retry the payment. Please try again in a few seconds."
+  },
+  "simulatedPaymentPanel": {
+    "badge": "Gateway in simulated mode",
+    "description": "There's no Bold account connected yet. Use these buttons to test the flow.",
+    "simulatingApproved": "Simulating…",
+    "simulatingRejected": "Simulating…",
+    "approveButton": "Simulate approved payment",
+    "rejectButton": "Simulate rejected payment"
+  },
+  "checkoutPage": {
+    "title": "Checkout",
+    "titlePaying": "Complete your payment",
+    "steps": {
+      "contact": "Contact",
+      "delivery": "Delivery",
+      "shipping": "Shipping",
+      "payment": "Payment"
+    },
+    "selectShippingMethod": "Select a shipping method before continuing.",
+    "selectPaymentMethod": "Select a payment method before continuing.",
+    "processing": "Processing…",
+    "payNow": "Pay now",
+    "continueWhatsapp": "Continue via WhatsApp",
+    "whatsappNotice": "We opened WhatsApp with your order ready — just hit send. If it didn't open, check that your browser didn't block the pop-up.",
+    "termsNotice": "By confirming you accept our terms and conditions.",
+    "genericError": "We couldn't process your order. Please try again in a few seconds.",
+    "orderRegistered": "Your order <strong>{{orderNumber}}</strong> was registered. Complete the payment to confirm it.",
+    "total": "Total"
+  },
+  "checkoutResultPage": {
+    "confirming": "We're confirming your payment…",
+    "dontClose": "This can take a few seconds. Don't close this window.",
+    "timeoutTitle": "Your payment may take a few more minutes",
+    "timeoutDescription": "We'll let you know by email as soon as it's confirmed, or you can check again.",
+    "checkAgain": "Check again",
+    "notFoundTitle": "We couldn't find that order",
+    "notFoundDescription": "Check the link or contact us if the problem continues.",
+    "goToStore": "Go to the shop",
+    "paidTitle": "Order confirmed!",
+    "paidDescription": "Your order <strong>{{orderNumber}}</strong> was registered for <strong2>{{total}}</strong2>. We'll let you know by email when it changes status.",
+    "keepShopping": "Keep shopping",
+    "failedTitle": "We couldn't process your payment",
+    "failedFallback": "Try a different payment method.",
+    "boldReported": "Bold reported: {{status}}. Confirming with our server…"
+  }
+}

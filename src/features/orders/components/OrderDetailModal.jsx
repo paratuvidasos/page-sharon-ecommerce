@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { IconButton } from "@ui/components/IconButton";
 import { ProductImage } from "@ui/ProductImage";
 import { Modal } from "@ui/components/Modal";
@@ -34,6 +35,7 @@ const formatDateTime = (isoDate) =>
 // historial), igual se pide el detalle fresco — es la única forma de tener
 // `statusHistory` sin duplicar esa lógica en cada lugar que abre este modal.
 export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDetail }) => {
+  const { t } = useTranslation("orders");
   const { getAccessToken } = useAuth();
   const [detail, setDetail] = useState(null);
 
@@ -87,7 +89,7 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
         }}
       >
         <div>
-          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Pedido {order.orderNumber}</span>
+          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>{t("detail.eyebrowOrder", { orderNumber: order.orderNumber })}</span>
           <div id="order-detail-title" className="display" style={{ fontSize: 22, marginTop: 6 }}>
             {formatDate(order.placedAt)}
           </div>
@@ -105,10 +107,10 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
               borderRadius: 999,
             }}
           >
-            {status.label}
+            {t(`statusLabels.${status.value}`)}
           </span>
         </div>
-        <IconButton icon="close" size={36} iconSize={18} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={36} iconSize={18} onClick={onClose} aria-label={t("detail.close")} />
       </div>
 
       <div className="stitch" style={{ margin: "18px 26px 0", flexShrink: 0 }} />

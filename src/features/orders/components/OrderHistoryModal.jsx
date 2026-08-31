@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Modal } from "@ui/components/Modal";
@@ -26,6 +27,7 @@ const INITIAL_FILTERS = { status: "all", from: "", to: "" };
 // AccountMenu, no anidada dentro de ProfileModal). El detalle de cada pedido vive en
 // OrderDetailModal, anidado a su vez dentro de este.
 export const OrderHistoryModal = ({ open, onClose, orders }) => {
+  const { t } = useTranslation("orders");
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -75,22 +77,22 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }} />
-              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Tu cuenta</span>
+              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>{t("history.eyebrow")}</span>
             </div>
             <div id="order-history-title" className="display" style={{ fontSize: 24 }}>
-              Historial de pedidos
+              {t("history.title")}
             </div>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 380 }}>
-              Consulta el estado, contenido y monto de tus pedidos anteriores.
+              {t("history.subtitle")}
             </p>
           </div>
-          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+          <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("history.close")} />
         </div>
 
         <div style={{ padding: "20px 26px", borderBottom: "1px dashed rgba(27,24,21,.16)", flexShrink: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 14 }} className="order-filters-grid">
             <label style={{ display: "block" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Desde</span>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>{t("history.filters.from")}</span>
               <input
                 type="date"
                 value={filters.from}
@@ -100,7 +102,7 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
               />
             </label>
             <label style={{ display: "block" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Hasta</span>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>{t("history.filters.to")}</span>
               <input
                 type="date"
                 value={filters.to}
@@ -110,15 +112,15 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
               />
             </label>
             <label style={{ display: "block" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>Estado</span>
+              <span style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 }}>{t("history.filters.status")}</span>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
                 style={filterInputStyle}
               >
-                <option value="all">Todos</option>
+                <option value="all">{t("history.filters.all")}</option>
                 {ORDER_STATUSES.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                  <option key={s.value} value={s.value}>{t(`statusLabels.${s.value}`)}</option>
                 ))}
               </select>
             </label>
@@ -129,7 +131,7 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
               onClick={() => setFilters(INITIAL_FILTERS)}
               style={{ marginTop: 10, background: "none", border: 0, padding: 0, fontSize: 12.5, color: "var(--ink-soft)", textDecoration: "underline", cursor: "pointer" }}
             >
-              Limpiar filtros
+              {t("history.filters.clear")}
             </button>
           )}
         </div>
@@ -138,11 +140,11 @@ export const OrderHistoryModal = ({ open, onClose, orders }) => {
           {orders.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
               <Icon name="cart" size={26} />
-              <p style={{ fontSize: 13, marginTop: 10 }}>Todavía no tienes pedidos.</p>
+              <p style={{ fontSize: 13, marginTop: 10 }}>{t("history.empty")}</p>
             </div>
           ) : filteredOrders.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
-              <p style={{ fontSize: 13 }}>No encontramos pedidos con estos filtros.</p>
+              <p style={{ fontSize: 13 }}>{t("history.noResults")}</p>
             </div>
           ) : (
             filteredOrders.map((order) => (

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Reveal } from "./Reveal";
 import { Icon } from "./Icon";
 import { Button } from "./components/Button";
@@ -12,6 +13,7 @@ import FotoHelechos from "@assets/img/sharon_img_5.jpg";
 // oscura. Reemplaza los OfferBanner + Newsletter que antes eran dos secciones
 // seguidas.
 export const OfferBanner = () => {
+  const { t } = useTranslation("home");
   return (
     <section style={{ padding: "100px 0" }}>
       <div className="wrap">
@@ -35,16 +37,16 @@ export const OfferBanner = () => {
               </svg>
 
               <div style={{ position: "relative", zIndex: 2 }}>
-                <div className="eyebrow">Oferta Especial · Solo esta semana</div>
+                <div className="eyebrow">{t("offerBanner.eyebrow")}</div>
                 <h2 className="display" style={{ fontSize: "clamp(36px, 5.4vw, 64px)", margin: "12px 0 18px", lineHeight: 1 }}>
-                  Kit <span className="script" style={{ color: "var(--botanic-deep)" }}>Sharon</span> completo
+                  {t("offerBanner.title1")} <span className="script" style={{ color: "var(--botanic-deep)" }}>{t("offerBanner.titleScript")}</span> {t("offerBanner.title2")}
                 </h2>
                 <p style={{ fontSize: 16, color: "var(--ink-soft)", lineHeight: 1.6, maxWidth: 420, marginBottom: 28 }}>
-                  Tónico, mascarilla, engrosante y cepillo masajeador. La rutina premium en un solo gesto.
+                  {t("offerBanner.description")}
                 </p>
 
-                <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 26 }}>
-                  <span className="display" style={{ fontSize: 48, color: "var(--ink)" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 26, flexWrap: "wrap" }}>
+                  <span className="display" style={{ fontSize: "clamp(32px, 8vw, 48px)", color: "var(--ink)" }}>
                     ${Intl.NumberFormat("es-CO").format(138000)}
                   </span>
                   <span style={{ fontSize: 18, color: "var(--ink-soft)", textDecoration: "line-through" }}>${Intl.NumberFormat("es-CO").format(150000)}</span>
@@ -56,14 +58,14 @@ export const OfferBanner = () => {
                 </div>
 
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <Button>Llevar el kit <Icon name="arrow" size={16} /></Button>
-                  <Button as="a" href="#shop" variant="ghost">Ver qué incluye</Button>
+                  <Button>{t("offerBanner.ctaBuy")} <Icon name="arrow" size={16} /></Button>
+                  <Button as="a" href="#shop" variant="ghost">{t("offerBanner.ctaView")}</Button>
                 </div>
 
                 <div style={{ display: "flex", gap: 20, marginTop: 26, flexWrap: "wrap", color: "var(--ink-soft)", fontSize: 12 }}>
-                  <span>✦ Envío gratis</span>
-                  <span>✦ Devolución en 30 días</span>
-                  <span>✦ Stock limitado</span>
+                  <span>✦ {t("offerBanner.freeShipping")}</span>
+                  <span>✦ {t("offerBanner.freeReturn")}</span>
+                  <span>✦ {t("offerBanner.limitedStock")}</span>
                 </div>
               </div>
 
@@ -73,21 +75,21 @@ export const OfferBanner = () => {
                 gap: 12, height: 400,
               }} className="offer-kit">
                 <div style={{ gridRow: "span 2", borderRadius: 22, overflow: "hidden", background: "var(--botanic-muted)" }}>
-                  <img src={FotoMascarilla} alt="Mascarilla capilar en manos" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={FotoMascarilla} alt={t("offerBanner.altMask")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div style={{ borderRadius: 22, overflow: "hidden", background: "var(--botanic-muted)" }}>
-                  <img src={FotoTonico} alt="Tónico capilar acelerador de crecimiento" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={FotoTonico} alt={t("offerBanner.altTonic")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div style={{ borderRadius: 22, overflow: "hidden", background: "var(--botanic-muted)" }}>
-                  <img src={FotoHelechos} alt="Mascarilla capilar entre helechos" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={FotoHelechos} alt={t("offerBanner.altFerns")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
               </div>
             </div>
 
             <div style={{ background: "var(--ink)", padding: "clamp(26px, 3.6vw, 34px) clamp(28px, 6vw, 60px)" }}>
               <NewsletterInline
-                eyebrow="Comunidad Sharon"
-                heading={<>Súmate y recibe un <span className="script" style={{ color: "var(--botanic)" }}>-10%</span> en tu primera orden</>}
+                eyebrow={t("offerBanner.community.eyebrow")}
+                heading={<>{t("offerBanner.community.headingPrefix")} <span className="script" style={{ color: "var(--botanic)" }}>{t("offerBanner.community.headingDiscount")}</span> {t("offerBanner.community.headingSuffix")}</>}
               />
             </div>
           </div>

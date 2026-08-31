@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@ui/components/Button";
 import { simulatePaymentStatus } from "@shared/api-client";
 
@@ -7,6 +8,7 @@ import { simulatePaymentStatus } from "@shared/api-client";
 // vacío + sandbox:true. Solo visible en desarrollo (gateado por import.meta.env.DEV
 // en BoldPaymentPanel) para poder probar [0038]-[0040] sin la pasarela real.
 export const SimulatedPaymentPanel = ({ orderNumber, referenceId, email }) => {
+  const { t } = useTranslation("checkout");
   const navigate = useNavigate();
   const [pending, setPending] = useState(null);
 
@@ -29,16 +31,16 @@ export const SimulatedPaymentPanel = ({ orderNumber, referenceId, email }) => {
 
   return (
     <div style={{ border: ".5px solid var(--line)", borderRadius: 16, padding: "18px 20px" }}>
-      <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>Pasarela en modo simulado</div>
+      <div className="eyebrow" style={{ fontSize: 10, marginBottom: 8 }}>{t("simulatedPaymentPanel.badge")}</div>
       <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 14 }}>
-        Todavía no hay cuenta de Bold conectada. Usa estos botones para probar el flujo.
+        {t("simulatedPaymentPanel.description")}
       </p>
       <div style={{ display: "flex", gap: 10 }}>
         <Button type="button" onClick={() => simulate("approved")} disabled={pending !== null}>
-          {pending === "approved" ? "Simulando…" : "Simular pago aprobado"}
+          {pending === "approved" ? t("simulatedPaymentPanel.simulatingApproved") : t("simulatedPaymentPanel.approveButton")}
         </Button>
         <Button type="button" variant="ghost" onClick={() => simulate("rejected")} disabled={pending !== null}>
-          {pending === "rejected" ? "Simulando…" : "Simular pago rechazado"}
+          {pending === "rejected" ? t("simulatedPaymentPanel.simulatingRejected") : t("simulatedPaymentPanel.rejectButton")}
         </Button>
       </div>
     </div>

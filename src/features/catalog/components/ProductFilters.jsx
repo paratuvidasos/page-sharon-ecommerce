@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@shared/i18n/currency";
 
 const groupLabelStyle = {
@@ -50,9 +51,9 @@ const inputStyle = {
 };
 
 const FACETS = [
-  { key: "hairType", label: "Tipo de cabello", facetKey: "hairType" },
-  { key: "line", label: "Línea", facetKey: "line" },
-  { key: "ingredient", label: "Ingrediente principal", facetKey: "mainIngredient" },
+  { key: "hairType", labelKey: "filters.groups.hairType", facetKey: "hairType" },
+  { key: "line", labelKey: "filters.groups.line", facetKey: "line" },
+  { key: "ingredient", labelKey: "filters.groups.ingredient", facetKey: "mainIngredient" },
 ];
 
 // Sidebar de filtros al estilo de referencias de e-commerce como Undergold: grupos
@@ -69,6 +70,7 @@ export const ProductFilters = ({
   selected,
   onChange,
 }) => {
+  const { t } = useTranslation("catalog");
   const hasActiveFilters = selected.hairType || selected.line || selected.ingredient || selected.priceMin || selected.priceMax || categoryId;
 
   const toggleAttr = (key, value) => {
@@ -83,23 +85,23 @@ export const ProductFilters = ({
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase" }}>Filtrar</span>
+        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase" }}>{t("filters.title")}</span>
         {hasActiveFilters && (
           <button
             type="button"
             onClick={clearAll}
             style={{ background: "none", border: 0, padding: 0, fontSize: 11, color: "var(--ink-soft)", textDecoration: "underline", cursor: "pointer" }}
           >
-            Limpiar
+            {t("filters.clear")}
           </button>
         )}
       </div>
 
       {categories && categories.length > 0 && (
         <div style={{ marginBottom: 28 }}>
-          <div style={groupLabelStyle}>Categoría</div>
+          <div style={groupLabelStyle}>{t("filters.category")}</div>
           <button onClick={() => onCategoryChange(null)} style={rowStyle(categoryId === null)}>
-            <span>Todo</span>
+            <span>{t("filters.all")}</span>
             <span style={checkboxStyle(categoryId === null)} />
           </button>
           {categories.map((c) => (
@@ -111,12 +113,12 @@ export const ProductFilters = ({
         </div>
       )}
 
-      {facets && FACETS.map(({ key, label, facetKey }) => {
+      {facets && FACETS.map(({ key, labelKey, facetKey }) => {
         const options = facets[facetKey];
         if (!options || options.length === 0) return null;
         return (
           <div key={key} style={{ marginBottom: 28 }}>
-            <div style={groupLabelStyle}>{label}</div>
+            <div style={groupLabelStyle}>{t(labelKey)}</div>
             {options.map((opt) => {
               const active = selected[key] === opt.value;
               const disabled = opt.count === 0 && !active;
@@ -141,18 +143,18 @@ export const ProductFilters = ({
 
       {facets?.priceRange && (
         <div style={{ marginBottom: 28 }}>
-          <div style={groupLabelStyle}>Precio</div>
+          <div style={groupLabelStyle}>{t("filters.price")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <input
               type="number"
-              placeholder={`Desde ${formatCurrency(facets.priceRange.min)}`}
+              placeholder={t("filters.priceFrom", { amount: formatCurrency(facets.priceRange.min) })}
               value={selected.priceMin ?? ""}
               onChange={(e) => onChange({ ...selected, priceMin: e.target.value ? Number(e.target.value) : null })}
               style={inputStyle}
             />
             <input
               type="number"
-              placeholder={`Hasta ${formatCurrency(facets.priceRange.max)}`}
+              placeholder={t("filters.priceTo", { amount: formatCurrency(facets.priceRange.max) })}
               value={selected.priceMax ?? ""}
               onChange={(e) => onChange({ ...selected, priceMax: e.target.value ? Number(e.target.value) : null })}
               style={inputStyle}

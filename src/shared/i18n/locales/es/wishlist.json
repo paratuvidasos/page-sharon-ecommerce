@@ -1,0 +1,11 @@
+{
+  "modal": {
+    "eyebrow": "Favoritos",
+    "title": "Tu lista de deseos",
+    "close": "Cerrar",
+    "loading": "Cargando tus favoritos…",
+    "loadError": "No pudimos cargar tus favoritos. Intenta de nuevo.",
+    "empty": "Todavía no guardas productos."
+  },
+  "row": { "add": "Añadir", "remove": "Quitar de favoritos" }
+}
