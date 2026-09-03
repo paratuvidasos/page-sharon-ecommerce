@@ -24,4 +24,17 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, 'src/hooks')
     },
   },
+  server: {
+    watch: {
+      // El bind mount de Docker Desktop (macOS/Windows) no propaga eventos nativos
+      // del filesystem (inotify) al contenedor: sin esto, chokidar se queda esperando
+      // cambios que nunca le llegan y el hot reload no dispara aunque el archivo sí
+      // cambió en el host (visible con `docker logs`, que no muestra ningún rebuild).
+      // CHOKIDAR_USEPOLLING=true lo pone docker-compose.yml solo para el contenedor;
+      // en dev local (fuera de Docker) esta variable no existe y sigue usando el
+      // watcher nativo, más liviano.
+      usePolling: process.env.CHOKIDAR_USEPOLLING === 'true',
+      interval: 300,
+    },
+  },
 })

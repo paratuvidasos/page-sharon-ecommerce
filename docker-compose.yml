@@ -12,6 +12,12 @@ services:
       - "5190:5190"
     env_file:
       - .env
+    environment:
+      # Necesario para que el hot reload funcione de verdad: el bind mount de Docker
+      # Desktop (macOS/Windows) no propaga eventos nativos de filesystem al contenedor,
+      # así que sin esto Vite se queda esperando cambios que nunca detecta (ver
+      # vite.config.js). No aplica a dev fuera de Docker, ahí no se define esta variable.
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       # Código fuente montado para hot reload al editar en el host.
       - .:/app
