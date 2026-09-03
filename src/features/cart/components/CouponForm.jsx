@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useCart } from "@shared/cart/CartContext";
 import { formatCurrency } from "@shared/i18n/currency";
 
@@ -17,6 +18,7 @@ const inputStyle = {
 // /cart/coupon. El mensaje de error se muestra tal cual lo devuelve el backend
 // (404 no existe, 400 vencido/no vigente/compra mínima/límite de usos).
 export const CouponForm = () => {
+  const { t } = useTranslation("cart");
   const { cart, applyCoupon, removeCoupon } = useCart();
   const [code, setCode] = useState("");
   const [pending, setPending] = useState(false);
@@ -29,7 +31,7 @@ export const CouponForm = () => {
     const result = await applyCoupon(code.trim());
     setPending(false);
     if (result.ok) setCode("");
-    else setError(result.message || "No pudimos aplicar este cupón.");
+    else setError(result.message || t("coupon.genericError"));
   };
 
   const handleRemove = async () => {
@@ -42,9 +44,9 @@ export const CouponForm = () => {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12 }}>
         <div style={{ fontSize: 12.5 }}>
-          Cupón <strong>{cart.couponCode}</strong>
+          {t("coupon.label")} <strong>{cart.couponCode}</strong>
           {cart.discount > 0 && <span style={{ color: "var(--botanic-deep)" }}> · -{formatCurrency(cart.discount)}</span>}
-          {cart.couponInvalid && <span style={{ color: "#9C4A4A" }}> · ya no es válido</span>}
+          {cart.couponInvalid && <span style={{ color: "#9C4A4A" }}> · {t("coupon.invalid")}</span>}
         </div>
         <button
           type="button"
@@ -52,7 +54,7 @@ export const CouponForm = () => {
           disabled={pending}
           style={{ background: "none", border: 0, padding: 0, fontSize: 12, color: "var(--ink-soft)", textDecoration: "underline", cursor: pending ? "not-allowed" : "pointer" }}
         >
-          Quitar
+          {t("coupon.remove")}
         </button>
       </div>
     );
@@ -65,7 +67,7 @@ export const CouponForm = () => {
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === "Enter" && handleApply()}
-          placeholder="Código de descuento"
+          placeholder={t("coupon.placeholder")}
           style={inputStyle}
           disabled={pending}
         />
@@ -85,7 +87,7 @@ export const CouponForm = () => {
             opacity: pending || !code.trim() ? 0.6 : 1,
           }}
         >
-          Aplicar
+          {t("coupon.apply")}
         </button>
       </div>
       {error && (

@@ -83,7 +83,11 @@
     "city": "Ciudad",
     "cityPlaceholder": "Tu ciudad",
     "postalCode": "Código postal",
-    "postalCodeHint": "Ej. {{example}}"
+    "postalCodeHint": "Ej. {{example}}",
+    "selectDepartmentPlaceholder": "Selecciona un departamento",
+    "selectCityPlaceholder": "Selecciona un municipio",
+    "loadingDepartments": "Cargando departamentos…",
+    "loadingCities": "Cargando municipios…"
   },
   "shippingMethodStep": {
     "title": "Método de envío",

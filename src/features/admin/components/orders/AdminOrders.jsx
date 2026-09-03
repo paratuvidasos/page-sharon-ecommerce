@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDate } from "@shared/i18n/date";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAdminOrders } from "@shared/api-client";
 import { ORDER_STATUSES, getStatus } from "@features/orders/data/statuses";
 import { Pagination } from "../Pagination";
 import { AdminOrderStatusModal } from "./AdminOrderStatusModal";
 import { AdminOrderDetail } from "./AdminOrderDetail";
-
-const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
 
 const filterStyle = { padding: "9px 12px", border: "1px solid var(--line)", borderRadius: 10, background: "#fff", fontSize: 12.5, fontFamily: "var(--sans)" };
 

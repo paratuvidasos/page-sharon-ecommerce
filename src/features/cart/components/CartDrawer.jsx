@@ -126,6 +126,7 @@ const CartLine = ({ item }) => {
 };
 
 export const CartDrawer = ({ open, onClose }) => {
+  const { t } = useTranslation("cart");
   const navigate = useNavigate();
   const { cart, clear } = useCart();
   const [confirmingClear, setConfirmingClear] = useState(false);
@@ -157,8 +158,8 @@ export const CartDrawer = ({ open, onClose }) => {
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px" }}>
           <div>
-            <div className="eyebrow">Tu bolsa</div>
-            <div className="display" style={{ fontSize: 22 }}>{cart.items.length} {cart.items.length === 1 ? "artículo" : "artículos"}</div>
+            <div className="eyebrow">{t("drawer.title")}</div>
+            <div className="display" style={{ fontSize: 22 }}>{t("drawer.itemCount", { count: cart.items.length })}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {cart.items.length > 0 && !confirmingClear && (
@@ -166,23 +167,23 @@ export const CartDrawer = ({ open, onClose }) => {
                 onClick={() => setConfirmingClear(true)}
                 style={{ background: "transparent", border: 0, color: "var(--ink-soft)", fontSize: 11, cursor: "pointer", textDecoration: "underline" }}
               >
-                Vaciar carrito
+                {t("drawer.clear")}
               </button>
             )}
-            <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar bolsa" />
+            <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("drawer.close")} />
           </div>
         </div>
         <div className="stitch" style={{ margin: "0 26px" }} />
 
         {confirmingClear && (
           <div style={{ margin: "16px 26px 0", padding: "10px 12px", background: "rgba(156,74,74,.08)", border: "1px solid rgba(156,74,74,.3)", borderRadius: 12 }}>
-            <p style={{ fontSize: 12, color: "#7A3535" }}>¿Vaciar todo el carrito? No se puede deshacer.</p>
+            <p style={{ fontSize: 12, color: "#7A3535" }}>{t("drawer.confirmClear")}</p>
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <Button type="button" size="sm" onClick={handleClear} disabled={clearing}>
-                {clearing ? "Vaciando…" : "Sí, vaciar"}
+                {clearing ? t("drawer.clearing") : t("drawer.confirmClearYes")}
               </Button>
               <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingClear(false)} disabled={clearing}>
-                Cancelar
+                {t("drawer.cancel")}
               </Button>
             </div>
           </div>
@@ -195,10 +196,10 @@ export const CartDrawer = ({ open, onClose }) => {
                 <Icon name="cart" size={32} />
               </div>
               <div>
-                <div className="display" style={{ fontSize: 22 }}>Tu bolsa está vacía</div>
-                <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>Añade algún producto para empezar tus hábitos.</div>
+                <div className="display" style={{ fontSize: 22 }}>{t("drawer.emptyTitle")}</div>
+                <div style={{ color: "var(--ink-soft)", fontSize: 14, marginTop: 4 }}>{t("drawer.emptySubtitle")}</div>
               </div>
-              <Button onClick={onClose} size="sm" style={{ marginTop: 6 }}>Explorar productos</Button>
+              <Button onClick={onClose} size="sm" style={{ marginTop: 6 }}>{t("drawer.exploreProducts")}</Button>
             </div>
           )}
 
@@ -211,27 +212,27 @@ export const CartDrawer = ({ open, onClose }) => {
           <div style={{ padding: "20px 26px 28px", borderTop: "1px solid var(--line)", background: "#fff" }}>
             <CouponForm />
             <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13, marginBottom: 4 }}>
-              <span>Subtotal</span><span>{formatCurrency(cart.subtotal)}</span>
+              <span>{t("drawer.subtotal")}</span><span>{formatCurrency(cart.subtotal)}</span>
             </div>
             {cart.discount > 0 && (
               <div style={{ display: "flex", justifyContent: "space-between", color: "var(--botanic-deep)", fontSize: 13, marginBottom: 4 }}>
-                <span>Descuento</span><span>-{formatCurrency(cart.discount)}</span>
+                <span>{t("drawer.discount")}</span><span>-{formatCurrency(cart.discount)}</span>
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink-soft)", fontSize: 13, marginBottom: 12 }}>
-              <span>Envío</span><span>{shipping === 0 ? "Gratis" : formatCurrency(shipping)}</span>
+              <span>{t("drawer.shipping")}</span><span>{shipping === 0 ? t("drawer.shippingFree") : formatCurrency(shipping)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingTop: 12, borderTop: "1px solid var(--line)", marginBottom: 14 }}>
-              <span className="display" style={{ fontSize: 22 }}>Total</span>
+              <span className="display" style={{ fontSize: 22 }}>{t("drawer.total")}</span>
               <span className="display" style={{ fontSize: 28 }}>{formatCurrency(cart.total + shipping)}</span>
             </div>
             <Button onClick={() => { onClose(); navigate("/checkout"); }} style={{ width: "100%", justifyContent: "center" }}>
-              Finalizar compra <Icon name="arrow" size={16} />
+              {t("drawer.checkout")} <Icon name="arrow" size={16} />
             </Button>
             <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
               {cart.total < FREE_SHIPPING_THRESHOLD && cart.total > 0
-                ? `Te faltan ${formatCurrency(FREE_SHIPPING_THRESHOLD - cart.total)} para envío gratis`
-                : "Envío gratis aplicado ✦"}
+                ? t("drawer.freeShippingRemaining", { amount: formatCurrency(FREE_SHIPPING_THRESHOLD - cart.total) })
+                : t("drawer.freeShippingApplied")}
             </div>
           </div>
         )}

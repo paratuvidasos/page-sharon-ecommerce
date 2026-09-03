@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Hero } from "@ui/Hero";
-import { CampaignCarousel } from "@ui/CampaignCarousel";
+import { WelcomeBannerModal } from "@ui/WelcomeBannerModal";
 import { Benefits } from "@ui/Benefits";
 import { BeforeAfter } from "@ui/BeforeAfter";
 import { Testimonials } from "@ui/Testimonials";
@@ -27,8 +27,8 @@ export const HomePage = ({ onWish, wishlistIds, onOpenProduct }) => {
 
   return (
     <>
+      <WelcomeBannerModal />
       <Hero onShop={() => navigate("/tienda")} />
-      <CampaignCarousel />
       <Benefits />
       <BeforeAfter />
       <Testimonials />

@@ -359,7 +359,7 @@ export const CheckoutPage = ({ user, addresses, onOrderPlaced }) => {
           alignItems: "center", gap: 14, zIndex: 40,
         }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10.5, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".08em" }}>Total</div>
+            <div style={{ fontSize: 10.5, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".08em" }}>{t("checkoutPage.total")}</div>
             <div className="display" style={{ fontSize: 19 }}>{formatCurrency(computeCheckoutTotal(cart, shippingOption).total)}</div>
           </div>
           <Button

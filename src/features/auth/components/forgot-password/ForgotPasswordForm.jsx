@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthField } from "../AuthField";
 import { requestPasswordReset } from "@shared/api-client";
 
@@ -6,15 +7,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const INITIAL_FORM = { email: "" };
 
-const FIELDS = [
-  { name: "email", label: "Correo electrónico", type: "email", placeholder: "tucorreo@ejemplo.com", autoComplete: "email", full: true },
-];
+function getFields(t) {
+  return [
+    { name: "email", label: t("forgotPasswordForm.emailLabel"), type: "email", placeholder: t("forgotPasswordForm.emailPlaceholder"), autoComplete: "email", full: true },
+  ];
+}
 
-function validateField(field, value) {
+function validateField(field, value, t) {
   switch (field) {
     case "email":
-      if (!value.trim()) return "Necesitamos tu correo para enviarte el enlace.";
-      if (!EMAIL_RE.test(value.trim())) return "Ese correo no parece válido, revisa el formato.";
+      if (!value.trim()) return t("forgotPasswordForm.emailRequired");
+      if (!EMAIL_RE.test(value.trim())) return t("forgotPasswordForm.emailInvalid");
       return "";
     default:
       return "";
@@ -24,6 +27,8 @@ function validateField(field, value) {
 // Formulario de "olvidé mi contraseña": un único campo de correo, autocontenido
 // igual que RegisterForm/LoginForm (validación + submit() imperativo).
 export const ForgotPasswordForm = forwardRef((_props, ref) => {
+  const { t } = useTranslation("auth");
+  const FIELDS = getFields(t);
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -44,25 +49,25 @@ export const ForgotPasswordForm = forwardRef((_props, ref) => {
   const handleChange = (field) => (e) => {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => (touched[field] ? { ...prev, [field]: validateField(field, value) } : prev));
+    setErrors((prev) => (touched[field] ? { ...prev, [field]: validateField(field, value, t) } : prev));
   };
 
   const handleBlur = (field) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field]) }));
+    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field], t) }));
   };
 
   const invalidFields = FIELDS.filter(({ name }) => errors[name]);
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
-      const nextErrors = { email: validateField("email", form.email) };
+      const nextErrors = { email: validateField("email", form.email, t) };
       setErrors(nextErrors);
       setTouched({ email: true });
 
       if (nextErrors.email) {
         setShowSummary(true);
-        setSummaryToken((t) => t + 1);
+        setSummaryToken((prev) => prev + 1);
         return { ok: false };
       }
 
@@ -72,7 +77,7 @@ export const ForgotPasswordForm = forwardRef((_props, ref) => {
         await requestPasswordReset(form.email);
         return { ok: true, info: { email: form.email } };
       } catch {
-        setServerError("No pudimos enviar el enlace. Intenta de nuevo en unos segundos.");
+        setServerError(t("forgotPasswordForm.genericError"));
         return { ok: false };
       }
     },
@@ -95,7 +100,7 @@ export const ForgotPasswordForm = forwardRef((_props, ref) => {
           }}
         >
           <div style={{ fontWeight: 600, fontSize: 13, color: "#7A3535", marginBottom: 8 }}>
-            Hay campos por revisar
+            {t("forgotPasswordForm.summaryTitle")}
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {invalidFields.map(({ name, label }) => (

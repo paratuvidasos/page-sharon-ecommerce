@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { IconButton } from "@ui/components/IconButton";
 
 // Campo de texto/contraseña reutilizado por RegisterForm y LoginForm: label +
 // input + (si es contraseña) toggle de mostrar/ocultar propio + mensaje de error o ayuda.
 export const AuthField = ({ config, value, error, touched, onChange, onBlur, idPrefix, disabled = false }) => {
+  const { t } = useTranslation("auth");
   const { name, label, type, placeholder, autoComplete, helper, full } = config;
   const [visible, setVisible] = useState(false);
   const isPasswordField = type === "password";
@@ -51,7 +53,7 @@ export const AuthField = ({ config, value, error, touched, onChange, onBlur, idP
             iconSize={16}
             disabled={disabled}
             onClick={() => setVisible((v) => !v)}
-            aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-label={visible ? t("authField.hidePasswordAria") : t("authField.showPasswordAria")}
             style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)" }}
           />
         )}

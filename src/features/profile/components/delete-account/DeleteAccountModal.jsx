@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -14,6 +15,7 @@ import { DeleteAccountForm } from "./DeleteAccountForm";
 // justo ese momento. `onDeleted` avisa a App.jsx apenas el backend confirma el borrado,
 // para que oculte ProfileModal por detrás sin esperar a que este modal se cierre.
 export const DeleteAccountModal = ({ open, onClose, onDeleted }) => {
+  const { t } = useTranslation("profile");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formKey, setFormKey] = useState(0);
@@ -69,19 +71,19 @@ export const DeleteAccountModal = ({ open, onClose, onDeleted }) => {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: success ? "var(--botanic-deep)" : "#9C4A4A" }} />
             <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>
-              {success ? "Listo" : "Eliminar cuenta"}
+              {success ? t("deleteAccount.modal.eyebrowSuccess") : t("deleteAccount.modal.eyebrowDefault")}
             </span>
           </div>
           <div id="delete-account-modal-title" className="display" style={{ fontSize: 24, lineHeight: 1.15 }}>
-            {success ? "Cuenta eliminada" : "¿Eliminar tu cuenta?"}
+            {success ? t("deleteAccount.modal.titleSuccess") : t("deleteAccount.modal.title")}
           </div>
           {!success && (
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 360 }}>
-              Esta acción no se puede deshacer. Se eliminarán tu cuenta y tus datos personales.
+              {t("deleteAccount.modal.subtitle")}
             </p>
           )}
         </div>
-        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("deleteAccount.modal.close")} />
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -101,10 +103,10 @@ export const DeleteAccountModal = ({ open, onClose, onDeleted }) => {
               <Icon name="leaf" size={28} color="var(--botanic-deep)" />
             </div>
             <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>
-              Tu cuenta y tus datos personales fueron eliminados correctamente.
+              {t("deleteAccount.modal.successMessage")}
             </p>
             <Button onClick={onClose} style={{ marginTop: 22 }}>
-              Entendido
+              {t("deleteAccount.modal.successOk")}
             </Button>
           </div>
         ) : (
@@ -125,7 +127,7 @@ export const DeleteAccountModal = ({ open, onClose, onDeleted }) => {
               cursor: submitting ? "not-allowed" : "pointer",
             }}
           >
-            {submitting ? "Eliminando…" : "Eliminar mi cuenta definitivamente"}
+            {submitting ? t("deleteAccount.modal.submitting") : t("deleteAccount.modal.submit")}
           </Button>
         </div>
       )}

@@ -12,7 +12,22 @@ import {
   uploadBannerImage,
 } from "@shared/api-client";
 
-const emptyForm = () => ({ id: null, imageUrl: "", linkUrl: "", title: "", startsAt: "", endsAt: "", isActive: true });
+const CATEGORIES = ["EVENTO", "KIT", "PROMOCION", "LANZAMIENTO", "COLECCION", "GENERAL"];
+const ACTION_TYPES = ["COMPRAR", "INSCRIPCION", "MAS_INFORMACION"];
+const PLACEMENTS = ["WELCOME_MODAL", "HOME_SECTION"];
+
+const emptyForm = () => ({
+  id: null,
+  imageUrl: "",
+  linkUrl: "",
+  title: "",
+  category: "GENERAL",
+  actionType: "MAS_INFORMACION",
+  placements: [],
+  startsAt: "",
+  endsAt: "",
+  isActive: true,
+});
 const fieldStyle = { width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" };
 const labelStyle = { fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 };
 
@@ -46,9 +61,29 @@ export const AdminBanners = () => {
 
   const openNew = () => { setForm(emptyForm()); setError(null); setModalOpen(true); };
   const openEdit = (b) => {
-    setForm({ id: b.id, imageUrl: b.imageUrl, linkUrl: b.linkUrl || "", title: b.title, startsAt: b.startsAt?.slice(0, 10) || "", endsAt: b.endsAt?.slice(0, 10) || "", isActive: b.isActive });
+    setForm({
+      id: b.id,
+      imageUrl: b.imageUrl,
+      linkUrl: b.linkUrl || "",
+      title: b.title,
+      category: b.category || "GENERAL",
+      actionType: b.actionType || "MAS_INFORMACION",
+      placements: b.placements || [],
+      startsAt: b.startsAt?.slice(0, 10) || "",
+      endsAt: b.endsAt?.slice(0, 10) || "",
+      isActive: b.isActive,
+    });
     setError(null);
     setModalOpen(true);
+  };
+
+  const togglePlacement = (placement) => {
+    setForm((f) => ({
+      ...f,
+      placements: f.placements.includes(placement)
+        ? f.placements.filter((p) => p !== placement)
+        : [...f.placements, placement],
+    }));
   };
 
   const handleUpload = async (e) => {
@@ -73,10 +108,17 @@ export const AdminBanners = () => {
       setError(t("banners.requiredFieldsError"));
       return;
     }
+    if (form.placements.length === 0) {
+      setError(t("banners.requiredPlacementError"));
+      return;
+    }
     const payload = {
       imageUrl: form.imageUrl,
       linkUrl: form.linkUrl.trim() || undefined,
       title: form.title.trim(),
+      category: form.category,
+      actionType: form.actionType,
+      placements: form.placements,
       startsAt: form.startsAt || undefined,
       endsAt: form.endsAt || undefined,
       isActive: form.isActive,
@@ -153,7 +195,21 @@ export const AdminBanners = () => {
               <div className="cell-thumb" style={{ width: 60, height: 40, borderRadius: 8, overflow: "hidden", background: "var(--cream-2)" }}>
                 <img src={b.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
-              <span className="cell-title" style={{ fontWeight: 600, fontSize: 13.5 }}>{b.title}</span>
+              <div className="cell-title" style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, fontSize: 13.5 }}>{b.title}</span>
+                <span style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {b.category && (
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".04em", padding: "3px 9px", borderRadius: 999, background: "var(--cream-2)", color: "var(--ink-soft)" }}>
+                      {t(`banners.category.${b.category}`)}
+                    </span>
+                  )}
+                  {(b.placements || []).map((p) => (
+                    <span key={p} style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".04em", padding: "3px 9px", borderRadius: 999, background: "var(--botanic-muted)", color: "#3A4A34" }}>
+                      {t(`banners.placement.${p}`)}
+                    </span>
+                  ))}
+                </span>
+              </div>
               <button
                 onClick={() => toggleActive(b)}
                 disabled={togglingId === b.id}
@@ -201,12 +257,30 @@ export const AdminBanners = () => {
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleUpload} style={{ display: "none" }} />
               </div>
               <div>
-                <label style={labelStyle}>{t("banners.form.titleLabel")}</label>
-                <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={fieldStyle} />
+                <label style={labelStyle} htmlFor="banner-title">{t("banners.form.titleLabel")}</label>
+                <input id="banner-title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={fieldStyle} />
               </div>
               <div>
                 <label style={labelStyle}>{t("banners.form.linkLabel")}</label>
                 <input value={form.linkUrl} onChange={(e) => setForm((f) => ({ ...f, linkUrl: e.target.value }))} style={fieldStyle} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={labelStyle} htmlFor="banner-category">{t("banners.form.categoryLabel")}</label>
+                  <select id="banner-category" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={fieldStyle}>
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{t(`banners.category.${c}`)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle} htmlFor="banner-action-type">{t("banners.form.actionTypeLabel")}</label>
+                  <select id="banner-action-type" value={form.actionType} onChange={(e) => setForm((f) => ({ ...f, actionType: e.target.value }))} style={fieldStyle}>
+                    {ACTION_TYPES.map((a) => (
+                      <option key={a} value={a}>{t(`banners.actionType.${a}`)}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
@@ -216,6 +290,21 @@ export const AdminBanners = () => {
                 <div>
                   <label style={labelStyle}>{t("banners.form.endsAt")}</label>
                   <input value={form.endsAt} onChange={(e) => setForm((f) => ({ ...f, endsAt: e.target.value }))} type="date" style={fieldStyle} />
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>{t("banners.form.placementsLabel")}</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {PLACEMENTS.map((p) => (
+                    <label key={p} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.placements.includes(p)}
+                        onChange={() => togglePlacement(p)}
+                      />
+                      {t(p === "WELCOME_MODAL" ? "banners.form.placementWelcomeModal" : "banners.form.placementHomeSection")}
+                    </label>
+                  ))}
                 </div>
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>

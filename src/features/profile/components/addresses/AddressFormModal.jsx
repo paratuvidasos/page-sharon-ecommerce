@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -10,6 +11,7 @@ import { AddressForm } from "./AddressForm";
 // (mismo patrón que el diálogo de Google anidado en AuthModal). No es dueño de la
 // lista de direcciones: solo junta los campos y se los pasa a onSave.
 export const AddressFormModal = ({ open, onClose, address, onSave }) => {
+  const { t } = useTranslation("profile");
   const [submitting, setSubmitting] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const formRef = useRef(null);
@@ -60,12 +62,12 @@ export const AddressFormModal = ({ open, onClose, address, onSave }) => {
         }}
       >
         <div>
-          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Direcciones</span>
+          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>{t("addresses.formModal.eyebrow")}</span>
           <div id="address-form-modal-title" className="display" style={{ fontSize: 22, marginTop: 6 }}>
-            {isEditing ? "Editar dirección" : "Agregar dirección"}
+            {isEditing ? t("addresses.formModal.editTitle") : t("addresses.formModal.addTitle")}
           </div>
         </div>
-        <IconButton icon="close" size={36} iconSize={18} onClick={close} aria-label="Cerrar" />
+        <IconButton icon="close" size={36} iconSize={18} onClick={close} aria-label={t("addresses.formModal.close")} />
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "18px 24px" }}>
@@ -83,7 +85,7 @@ export const AddressFormModal = ({ open, onClose, address, onSave }) => {
             cursor: submitting ? "not-allowed" : "pointer",
           }}
         >
-          {submitting ? "Guardando…" : <>{isEditing ? "Guardar cambios" : "Agregar dirección"} <Icon name="arrow" size={16} /></>}
+          {submitting ? t("addresses.formModal.saving") : <>{isEditing ? t("addresses.formModal.save") : t("addresses.formModal.add")} <Icon name="arrow" size={16} /></>}
         </Button>
       </div>
     </Modal>

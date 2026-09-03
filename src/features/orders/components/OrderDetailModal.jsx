@@ -5,17 +5,14 @@ import { ProductImage } from "@ui/ProductImage";
 import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDate as formatDateBase, formatDateTime } from "@shared/i18n/date";
 import { COUNTRIES } from "@shared/data/countries";
 import { PRODUCTS } from "@features/catalog/data/products";
 import { getOrder } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
 import { getStatus } from "../data/statuses";
 
-const formatDate = (isoDate) =>
-  new Date(isoDate).toLocaleDateString("es-CO", { day: "2-digit", month: "long", year: "numeric" });
-
-const formatDateTime = (isoDate) =>
-  new Date(isoDate).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const formatDate = (isoDate) => formatDateBase(isoDate, { month: "long" });
 
 // Detalle completo de un pedido: productos, dirección de envío y método de pago
 // usado (los tres datos que pide el AC), anidado dentro de OrderHistoryModal igual
@@ -116,7 +113,7 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
       <div className="stitch" style={{ margin: "18px 26px 0", flexShrink: 0 }} />
 
       <div style={{ flex: 1, overflowY: "auto", padding: "18px 26px" }}>
-        <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Productos</span>
+        <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>{t("detail.products")}</span>
         {order.items.map((item) => {
           const product = PRODUCTS.find((p) => p.productId === item.productId);
           return (
@@ -126,7 +123,7 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
               </div>
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 500 }}>{item.productName}</div>
-                <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>Cantidad: {item.quantity}</div>
+                <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{t("detail.quantity", { count: item.quantity })}</div>
               </div>
               <div style={{ fontSize: 13.5, textAlign: "right" }}>{formatCurrency(item.lineTotal)}</div>
             </div>
@@ -134,12 +131,12 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
         })}
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "14px 16px", marginBottom: 24, background: "var(--cream-2)", borderRadius: 14 }}>
-          <span className="display" style={{ fontSize: 18 }}>Total</span>
+          <span className="display" style={{ fontSize: 18 }}>{t("detail.total")}</span>
           <span className="display" style={{ fontSize: 24 }}>{formatCurrency(order.total)}</span>
         </div>
 
         <div>
-          <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Dirección de envío</span>
+          <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>{t("detail.shippingAddress")}</span>
           <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>
             <strong>{order.shippingAddress.recipientName}</strong>
             <br />
@@ -151,35 +148,35 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
         </div>
 
         <div style={{ marginTop: 20 }}>
-          <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Método de pago</span>
+          <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>{t("detail.paymentMethod")}</span>
           <p style={{ fontSize: 13.5 }}>{order.paymentMethodLabel}</p>
         </div>
 
         {order.shipment && (
           <div style={{ marginTop: 20 }}>
-            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>Envío</span>
+            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 8 }}>{t("detail.shipping")}</span>
             <p style={{ fontSize: 13, lineHeight: 1.6 }}>
               {order.shipment.carrierName || order.shipment.carrierCode}
-              {order.shipment.trackingNumber && <> — guía {order.shipment.trackingNumber}</>}
+              {order.shipment.trackingNumber && <> — {t("row.guide", { trackingNumber: order.shipment.trackingNumber })}</>}
               {order.shipment.trackingUrl && (
                 <>
                   {" "}
                   <a href={order.shipment.trackingUrl} target="_blank" rel="noreferrer" style={{ color: "var(--botanic-deep)", fontWeight: 600 }}>
-                    Rastrear envío
+                    {t("detail.trackShipment")}
                   </a>
                 </>
               )}
             </p>
             <p style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>
-              Enviado el {formatDate(order.shipment.shippedAt)}
-              {order.shipment.deliveredAt && <> · Entregado el {formatDate(order.shipment.deliveredAt)}</>}
+              {t("detail.shippedOn", { date: formatDate(order.shipment.shippedAt) })}
+              {order.shipment.deliveredAt && <> · {t("detail.deliveredOn", { date: formatDate(order.shipment.deliveredAt) })}</>}
             </p>
           </div>
         )}
 
         {order.statusHistory?.length > 0 && (
           <div style={{ marginTop: 20 }}>
-            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Seguimiento del pedido</span>
+            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>{t("detail.tracking")}</span>
             <div>
               {order.statusHistory.map((entry, i) => {
                 const entryStatus = getStatus(entry.status);

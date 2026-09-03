@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -6,10 +7,12 @@ import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
-const STATUS_COPY = {
-  invalid: { eyebrow: "Enlace no válido", title: "Este enlace no es válido", subtitle: "Puede estar incompleto, vencido o ya haberse usado." },
-  ready: { eyebrow: "Nueva contraseña", title: "Define tu nueva contraseña", subtitle: "Elige una contraseña segura para tu cuenta." },
-};
+function getStatusCopy(t) {
+  return {
+    invalid: { eyebrow: t("resetPasswordModal.invalidEyebrow"), title: t("resetPasswordModal.invalidTitle"), subtitle: t("resetPasswordModal.invalidSubtitle") },
+    ready: { eyebrow: t("resetPasswordModal.readyEyebrow"), title: t("resetPasswordModal.readyTitle"), subtitle: t("resetPasswordModal.readySubtitle") },
+  };
+}
 
 // Modal de aterrizaje del enlace de recuperación (sharon.com/reset-password?token=...).
 // Independiente de AuthModal: se abre directo desde App.jsx según la URL. El backend
@@ -17,6 +20,8 @@ const STATUS_COPY = {
 // que se muestra el formulario directamente si hay token en la URL; si el POST real
 // responde PASSWORD_RESET_TOKEN_INVALID, ahí sí se cae al estado de enlace inválido/vencido.
 export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onGoToLogin }) => {
+  const { t } = useTranslation("auth");
+  const STATUS_COPY = getStatusCopy(t);
   const [status, setStatus] = useState("ready");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -40,7 +45,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
   };
 
   const copy = success
-    ? { eyebrow: "Listo", title: "Contraseña actualizada" }
+    ? { eyebrow: t("resetPasswordModal.successEyebrow"), title: t("resetPasswordModal.successTitle") }
     : STATUS_COPY[status];
 
   return (
@@ -83,7 +88,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 360 }}>{copy.subtitle}</p>
           )}
         </div>
-        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("resetPasswordModal.closeAria")} />
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -103,10 +108,10 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
               <Icon name="leaf" size={28} color="var(--botanic-deep)" />
             </div>
             <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>
-              Por tu seguridad, cerramos todas tus sesiones activas. Inicia sesión con tu nueva contraseña.
+              {t("resetPasswordModal.successBody")}
             </p>
             <Button onClick={onGoToLogin} style={{ marginTop: 22 }}>
-              Iniciar sesión
+              {t("resetPasswordModal.goToLogin")}
             </Button>
           </div>
         ) : status === "invalid" ? (
@@ -124,7 +129,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
             >
               <Icon name="close" size={26} color="#9C4A4A" />
             </div>
-            <Button onClick={onRequestNewLink}>Solicitar nuevo enlace</Button>
+            <Button onClick={onRequestNewLink}>{t("resetPasswordModal.requestNewLink")}</Button>
           </div>
         ) : (
           <ResetPasswordForm key={`reset-${formKey}`} ref={formRef} token={token} />
@@ -138,7 +143,7 @@ export const ResetPasswordModal = ({ open, onClose, token, onRequestNewLink, onG
             disabled={submitting}
             style={{ width: "100%", justifyContent: "center", opacity: submitting ? 0.6 : 1, cursor: submitting ? "not-allowed" : "pointer" }}
           >
-            {submitting ? "Guardando…" : <>Guardar nueva contraseña <Icon name="arrow" size={16} /></>}
+            {submitting ? t("resetPasswordModal.saving") : <>{t("resetPasswordModal.saveButton")} <Icon name="arrow" size={16} /></>}
           </Button>
         </div>
       )}

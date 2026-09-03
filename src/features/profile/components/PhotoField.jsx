@@ -1,11 +1,12 @@
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-export function validatePhotoFile(file) {
-  if (!file.type.startsWith("image/")) return "Sube un archivo de imagen (JPG, PNG o WEBP).";
-  if (file.size > MAX_SIZE_BYTES) return "La imagen no puede pesar más de 5MB.";
+export function validatePhotoFile(file, t) {
+  if (!file.type.startsWith("image/")) return t("photoField.invalidType");
+  if (file.size > MAX_SIZE_BYTES) return t("photoField.tooLarge");
   return "";
 }
 
@@ -14,13 +15,14 @@ export function validatePhotoFile(file) {
 // error; onChange recibe { file, previewUrl } — file es el File original a mandar
 // como parte del FormData al guardar (null si no se cambió o se quitó la foto).
 export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) => {
+  const { t } = useTranslation("profile");
   const inputRef = useRef(null);
 
   const handleFile = (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    const validationError = validatePhotoFile(file);
+    const validationError = validatePhotoFile(file, t);
     if (validationError) {
       onErrorChange(validationError);
       return;
@@ -63,7 +65,7 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
             {value ? (
               <img
                 src={value}
-                alt="Previsualización de tu foto de perfil"
+                alt={t("photoField.previewAlt")}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             ) : (
@@ -90,7 +92,7 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <span className="eyebrow" style={{ fontSize: 10 }}>Foto de perfil</span>
+          <span className="eyebrow" style={{ fontSize: 10 }}>{t("photoField.label")}</span>
           <div style={{ display: "flex", gap: 14 }}>
             <button
               type="button"
@@ -106,7 +108,7 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
                 cursor: "pointer",
               }}
             >
-              {value ? "Cambiar foto" : "Subir foto"}
+              {value ? t("photoField.change") : t("photoField.upload")}
             </button>
             {value && (
               <button
@@ -122,11 +124,11 @@ export const PhotoField = ({ value, onChange, error, onErrorChange, initials }) 
                   cursor: "pointer",
                 }}
               >
-                Quitar
+                {t("photoField.remove")}
               </button>
             )}
           </div>
-          <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>JPG, PNG o WEBP. Máximo 5MB.</span>
+          <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("photoField.hint")}</span>
         </div>
       </div>
 

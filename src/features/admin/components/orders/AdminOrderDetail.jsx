@@ -4,10 +4,8 @@ import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { getAdminOrder } from "@shared/api-client";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDateTime } from "@shared/i18n/date";
 import { getStatus } from "@features/orders/data/statuses";
-
-const formatDateTime = (iso) =>
-  new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 // Detalle de un pedido desde el panel admin: GET /admin/orders/:orderNumber, distinto
 // del OrderDetailModal del cliente (features/orders) — trae changedByAdminLabel en la

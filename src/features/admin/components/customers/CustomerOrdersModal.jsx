@@ -4,9 +4,8 @@ import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAdminOrders } from "@shared/api-client";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDate } from "@shared/i18n/date";
 import { getStatus } from "@features/orders/data/statuses";
-
-const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
 
 // "Ver pedidos de un cliente" reusa GET /admin/orders con el filtro userId agregado
 // (mismo endpoint que AdminOrders.jsx) en vez de un endpoint propio de clientes.

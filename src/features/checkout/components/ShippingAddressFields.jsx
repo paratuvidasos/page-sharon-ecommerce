@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { COUNTRIES } from "@shared/data/countries";
+import { useColombiaLocations } from "@shared/geo/useColombiaLocations";
 import { selectStyle, inputStyle, fieldLabelStyle, fieldErrorStyle, fieldHintStyle } from "../fieldStyles";
 
 // Inputs puros de dirección de envío, controlados 100% por props — sin estado propio,
@@ -11,8 +12,29 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
   const { t } = useTranslation("checkout");
   const country = COUNTRIES.find((c) => c.code === values.countryCode) || COUNTRIES[0];
 
+  // Mismo criterio que AddressForm.jsx (libreta de direcciones del perfil): departamento
+  // y municipio reales de api-colombia.com solo para Colombia, con fallback a texto
+  // libre si la API externa falla — ver shared/geo/useColombiaLocations.
+  const isColombia = values.countryCode === "CO";
+  const { departments, loadingDepartments, departmentsError, cities, loadingCities, citiesError } =
+    useColombiaLocations(isColombia, values.stateProvince);
+  const showDepartmentSelect = isColombia && !departmentsError;
+  const showCitySelect = showDepartmentSelect && !citiesError;
+
   const set = (field) => (e) => onChange(field, e.target.value);
   const blur = (field) => () => onBlur(field);
+
+  const selectDepartment = (e) => {
+    onChange("stateProvince", e.target.value);
+    onChange("city", "");
+  };
+
+  const selectCity = (e) => {
+    const v = e.target.value;
+    onChange("city", v);
+    const match = cities.find((c) => c.name === v);
+    if (match?.postalCode) onChange("postalCode", match.postalCode);
+  };
 
   return (
     <div>
@@ -108,16 +130,37 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
         <label htmlFor="checkout-stateProvince" className="eyebrow" style={fieldLabelStyle}>
           {t("shippingAddressFields.stateProvince")}
         </label>
-        <input
-          id="checkout-stateProvince"
-          value={values.stateProvince}
-          onChange={set("stateProvince")}
-          onBlur={blur("stateProvince")}
-          type="text"
-          placeholder={t("shippingAddressFields.stateProvincePlaceholder")}
-          autoComplete="address-level1"
-          style={inputStyle(touched.stateProvince && errors.stateProvince)}
-        />
+        {showDepartmentSelect ? (
+          <select
+            id="checkout-stateProvince"
+            value={values.stateProvince}
+            onChange={selectDepartment}
+            onBlur={blur("stateProvince")}
+            disabled={loadingDepartments}
+            style={selectStyle}
+          >
+            <option value="">
+              {loadingDepartments ? t("shippingAddressFields.loadingDepartments") : t("shippingAddressFields.selectDepartmentPlaceholder")}
+            </option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.name}>{d.name}</option>
+            ))}
+            {values.stateProvince && !departments.some((d) => d.name === values.stateProvince) && (
+              <option value={values.stateProvince}>{values.stateProvince}</option>
+            )}
+          </select>
+        ) : (
+          <input
+            id="checkout-stateProvince"
+            value={values.stateProvince}
+            onChange={set("stateProvince")}
+            onBlur={blur("stateProvince")}
+            type="text"
+            placeholder={t("shippingAddressFields.stateProvincePlaceholder")}
+            autoComplete="address-level1"
+            style={inputStyle(touched.stateProvince && errors.stateProvince)}
+          />
+        )}
         <div style={{ minHeight: 18, marginTop: 4 }}>
           {touched.stateProvince && errors.stateProvince && <span role="alert" style={fieldErrorStyle}>{errors.stateProvince}</span>}
         </div>
@@ -126,16 +169,37 @@ export const ShippingAddressFields = ({ values, errors, touched, onChange, onBlu
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }} className="checkout-grid">
         <div>
           <label htmlFor="checkout-city" className="eyebrow" style={fieldLabelStyle}>{t("shippingAddressFields.city")}</label>
-          <input
-            id="checkout-city"
-            value={values.city}
-            onChange={set("city")}
-            onBlur={blur("city")}
-            type="text"
-            placeholder={t("shippingAddressFields.cityPlaceholder")}
-            autoComplete="address-level2"
-            style={inputStyle(touched.city && errors.city)}
-          />
+          {showCitySelect ? (
+            <select
+              id="checkout-city"
+              value={values.city}
+              onChange={selectCity}
+              onBlur={blur("city")}
+              disabled={!values.stateProvince || loadingCities}
+              style={selectStyle}
+            >
+              <option value="">
+                {loadingCities ? t("shippingAddressFields.loadingCities") : t("shippingAddressFields.selectCityPlaceholder")}
+              </option>
+              {cities.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+              {values.city && !cities.some((c) => c.name === values.city) && (
+                <option value={values.city}>{values.city}</option>
+              )}
+            </select>
+          ) : (
+            <input
+              id="checkout-city"
+              value={values.city}
+              onChange={set("city")}
+              onBlur={blur("city")}
+              type="text"
+              placeholder={t("shippingAddressFields.cityPlaceholder")}
+              autoComplete="address-level2"
+              style={inputStyle(touched.city && errors.city)}
+            />
+          )}
           <div style={{ minHeight: 18, marginTop: 4 }}>
             {touched.city && errors.city && <span role="alert" style={fieldErrorStyle}>{errors.city}</span>}
           </div>

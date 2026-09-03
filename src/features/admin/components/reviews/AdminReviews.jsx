@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, Stars } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listAdminReviews, approveReview, rejectReview, hideReview } from "@shared/api-client";
+import { formatDate } from "@shared/i18n/date";
 import { Pagination } from "../Pagination";
 
 const TAB_VALUES = [
@@ -11,8 +12,6 @@ const TAB_VALUES = [
   { value: "REJECTED", key: "rejected" },
   { value: "HIDDEN", key: "hidden" },
 ];
-
-const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
 
 // GET /admin/reviews con tabs de estado + acciones de moderación. Nota: hoy las
 // reseñas nuevas se siguen publicando automáticamente (REVIEWS_REQUIRE_MODERATION es

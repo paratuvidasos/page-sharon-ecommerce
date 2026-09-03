@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listInventory, listAdminCategories, setVariantStock, setVariantLowStockThreshold } from "@shared/api-client";
 import { Pagination } from "../Pagination";
 
-const SORT_OPTIONS = [
-  { value: "NAME_ASC", label: "Nombre (A-Z)" },
-  { value: "NAME_DESC", label: "Nombre (Z-A)" },
-  { value: "STOCK_ASC", label: "Menor stock primero" },
-  { value: "STOCK_DESC", label: "Mayor stock primero" },
-];
+function getSortOptions(t) {
+  return [
+    { value: "NAME_ASC", label: t("inventory.sortOptions.nameAsc") },
+    { value: "NAME_DESC", label: t("inventory.sortOptions.nameDesc") },
+    { value: "STOCK_ASC", label: t("inventory.sortOptions.stockAsc") },
+    { value: "STOCK_DESC", label: t("inventory.sortOptions.stockDesc") },
+  ];
+}
 
 const filterStyle = { padding: "9px 12px", border: "1px solid var(--line)", borderRadius: 10, background: "#fff", fontSize: 12.5, fontFamily: "var(--sans)" };
 
 const InventoryRow = ({ item, onSaved }) => {
+  const { t } = useTranslation("admin");
   const { getAccessToken } = useAuth();
   const [quantity, setQuantity] = useState(String(item.stockQuantity));
   const [threshold, setThreshold] = useState(item.lowStockThreshold != null ? String(item.lowStockThreshold) : "");
@@ -47,17 +51,17 @@ const InventoryRow = ({ item, onSaved }) => {
       </div>
       <span className="mono" style={{ fontSize: 12 }}><span className="cell-label">SKU</span>{item.sku}</span>
       <div>
-        <span className="cell-label">Stock</span>
+        <span className="cell-label">{t("inventory.columns.stock")}</span>
         <div style={{ display: "flex", gap: 6 }}>
           <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" min="0" style={{ width: 70, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
-          <button onClick={saveStock} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+          <button onClick={saveStock} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>{t("inventory.save")}</button>
         </div>
       </div>
       <div>
-        <span className="cell-label">Umbral</span>
+        <span className="cell-label">{t("inventory.columns.threshold")}</span>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <input value={threshold} onChange={(e) => setThreshold(e.target.value)} type="number" min="0" placeholder="Auto" style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
-          <button onClick={saveThreshold} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>OK</button>
+          <input value={threshold} onChange={(e) => setThreshold(e.target.value)} type="number" min="0" placeholder={t("inventory.thresholdPlaceholder")} style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
+          <button onClick={saveThreshold} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>{t("inventory.save")}</button>
         </div>
       </div>
     </div>
@@ -68,6 +72,8 @@ const InventoryRow = ({ item, onSaved }) => {
 // nombre/SKU, categoría, solo-stock-bajo) y orden. Cada fila edita stock (SET
 // absoluto) y umbral (null = usar el global) inline.
 export const AdminInventory = () => {
+  const { t } = useTranslation("admin");
+  const SORT_OPTIONS = getSortOptions(t);
   const { getAccessToken } = useAuth();
   const [items, setItems] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -120,11 +126,11 @@ export const AdminInventory = () => {
         <input
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Buscar por producto o SKU…"
+          placeholder={t("inventory.searchPlaceholder")}
           style={{ ...filterStyle, flex: "1 1 220px" }}
         />
         <select value={categoryId} onChange={(e) => resetAndSet(setCategoryId)(e.target.value)} style={filterStyle}>
-          <option value="">Todas las categorías</option>
+          <option value="">{t("inventory.allCategories")}</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         <select value={sort} onChange={(e) => resetAndSet(setSort)(e.target.value)} style={filterStyle}>
@@ -132,24 +138,24 @@ export const AdminInventory = () => {
         </select>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, cursor: "pointer" }}>
           <input type="checkbox" checked={onlyLowStock} onChange={(e) => resetAndSet(setOnlyLowStock)(e.target.checked)} />
-          Solo stock bajo
+          {t("inventory.onlyLowStock")}
         </label>
       </div>
 
       <div style={{ background: "#fff", borderRadius: 20, border: ".5px solid var(--line)", overflow: "hidden" }}>
         <div className="admin-table-head" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 140px 170px", padding: "12px 22px", fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-soft)", borderBottom: "1px solid var(--line)" }}>
-          <span>Producto</span><span>SKU</span><span>Stock</span>
+          <span>{t("inventory.columns.product")}</span><span>{t("inventory.columns.sku")}</span><span>{t("inventory.columns.stock")}</span>
           <span>
-            Umbral
+            {t("inventory.columns.threshold")}
             <span style={{ display: "block", fontSize: 9.5, letterSpacing: "normal", textTransform: "none", fontWeight: 400, marginTop: 2 }}>
-              stock que dispara "stock bajo"
+              {t("inventory.columns.thresholdHint")}
             </span>
           </span>
         </div>
 
-        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>Cargando inventario…</div>}
-        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>No se pudo cargar el inventario.</div>}
-        {status === "ready" && items.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>No hay variantes con estos filtros.</div>}
+        {status === "loading" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("inventory.loading")}</div>}
+        {status === "error" && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--terracotta-deep)" }}>{t("inventory.loadError")}</div>}
+        {status === "ready" && items.length === 0 && <div style={{ padding: "24px 22px", fontSize: 13, color: "var(--ink-soft)" }}>{t("inventory.empty")}</div>}
 
         {items.map((item) => (
           <InventoryRow

@@ -5,8 +5,9 @@ import { request } from "./http";
 // /admin/banners y /admin/homepage/featured-config, pero todavía no se conectan a
 // ningún componente de la landing: eso no se pidió en esta tarea.
 
-export function listPublicBanners() {
-  return request("/banners");
+export function listPublicBanners(placement) {
+  const query = placement ? `?placement=${encodeURIComponent(placement)}` : "";
+  return request(`/banners${query}`);
 }
 
 export function listPublicFeaturedProducts() {

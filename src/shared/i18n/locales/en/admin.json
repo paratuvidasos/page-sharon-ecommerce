@@ -214,7 +214,25 @@
     "cancel": "Cancel",
     "uploadErrorGeneric": "Couldn't upload the image.",
     "requiredFieldsError": "Image and title are required.",
+    "requiredPlacementError": "Select at least one placement.",
     "saveErrorGeneric": "Couldn't save the banner.",
+    "category": {
+      "EVENTO": "Event",
+      "KIT": "Kit",
+      "PROMOCION": "Promotion",
+      "LANZAMIENTO": "Launch",
+      "COLECCION": "Collection",
+      "GENERAL": "General"
+    },
+    "actionType": {
+      "COMPRAR": "Shop",
+      "INSCRIPCION": "Sign up",
+      "MAS_INFORMACION": "More information"
+    },
+    "placement": {
+      "WELCOME_MODAL": "Welcome modal",
+      "HOME_SECTION": "Home section"
+    },
     "form": {
       "eyebrow": "Banners",
       "editTitle": "Edit banner",
@@ -224,6 +242,11 @@
       "uploadButton": "Upload image",
       "titleLabel": "Title",
       "linkLabel": "Link (optional)",
+      "categoryLabel": "Category",
+      "actionTypeLabel": "Action type",
+      "placementsLabel": "Placement",
+      "placementWelcomeModal": "Welcome modal (shown when entering the site)",
+      "placementHomeSection": "Home section (permanent carousel)",
       "startsAt": "Starts",
       "endsAt": "Ends",
       "activeLabel": "Active",

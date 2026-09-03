@@ -1,11 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PhoneField } from "./PhoneField";
 import { PhotoField } from "./PhotoField";
 import { COUNTRIES, stripDialCode } from "@shared/data/countries";
 import { updateProfile as updateProfileRequest, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
-
-const FIELD_LABELS = { firstName: "Nombre", lastName: "Apellido", phone: "Teléfono" };
 
 function splitName(fullName) {
   const trimmed = (fullName || "").trim();
@@ -14,20 +13,20 @@ function splitName(fullName) {
   return { firstName, lastName: rest.join(" ") };
 }
 
-function validateFirstName(value) {
-  if (!value.trim()) return "Necesitamos tu nombre.";
+function validateFirstName(value, t) {
+  if (!value.trim()) return t("form.firstName.required");
   return "";
 }
 
-function validateLastName(value) {
-  if (!value.trim()) return "Necesitamos tu apellido.";
+function validateLastName(value, t) {
+  if (!value.trim()) return t("form.lastName.required");
   return "";
 }
 
-function validatePhone(value, countryCode) {
+function validatePhone(value, countryCode, t) {
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
-  if (!value) return "Ingresa tu número de teléfono.";
-  if (value.length !== country.phoneDigits) return `Debe tener ${country.phoneDigits} dígitos para ${country.name}.`;
+  if (!value) return t("form.phoneRequired");
+  if (value.length !== country.phoneDigits) return t("form.phoneDigits", { digits: country.phoneDigits, country: country.name });
   return "";
 }
 
@@ -36,6 +35,8 @@ function validatePhone(value, countryCode) {
 // + submit() imperativo). El correo se muestra de solo lectura: cambiarlo requiere
 // reverificación, un flujo que todavía no existe.
 export const ProfileForm = forwardRef(({ initialValues }, ref) => {
+  const { t } = useTranslation("profile");
+  const FIELD_LABELS = { firstName: t("form.fieldLabels.firstName"), lastName: t("form.fieldLabels.lastName"), phone: t("form.fieldLabels.phone") };
   const { getAccessToken } = useAuth();
   const initialSplitName = splitName(initialValues.name);
   const [firstName, setFirstName] = useState(initialSplitName.firstName);
@@ -65,21 +66,21 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
   const handleFirstNameChange = (e) => {
     const value = e.target.value;
     setFirstName(value);
-    setErrors((prev) => (touched.firstName ? { ...prev, firstName: validateFirstName(value) } : prev));
+    setErrors((prev) => (touched.firstName ? { ...prev, firstName: validateFirstName(value, t) } : prev));
   };
   const handleFirstNameBlur = () => {
     setTouched((prev) => ({ ...prev, firstName: true }));
-    setErrors((prev) => ({ ...prev, firstName: validateFirstName(firstName) }));
+    setErrors((prev) => ({ ...prev, firstName: validateFirstName(firstName, t) }));
   };
 
   const handleLastNameChange = (e) => {
     const value = e.target.value;
     setLastName(value);
-    setErrors((prev) => (touched.lastName ? { ...prev, lastName: validateLastName(value) } : prev));
+    setErrors((prev) => (touched.lastName ? { ...prev, lastName: validateLastName(value, t) } : prev));
   };
   const handleLastNameBlur = () => {
     setTouched((prev) => ({ ...prev, lastName: true }));
-    setErrors((prev) => ({ ...prev, lastName: validateLastName(lastName) }));
+    setErrors((prev) => ({ ...prev, lastName: validateLastName(lastName, t) }));
   };
 
   const handlePhotoChange = ({ file, previewUrl }) => {
@@ -95,11 +96,11 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
   };
   const handlePhoneChange = (value) => {
     setPhone(value);
-    setErrors((prev) => (touched.phone ? { ...prev, phone: validatePhone(value, countryCode) } : prev));
+    setErrors((prev) => (touched.phone ? { ...prev, phone: validatePhone(value, countryCode, t) } : prev));
   };
   const handlePhoneBlur = () => {
     setTouched((prev) => ({ ...prev, phone: true }));
-    setErrors((prev) => ({ ...prev, phone: validatePhone(phone, countryCode) }));
+    setErrors((prev) => ({ ...prev, phone: validatePhone(phone, countryCode, t) }));
   };
 
   const invalidFields = Object.entries(errors)
@@ -109,9 +110,9 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
   useImperativeHandle(ref, () => ({
     submit: async () => {
       const nextErrors = {
-        firstName: validateFirstName(firstName),
-        lastName: validateLastName(lastName),
-        phone: validatePhone(phone, countryCode),
+        firstName: validateFirstName(firstName, t),
+        lastName: validateLastName(lastName, t),
+        phone: validatePhone(phone, countryCode, t),
       };
       setErrors(nextErrors);
       setTouched({ firstName: true, lastName: true, phone: true });
@@ -119,7 +120,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
       const hasErrors = Object.values(nextErrors).some(Boolean) || Boolean(photoError);
       if (hasErrors) {
         setShowSummary(true);
-        setSummaryToken((t) => t + 1);
+        setSummaryToken((prev) => prev + 1);
         return { ok: false };
       }
 
@@ -147,7 +148,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
         if (e instanceof ApiError && e.message) {
           setServerError(e.message);
         } else {
-          setServerError("No pudimos guardar tus cambios. Intenta de nuevo en unos segundos.");
+          setServerError(t("form.genericError"));
         }
         return { ok: false };
       }
@@ -173,7 +174,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
           }}
         >
           <div style={{ fontWeight: 600, fontSize: 13, color: "#7A3535", marginBottom: 8 }}>
-            Hay campos por revisar
+            {t("form.summaryTitle")}
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {invalidFields.map((field) => (
@@ -183,7 +184,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
                 </a>
               </li>
             ))}
-            {photoError && <li style={{ fontSize: 12.5, color: "#7A3535" }}>Foto de perfil: {photoError}</li>}
+            {photoError && <li style={{ fontSize: 12.5, color: "#7A3535" }}>{t("form.photoFieldSummary")}: {photoError}</li>}
           </ul>
         </div>
       )}
@@ -219,7 +220,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
       <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div>
           <label htmlFor="profile-firstName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-            Nombre
+            {t("form.firstName.label")}
           </label>
           <input
             id="profile-firstName"
@@ -227,7 +228,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
             onChange={handleFirstNameChange}
             onBlur={handleFirstNameBlur}
             type="text"
-            placeholder="Tu nombre"
+            placeholder={t("form.firstName.placeholder")}
             autoComplete="given-name"
             aria-describedby={touched.firstName && errors.firstName ? "profile-firstName-error" : undefined}
             aria-invalid={touched.firstName && errors.firstName ? "true" : undefined}
@@ -253,7 +254,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
 
         <div>
           <label htmlFor="profile-lastName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-            Apellido
+            {t("form.lastName.label")}
           </label>
           <input
             id="profile-lastName"
@@ -261,7 +262,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
             onChange={handleLastNameChange}
             onBlur={handleLastNameBlur}
             type="text"
-            placeholder="Tu apellido"
+            placeholder={t("form.lastName.placeholder")}
             autoComplete="family-name"
             aria-describedby={touched.lastName && errors.lastName ? "profile-lastName-error" : undefined}
             aria-invalid={touched.lastName && errors.lastName ? "true" : undefined}
@@ -300,7 +301,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Correo electrónico
+          {t("form.email.label")}
         </span>
         <div
           style={{
@@ -317,7 +318,7 @@ export const ProfileForm = forwardRef(({ initialValues }, ref) => {
           {initialValues.email}
         </div>
         <span style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4, display: "block" }}>
-          Para cambiar tu correo necesitas reverificarlo. Escríbenos a soporte para iniciar ese proceso.
+          {t("form.email.note")}
         </span>
       </div>
     </div>

@@ -16,11 +16,15 @@ const EMPTY_CART = { items: [], subtotal: 0, couponCode: null, discount: 0, tota
 
 const CartContext = createContext(null);
 
+// Sin mensaje propio para errores que no son ApiError (ej. falla de red): los
+// consumidores (ver CouponForm.jsx) ya tienen su propio fallback traducido vía
+// `result.message || t("...genericError")` — devolver un string en español acá
+// pisaría ese fallback y se colaría sin traducir.
 function toResult(e) {
   if (e instanceof ApiError) {
     return { ok: false, code: e.code, message: e.message, availableQuantity: e.availableQuantity };
   }
-  return { ok: false, message: "No pudimos completar la acción. Intenta de nuevo en unos segundos." };
+  return { ok: false };
 }
 
 // El carrito de invitado viaja solo por la cookie httpOnly guest_cart_id (el

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { COUNTRIES, stripDialCode } from "@shared/data/countries";
 import { createAddress, updateAddress, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
+import { useColombiaLocations } from "@shared/geo/useColombiaLocations";
 
 const selectStyle = {
   width: "100%",
@@ -104,43 +105,87 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
 
+  // Departamento/municipio reales (api-colombia.com, ver shared/geo) solo cuando el
+  // país elegido es Colombia — cualquier otro país conserva los inputs de texto libre
+  // de siempre. Si la API externa falla, se cae de vuelta a texto libre en vez de
+  // dejar un select roto (ver useColombiaLocations).
+  const isColombia = countryCode === "CO";
+  const { departments, loadingDepartments, departmentsError, cities, loadingCities, citiesError } =
+    useColombiaLocations(isColombia, stateProvince);
+  const showDepartmentSelect = isColombia && !departmentsError;
+  const showCitySelect = showDepartmentSelect && !citiesError;
+
+  const FIELD_LABELS = {
+    alias: t("addresses.form.fieldLabels.alias"),
+    recipientName: t("addresses.form.fieldLabels.recipientName"),
+    phone: t("addresses.form.fieldLabels.phone"),
+    line1: t("addresses.form.fieldLabels.line1"),
+    stateProvince: t("addresses.form.fieldLabels.stateProvince"),
+    city: t("addresses.form.fieldLabels.city"),
+    postalCode: t("addresses.form.fieldLabels.postalCode"),
+  };
+
   const handleAliasChange = (e) => {
     const v = e.target.value;
     setAlias(v);
-    setErrors((prev) => (touched.alias ? { ...prev, alias: validateAlias(v) } : prev));
+    setErrors((prev) => (touched.alias ? { ...prev, alias: validateAlias(v, t) } : prev));
   };
   const handleAliasBlur = () => {
     setTouched((prev) => ({ ...prev, alias: true }));
-    setErrors((prev) => ({ ...prev, alias: validateAlias(alias) }));
+    setErrors((prev) => ({ ...prev, alias: validateAlias(alias, t) }));
   };
 
   const handleRecipientNameChange = (e) => {
     const v = e.target.value;
     setRecipientName(v);
-    setErrors((prev) => (touched.recipientName ? { ...prev, recipientName: validateRecipientName(v) } : prev));
+    setErrors((prev) => (touched.recipientName ? { ...prev, recipientName: validateRecipientName(v, t) } : prev));
   };
   const handleRecipientNameBlur = () => {
     setTouched((prev) => ({ ...prev, recipientName: true }));
-    setErrors((prev) => ({ ...prev, recipientName: validateRecipientName(recipientName) }));
+    setErrors((prev) => ({ ...prev, recipientName: validateRecipientName(recipientName, t) }));
   };
 
   const handlePhoneChange = (value) => {
     setPhone(value);
-    setErrors((prev) => (touched.phone ? { ...prev, phone: validatePhone(value, countryCode) } : prev));
+    setErrors((prev) => (touched.phone ? { ...prev, phone: validatePhone(value, countryCode, t) } : prev));
   };
   const handlePhoneBlur = () => {
     setTouched((prev) => ({ ...prev, phone: true }));
-    setErrors((prev) => ({ ...prev, phone: validatePhone(phone, countryCode) }));
+    setErrors((prev) => ({ ...prev, phone: validatePhone(phone, countryCode, t) }));
   };
 
   const handleStateProvinceChange = (e) => {
     const v = e.target.value;
     setStateProvince(v);
-    setErrors((prev) => (touched.stateProvince ? { ...prev, stateProvince: validateStateProvince(v) } : prev));
+    setErrors((prev) => (touched.stateProvince ? { ...prev, stateProvince: validateStateProvince(v, t) } : prev));
   };
   const handleStateProvinceBlur = () => {
     setTouched((prev) => ({ ...prev, stateProvince: true }));
-    setErrors((prev) => ({ ...prev, stateProvince: validateStateProvince(stateProvince) }));
+    setErrors((prev) => ({ ...prev, stateProvince: validateStateProvince(stateProvince, t) }));
+  };
+
+  // Elegir departamento en el select reinicia el municipio (la lista de municipios
+  // depende del departamento) — mismo criterio que cambiar de país reinicia el teléfono.
+  const handleDepartmentSelect = (e) => {
+    const v = e.target.value;
+    setStateProvince(v);
+    setCity("");
+    setTouched((prev) => ({ ...prev, stateProvince: true }));
+    setErrors((prev) => ({ ...prev, stateProvince: validateStateProvince(v, t), city: undefined }));
+  };
+
+  const handleCitySelect = (e) => {
+    const v = e.target.value;
+    setCity(v);
+    setTouched((prev) => ({ ...prev, city: true }));
+    setErrors((prev) => ({ ...prev, city: validateCity(v, t) }));
+    // api-colombia trae el código postal real de bastantes municipios — si lo tiene,
+    // se usa de una vez en vez de dejar que el usuario lo escriba a mano.
+    const match = cities.find((c) => c.name === v);
+    if (match?.postalCode) {
+      setPostalCode(match.postalCode);
+      setErrors((prev) => ({ ...prev, postalCode: undefined }));
+    }
   };
 
   const handleCountryChange = (e) => {
@@ -151,38 +196,38 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
     setErrors((prev) => ({
       ...prev,
       phone: undefined,
-      postalCode: touched.postalCode ? validatePostalCode(postalCode, nextCode) : prev.postalCode,
+      postalCode: touched.postalCode ? validatePostalCode(postalCode, nextCode, t) : prev.postalCode,
     }));
   };
 
   const handleLine1Change = (e) => {
     const v = e.target.value;
     setLine1(v);
-    setErrors((prev) => (touched.line1 ? { ...prev, line1: validateLine1(v) } : prev));
+    setErrors((prev) => (touched.line1 ? { ...prev, line1: validateLine1(v, t) } : prev));
   };
   const handleLine1Blur = () => {
     setTouched((prev) => ({ ...prev, line1: true }));
-    setErrors((prev) => ({ ...prev, line1: validateLine1(line1) }));
+    setErrors((prev) => ({ ...prev, line1: validateLine1(line1, t) }));
   };
 
   const handleCityChange = (e) => {
     const v = e.target.value;
     setCity(v);
-    setErrors((prev) => (touched.city ? { ...prev, city: validateCity(v) } : prev));
+    setErrors((prev) => (touched.city ? { ...prev, city: validateCity(v, t) } : prev));
   };
   const handleCityBlur = () => {
     setTouched((prev) => ({ ...prev, city: true }));
-    setErrors((prev) => ({ ...prev, city: validateCity(city) }));
+    setErrors((prev) => ({ ...prev, city: validateCity(city, t) }));
   };
 
   const handlePostalCodeChange = (e) => {
     const v = e.target.value;
     setPostalCode(v);
-    setErrors((prev) => (touched.postalCode ? { ...prev, postalCode: validatePostalCode(v, countryCode) } : prev));
+    setErrors((prev) => (touched.postalCode ? { ...prev, postalCode: validatePostalCode(v, countryCode, t) } : prev));
   };
   const handlePostalCodeBlur = () => {
     setTouched((prev) => ({ ...prev, postalCode: true }));
-    setErrors((prev) => ({ ...prev, postalCode: validatePostalCode(postalCode, countryCode) }));
+    setErrors((prev) => ({ ...prev, postalCode: validatePostalCode(postalCode, countryCode, t) }));
   };
 
   const invalidFields = Object.entries(errors)
@@ -192,13 +237,13 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
   useImperativeHandle(ref, () => ({
     submit: async () => {
       const nextErrors = {
-        alias: validateAlias(alias),
-        recipientName: validateRecipientName(recipientName),
-        phone: validatePhone(phone, countryCode),
-        line1: validateLine1(line1),
-        stateProvince: validateStateProvince(stateProvince),
-        city: validateCity(city),
-        postalCode: validatePostalCode(postalCode, countryCode),
+        alias: validateAlias(alias, t),
+        recipientName: validateRecipientName(recipientName, t),
+        phone: validatePhone(phone, countryCode, t),
+        line1: validateLine1(line1, t),
+        stateProvince: validateStateProvince(stateProvince, t),
+        city: validateCity(city, t),
+        postalCode: validatePostalCode(postalCode, countryCode, t),
       };
       setErrors(nextErrors);
       setTouched({
@@ -214,7 +259,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
       const hasErrors = Object.values(nextErrors).some(Boolean);
       if (hasErrors) {
         setShowSummary(true);
-        setSummaryToken((t) => t + 1);
+        setSummaryToken((prev) => prev + 1);
         return { ok: false };
       }
 
@@ -240,7 +285,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
         if (e instanceof ApiError && e.message) {
           setServerError(e.message);
         } else {
-          setServerError("No pudimos guardar la dirección. Intenta de nuevo en unos segundos.");
+          setServerError(t("addresses.form.genericError"));
         }
         return { ok: false };
       }
@@ -264,7 +309,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
           }}
         >
           <div style={{ fontWeight: 600, fontSize: 13, color: "#7A3535", marginBottom: 8 }}>
-            Hay campos por revisar
+            {t("addresses.form.summaryTitle")}
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {invalidFields.map((field) => (
@@ -300,7 +345,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div>
         <label htmlFor="address-alias" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Alias
+          {t("addresses.form.aliasLabel")}
         </label>
         <input
           id="address-alias"
@@ -308,7 +353,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
           onChange={handleAliasChange}
           onBlur={handleAliasBlur}
           type="text"
-          placeholder="Casa, Oficina…"
+          placeholder={t("addresses.form.aliasPlaceholder")}
           aria-describedby={touched.alias && errors.alias ? "address-alias-error" : undefined}
           aria-invalid={touched.alias && errors.alias ? "true" : undefined}
           style={inputStyle(touched.alias && errors.alias)}
@@ -324,7 +369,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-recipientName" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Nombre de quien recibe
+          {t("addresses.form.recipientLabel")}
         </label>
         <input
           id="address-recipientName"
@@ -332,7 +377,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
           onChange={handleRecipientNameChange}
           onBlur={handleRecipientNameBlur}
           type="text"
-          placeholder="Quién recibe el pedido"
+          placeholder={t("addresses.form.recipientPlaceholder")}
           autoComplete="name"
           aria-describedby={touched.recipientName && errors.recipientName ? "address-recipientName-error" : undefined}
           aria-invalid={touched.recipientName && errors.recipientName ? "true" : undefined}
@@ -349,7 +394,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-country" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          País
+          {t("addresses.form.countryLabel")}
         </label>
         <select id="address-country" value={countryCode} onChange={handleCountryChange} style={selectStyle}>
           {COUNTRIES.map((c) => (
@@ -362,7 +407,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-phone" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Teléfono de contacto
+          {t("addresses.form.phoneLabel")}
         </label>
         <input
           id="address-phone"
@@ -383,7 +428,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
             </span>
           ) : (
             <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-              Formato: {country.dialCode} + {country.phoneDigits} dígitos.
+              {t("addresses.form.phoneFormat", { dialCode: country.dialCode, digits: country.phoneDigits })}
             </span>
           )}
         </div>
@@ -391,7 +436,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-line1" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Dirección
+          {t("addresses.form.line1Label")}
         </label>
         <input
           id="address-line1"
@@ -399,7 +444,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
           onChange={handleLine1Change}
           onBlur={handleLine1Blur}
           type="text"
-          placeholder="Calle, número…"
+          placeholder={t("addresses.form.line1Placeholder")}
           autoComplete="address-line1"
           aria-describedby={touched.line1 && errors.line1 ? "address-line1-error" : undefined}
           aria-invalid={touched.line1 && errors.line1 ? "true" : undefined}
@@ -416,14 +461,14 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-line2" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Apto, interior o referencia (opcional)
+          {t("addresses.form.line2Label")}
         </label>
         <input
           id="address-line2"
           value={line2}
           onChange={(e) => setLine2(e.target.value)}
           type="text"
-          placeholder="Apto 501, torre 2…"
+          placeholder={t("addresses.form.line2Placeholder")}
           autoComplete="address-line2"
           style={inputStyle(false)}
         />
@@ -431,20 +476,43 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
       <div style={{ marginTop: 14 }}>
         <label htmlFor="address-stateProvince" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Departamento / estado
+          {t("addresses.form.stateProvinceLabel")}
         </label>
-        <input
-          id="address-stateProvince"
-          value={stateProvince}
-          onChange={handleStateProvinceChange}
-          onBlur={handleStateProvinceBlur}
-          type="text"
-          placeholder="Tu departamento o estado"
-          autoComplete="address-level1"
-          aria-describedby={touched.stateProvince && errors.stateProvince ? "address-stateProvince-error" : undefined}
-          aria-invalid={touched.stateProvince && errors.stateProvince ? "true" : undefined}
-          style={inputStyle(touched.stateProvince && errors.stateProvince)}
-        />
+        {showDepartmentSelect ? (
+          <select
+            id="address-stateProvince"
+            value={stateProvince}
+            onChange={handleDepartmentSelect}
+            onBlur={handleStateProvinceBlur}
+            disabled={loadingDepartments}
+            aria-describedby={touched.stateProvince && errors.stateProvince ? "address-stateProvince-error" : undefined}
+            aria-invalid={touched.stateProvince && errors.stateProvince ? "true" : undefined}
+            style={selectStyle}
+          >
+            <option value="">
+              {loadingDepartments ? t("addresses.form.loadingDepartments") : t("addresses.form.selectDepartmentPlaceholder")}
+            </option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.name}>{d.name}</option>
+            ))}
+            {stateProvince && !departments.some((d) => d.name === stateProvince) && (
+              <option value={stateProvince}>{stateProvince}</option>
+            )}
+          </select>
+        ) : (
+          <input
+            id="address-stateProvince"
+            value={stateProvince}
+            onChange={handleStateProvinceChange}
+            onBlur={handleStateProvinceBlur}
+            type="text"
+            placeholder={t("addresses.form.stateProvincePlaceholder")}
+            autoComplete="address-level1"
+            aria-describedby={touched.stateProvince && errors.stateProvince ? "address-stateProvince-error" : undefined}
+            aria-invalid={touched.stateProvince && errors.stateProvince ? "true" : undefined}
+            style={inputStyle(touched.stateProvince && errors.stateProvince)}
+          />
+        )}
         <div style={{ minHeight: 18, marginTop: 4 }}>
           {touched.stateProvince && errors.stateProvince && (
             <span id="address-stateProvince-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
@@ -457,20 +525,41 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
         <div>
           <label htmlFor="address-city" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-            Ciudad
+            {t("addresses.form.cityLabel")}
           </label>
-          <input
-            id="address-city"
-            value={city}
-            onChange={handleCityChange}
-            onBlur={handleCityBlur}
-            type="text"
-            placeholder="Tu ciudad"
-            autoComplete="address-level2"
-            aria-describedby={touched.city && errors.city ? "address-city-error" : undefined}
-            aria-invalid={touched.city && errors.city ? "true" : undefined}
-            style={inputStyle(touched.city && errors.city)}
-          />
+          {showCitySelect ? (
+            <select
+              id="address-city"
+              value={city}
+              onChange={handleCitySelect}
+              onBlur={handleCityBlur}
+              disabled={!stateProvince || loadingCities}
+              aria-describedby={touched.city && errors.city ? "address-city-error" : undefined}
+              aria-invalid={touched.city && errors.city ? "true" : undefined}
+              style={selectStyle}
+            >
+              <option value="">
+                {loadingCities ? t("addresses.form.loadingCities") : t("addresses.form.selectCityPlaceholder")}
+              </option>
+              {cities.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+              {city && !cities.some((c) => c.name === city) && <option value={city}>{city}</option>}
+            </select>
+          ) : (
+            <input
+              id="address-city"
+              value={city}
+              onChange={handleCityChange}
+              onBlur={handleCityBlur}
+              type="text"
+              placeholder={t("addresses.form.cityPlaceholder")}
+              autoComplete="address-level2"
+              aria-describedby={touched.city && errors.city ? "address-city-error" : undefined}
+              aria-invalid={touched.city && errors.city ? "true" : undefined}
+              style={inputStyle(touched.city && errors.city)}
+            />
+          )}
           <div style={{ minHeight: 18, marginTop: 4 }}>
             {touched.city && errors.city && (
               <span id="address-city-error" role="alert" style={{ fontSize: 11, color: "#9C4A4A" }}>
@@ -482,7 +571,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
 
         <div>
           <label htmlFor="address-postal-code" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-            Código postal
+            {t("addresses.form.postalCodeLabel")}
           </label>
           <input
             id="address-postal-code"
@@ -502,7 +591,7 @@ export const AddressForm = forwardRef(({ initialValues }, ref) => {
                 {errors.postalCode}
               </span>
             ) : (
-              <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>Ej. {country.postalCodeExample}</span>
+              <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>{t("addresses.form.postalCodeExample", { example: country.postalCodeExample })}</span>
             )}
           </div>
         </div>

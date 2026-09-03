@@ -142,7 +142,11 @@
       "postalCodeLabel": "Postal code",
       "postalCodeRequired": "We need the postal code.",
       "postalCodeInvalid": "Invalid format for {{country}} (e.g. {{example}}).",
-      "postalCodeExample": "E.g. {{example}}"
+      "postalCodeExample": "E.g. {{example}}",
+      "selectDepartmentPlaceholder": "Select a department",
+      "selectCityPlaceholder": "Select a municipality",
+      "loadingDepartments": "Loading departments…",
+      "loadingCities": "Loading municipalities…"
     },
     "formModal": {
       "eyebrow": "Addresses",

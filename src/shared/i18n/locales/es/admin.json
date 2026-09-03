@@ -214,7 +214,25 @@
     "cancel": "Cancelar",
     "uploadErrorGeneric": "No se pudo subir la imagen.",
     "requiredFieldsError": "La imagen y el título son obligatorios.",
+    "requiredPlacementError": "Selecciona al menos una ubicación.",
     "saveErrorGeneric": "No se pudo guardar el banner.",
+    "category": {
+      "EVENTO": "Evento",
+      "KIT": "Kit",
+      "PROMOCION": "Promoción",
+      "LANZAMIENTO": "Lanzamiento",
+      "COLECCION": "Colección",
+      "GENERAL": "General"
+    },
+    "actionType": {
+      "COMPRAR": "Comprar",
+      "INSCRIPCION": "Inscripción",
+      "MAS_INFORMACION": "Más información"
+    },
+    "placement": {
+      "WELCOME_MODAL": "Modal de bienvenida",
+      "HOME_SECTION": "Sección del home"
+    },
     "form": {
       "eyebrow": "Banners",
       "editTitle": "Editar banner",
@@ -224,6 +242,11 @@
       "uploadButton": "Subir imagen",
       "titleLabel": "Título",
       "linkLabel": "Link (opcional)",
+      "categoryLabel": "Categoría",
+      "actionTypeLabel": "Tipo de acción",
+      "placementsLabel": "Ubicación",
+      "placementWelcomeModal": "Modal de bienvenida (aparece al entrar al sitio)",
+      "placementHomeSection": "Sección del home (carrusel permanente)",
       "startsAt": "Desde",
       "endsAt": "Hasta",
       "activeLabel": "Activo",

@@ -1,3 +1,4 @@
+import "@shared/i18n/i18n";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EmailVerificationModal } from "@features/auth/components/verify-email/EmailVerificationModal";
