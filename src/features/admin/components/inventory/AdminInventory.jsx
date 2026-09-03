@@ -53,14 +53,14 @@ const InventoryRow = ({ item, onSaved }) => {
       <div>
         <span className="cell-label">{t("inventory.columns.stock")}</span>
         <div style={{ display: "flex", gap: 6 }}>
-          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" min="0" style={{ width: 70, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
+          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveStock()} type="number" min="0" style={{ width: 70, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
           <button onClick={saveStock} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>{t("inventory.save")}</button>
         </div>
       </div>
       <div>
         <span className="cell-label">{t("inventory.columns.threshold")}</span>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <input value={threshold} onChange={(e) => setThreshold(e.target.value)} type="number" min="0" placeholder={t("inventory.thresholdPlaceholder")} style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
+          <input value={threshold} onChange={(e) => setThreshold(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveThreshold()} type="number" min="0" placeholder={t("inventory.thresholdPlaceholder")} style={{ width: 60, padding: "8px 8px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12.5 }} />
           <button onClick={saveThreshold} disabled={saving} className="foc" style={{ border: "1px solid var(--line)", borderRadius: 8, background: "#fff", fontSize: 11, padding: "0 10px", cursor: "pointer" }}>{t("inventory.save")}</button>
         </div>
       </div>
@@ -102,8 +102,8 @@ export const AdminInventory = () => {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  const load = () => {
-    setStatus("loading");
+  const load = ({ silent } = {}) => {
+    if (!silent) setStatus("loading");
     listInventory({ page, limit: 20, search: search || undefined, categoryId: categoryId || undefined, onlyLowStock, sort }, getAccessToken())
       .then((res) => {
         setItems(res.items);
@@ -161,7 +161,7 @@ export const AdminInventory = () => {
           <InventoryRow
             key={item.variantId}
             item={item}
-            onSaved={(next) => setItems((its) => its.map((i) => (i.variantId === next.variantId ? next : i)))}
+            onSaved={() => load({ silent: true })}
           />
         ))}
         <Pagination meta={meta} page={page} onPageChange={setPage} />

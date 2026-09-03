@@ -369,6 +369,7 @@
       "presentationSection": "Presentación",
       "presentationsSection": "Presentaciones",
       "presentationUnique": "Presentación única",
+      "loadingVariants": "Cargando presentaciones…",
       "addImages": "Agregar imágenes",
       "removeImageAria": "Quitar imagen",
       "uploading": "Subiendo…",
@@ -388,7 +389,8 @@
         "removeImageFailed": "No se pudo quitar la imagen.",
         "createVariantFailed": "No se pudo crear la variante.",
         "removeVariantFailed": "No se pudo eliminar la variante.",
-        "lastVariant": "No se puede eliminar la última variante del producto."
+        "lastVariant": "No se puede eliminar la última variante del producto.",
+        "loadVariantsFailed": "No se pudieron cargar las presentaciones del producto."
       }
     }
   },

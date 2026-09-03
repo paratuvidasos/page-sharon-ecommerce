@@ -369,6 +369,7 @@
       "presentationSection": "Variant",
       "presentationsSection": "Variants",
       "presentationUnique": "Single variant",
+      "loadingVariants": "Loading variants…",
       "addImages": "Add images",
       "removeImageAria": "Remove image",
       "uploading": "Uploading…",
@@ -388,7 +389,8 @@
         "removeImageFailed": "Couldn't remove the image.",
         "createVariantFailed": "Couldn't create the variant.",
         "removeVariantFailed": "Couldn't remove the variant.",
-        "lastVariant": "You can't remove the product's last variant."
+        "lastVariant": "You can't remove the product's last variant.",
+        "loadVariantsFailed": "Couldn't load the product's variants."
       }
     }
   },
