@@ -10,6 +10,14 @@
     "CANCELLED": "Cancelado",
     "REFUNDED": "Reembolsado"
   },
+  "trackingStatusLabels": {
+    "PENDING": "Preparando envío",
+    "IN_TRANSIT": "En camino",
+    "OUT_FOR_DELIVERY": "En reparto",
+    "DELIVERED": "Entregado",
+    "EXCEPTION": "Hubo un inconveniente con el envío",
+    "UNKNOWN": "Sin novedades por ahora"
+  },
   "history": {
     "eyebrow": "Tu cuenta",
     "title": "Historial de pedidos",
@@ -32,6 +40,9 @@
     "trackShipment": "Rastrear envío",
     "shippedOn": "Enviado el {{date}}",
     "deliveredOn": "Entregado el {{date}}",
-    "tracking": "Seguimiento del pedido"
+    "tracking": "Seguimiento del pedido",
+    "realTimeTracking": "Seguimiento del envío",
+    "lastSyncedAt": "Actualizado el {{date}}",
+    "notSyncedYet": "Estamos por confirmar el estado con la transportadora"
   }
 }

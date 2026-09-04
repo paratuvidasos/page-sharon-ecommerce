@@ -11,6 +11,7 @@ import { PRODUCTS } from "@features/catalog/data/products";
 import { getOrder } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
 import { getStatus } from "../data/statuses";
+import { ShipmentTrackingSection } from "./ShipmentTrackingSection";
 
 const formatDate = (isoDate) => formatDateBase(isoDate, { month: "long" });
 
@@ -174,6 +175,8 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
           </div>
         )}
 
+        <ShipmentTrackingSection order={order} />
+
         {order.statusHistory?.length > 0 && (
           <div style={{ marginTop: 20 }}>
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>{t("detail.tracking")}</span>
@@ -183,11 +186,11 @@ export const OrderDetailModal = ({ order: summary, onClose, zIndex = Z.orderDeta
                 return (
                   <div key={i} style={{ display: "flex", gap: 12, paddingBottom: i === order.statusHistory.length - 1 ? 0 : 14 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <span style={{ width: 9, height: 9, borderRadius: 999, background: entryStatus.color, flexShrink: 0, marginTop: 3 }} />
+                      <span style={{ width: 9, height: 9, borderRadius: 999, background: entryStatus.dot, flexShrink: 0, marginTop: 3 }} />
                       {i !== order.statusHistory.length - 1 && <span style={{ width: 1, flex: 1, background: "var(--line)", marginTop: 4 }} />}
                     </div>
                     <div style={{ paddingBottom: 4 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500 }}>{entryStatus.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500 }}>{t(`statusLabels.${entryStatus.value}`)}</div>
                       <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{formatDateTime(entry.changedAt)}</div>
                       {entry.note && <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{entry.note}</div>}
                     </div>
