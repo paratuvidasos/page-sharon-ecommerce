@@ -45,7 +45,7 @@ export const MobileMenu = ({ open, onClose, user, wishlistCount, onOpenWishlist,
     let cancelled = false;
     listProducts({ limit: 1 })
       .then((res) => {
-        if (!cancelled) setProductCount(res.meta?.total ?? res.items.length);
+        if (!cancelled && res) setProductCount(res.meta?.total ?? res.items?.length ?? 0);
       })
       .catch(() => {});
     return () => {

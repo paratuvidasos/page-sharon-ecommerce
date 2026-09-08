@@ -22,7 +22,7 @@ export const FeaturedProducts = ({ onWish, wishlistIds, onOpenProduct }) => {
     let cancelled = false;
     getFeaturedProducts()
       .then((res) => {
-        if (!cancelled) setItems(res.items.map(normalizeProduct));
+        if (!cancelled) setItems(Array.isArray(res?.items) ? res.items.map(normalizeProduct) : []);
       })
       .catch(() => {
         if (!cancelled) setItems([]);
