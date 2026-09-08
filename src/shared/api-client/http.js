@@ -1,6 +1,9 @@
 const ENV_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const ENV_API_PROCESS_URL = process.env.VITE_API_BASE_URL;
 export const BASE_URL = (ENV_API_BASE_URL || "http://localhost:3000/api/v1").replace(/\/$/, "");
-
+console.log("ENV_API_BASE_URL", ENV_API_BASE_URL);
+console.log("ENV_API_PROCESS_URL", ENV_API_PROCESS_URL);
+console.log("BASE_URL", BASE_URL);
 export class ApiError extends Error {
   constructor(status, body) {
     super(body?.message || `Error de la API (${status})`);
