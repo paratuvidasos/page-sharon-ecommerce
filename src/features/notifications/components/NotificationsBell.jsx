@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Z } from "@ui/zIndex";
@@ -43,6 +44,7 @@ const PrefToggle = ({ label, checked, onChange }) => (
 // una fila completa de menú — usado dentro de MobileMenu.jsx, donde el ícono normal
 // del header no está montado (ver Nav.jsx .nav-icons-desktop, oculto bajo 900px).
 export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" }) => {
+  const { t } = useTranslation("notifications");
   const { user, getAccessToken } = useAuth();
   const [open, setOpen] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
@@ -157,7 +159,7 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" 
           }}
         >
           <Icon name="bell" size={17} color="var(--ink-soft)" />
-          Notificaciones
+          {t("bell.menuRowLabel")}
           {unreadCount > 0 && (
             <span className="mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--terracotta)" }}>{unreadCount}</span>
           )}
@@ -167,7 +169,7 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" 
           icon="bell"
           iconSize={18}
           onClick={toggle}
-          aria-label="Notificaciones"
+          aria-label={t("bell.ariaLabel")}
           badge={unreadCount}
           badgeColor="var(--terracotta)"
           style={triggerStyle}
@@ -194,15 +196,15 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" 
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <span className="eyebrow" style={{ fontSize: 10 }}>Notificaciones</span>
+            <span className="eyebrow" style={{ fontSize: 10 }}>{t("bell.title")}</span>
             <div style={{ display: "flex", gap: 10 }}>
               {!prefsOpen && unreadCount > 0 && (
                 <button type="button" onClick={handleMarkAllRead} style={linkButtonStyle}>
-                  Marcar todas
+                  {t("bell.markAll")}
                 </button>
               )}
               <button type="button" onClick={prefsOpen ? () => setPrefsOpen(false) : openPreferences} style={linkButtonStyle}>
-                {prefsOpen ? "Volver" : "Preferencias"}
+                {prefsOpen ? t("bell.back") : t("bell.preferences")}
               </button>
             </div>
           </div>
@@ -210,20 +212,20 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" 
           {prefsOpen ? (
             <div style={{ padding: "4px 0" }}>
               {!prefs ? (
-                <p style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>Cargando…</p>
+                <p style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{t("bell.loading")}</p>
               ) : (
                 <>
-                  <PrefToggle label="Avisarme por correo" checked={prefs.emailEnabled} onChange={() => togglePref("emailEnabled")} />
-                  <PrefToggle label="Avisarme en la app" checked={prefs.inAppEnabled} onChange={() => togglePref("inAppEnabled")} />
+                  <PrefToggle label={t("bell.prefs.email")} checked={prefs.emailEnabled} onChange={() => togglePref("emailEnabled")} />
+                  <PrefToggle label={t("bell.prefs.inApp")} checked={prefs.inAppEnabled} onChange={() => togglePref("inAppEnabled")} />
                 </>
               )}
             </div>
           ) : (
             <div style={{ overflowY: "auto" }}>
               {loading ? (
-                <p style={{ fontSize: 12.5, color: "var(--ink-soft)", padding: "8px 0" }}>Cargando…</p>
+                <p style={{ fontSize: 12.5, color: "var(--ink-soft)", padding: "8px 0" }}>{t("bell.loading")}</p>
               ) : items.length === 0 ? (
-                <p style={{ fontSize: 12.5, color: "var(--ink-soft)", padding: "8px 0" }}>No tienes notificaciones.</p>
+                <p style={{ fontSize: 12.5, color: "var(--ink-soft)", padding: "8px 0" }}>{t("bell.empty")}</p>
               ) : (
                 items.map((item) => {
                   const isRead = item.read ?? Boolean(item.readAt);
@@ -244,7 +246,7 @@ export const NotificationsBell = ({ onOpenOrder, triggerStyle, variant = "icon" 
                         marginBottom: 4,
                       }}
                     >
-                      <div style={{ fontSize: 13, fontWeight: isRead ? 400 : 600 }}>{item.title || item.message || "Notificación"}</div>
+                      <div style={{ fontSize: 13, fontWeight: isRead ? 400 : 600 }}>{item.title || item.message || t("bell.defaultTitle")}</div>
                       {item.title && item.message && (
                         <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>{item.message}</div>
                       )}

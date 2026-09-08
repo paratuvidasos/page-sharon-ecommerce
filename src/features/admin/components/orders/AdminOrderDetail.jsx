@@ -4,16 +4,15 @@ import { Icon } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { getAdminOrder } from "@shared/api-client";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDateTime } from "@shared/i18n/date";
 import { getStatus } from "@features/orders/data/statuses";
-
-const formatDateTime = (iso) =>
-  new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+import { ShipmentTrackingSection } from "@features/orders/components/ShipmentTrackingSection";
 
 // Detalle de un pedido desde el panel admin: GET /admin/orders/:orderNumber, distinto
 // del OrderDetailModal del cliente (features/orders) — trae changedByAdminLabel en la
 // línea de tiempo, que el cliente no necesita ver.
 export const AdminOrderDetail = ({ orderNumber, onClose }) => {
-  const { t } = useTranslation("admin");
+  const { t } = useTranslation(["admin", "orders"]);
   const { getAccessToken } = useAuth();
   const [order, setOrder] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -52,7 +51,7 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
         {status === "ready" && order && (
           <>
             <span style={{ display: "inline-block", marginBottom: 20, fontSize: 10, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: getStatus(order.status).color, background: getStatus(order.status).bg, padding: "4px 10px", borderRadius: 999 }}>
-              {getStatus(order.status).label}
+              {t(`statusLabels.${getStatus(order.status).value}`, { ns: "orders" })}
             </span>
 
             <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>{t("orders.detail.products")}</div>
@@ -81,17 +80,19 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
               {order.shipment?.trackingNumber && <> · {t("orders.detail.shipmentTracking", { trackingNumber: order.shipment.trackingNumber, carrierName: order.shipment.carrierName })}</>}
             </p>
 
+            <ShipmentTrackingSection order={order} />
+
             {order.statusHistory?.length > 0 && (
-              <>
+              <div style={{ marginTop: 20 }}>
                 <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>{t("orders.detail.statusHistory")}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {order.statusHistory.map((entry, i) => {
                     const entryStatus = getStatus(entry.status);
                     return (
                       <div key={i} style={{ display: "flex", gap: 12, paddingBottom: i === order.statusHistory.length - 1 ? 0 : 12 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: 999, background: entryStatus.color, flexShrink: 0, marginTop: 5 }} />
+                        <span style={{ width: 8, height: 8, borderRadius: 999, background: entryStatus.dot, flexShrink: 0, marginTop: 5 }} />
                         <div>
-                          <div style={{ fontSize: 13, fontWeight: 600 }}>{entryStatus.label}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600 }}>{t(`statusLabels.${entryStatus.value}`, { ns: "orders" })}</div>
                           <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>
                             {formatDateTime(entry.changedAt)}
                             {entry.changedByAdminLabel && <> · {entry.changedByAdminLabel}</>}
@@ -101,7 +102,7 @@ export const AdminOrderDetail = ({ orderNumber, onClose }) => {
                     );
                   })}
                 </div>
-              </>
+              </div>
             )}
           </>
         )}

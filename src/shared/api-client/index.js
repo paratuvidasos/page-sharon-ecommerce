@@ -94,6 +94,7 @@ export {
   setVariantLowStockThreshold,
 } from "./adminCatalog";
 export { listCustomers, suspendCustomer, reactivateCustomer } from "./adminCustomers";
+export { listEmployees, createEmployee, updateEmployee, deleteEmployee } from "./adminTeam";
 export { listAdminReviews, approveReview, rejectReview, hideReview } from "./adminReviews";
 export {
   listBanners,

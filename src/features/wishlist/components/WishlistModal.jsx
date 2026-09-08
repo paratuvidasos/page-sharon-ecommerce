@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Modal } from "@ui/components/Modal";
@@ -14,6 +15,7 @@ import { WishlistRow } from "./WishlistRow";
 // página grande al abrir el modal en vez de una llamada por producto (ver comentario
 // en WishlistRow).
 export const WishlistModal = ({ open, onClose, items, onOpenProduct, onRemove }) => {
+  const { t } = useTranslation("wishlist");
   const [catalogById, setCatalogById] = useState(new Map());
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -78,27 +80,27 @@ export const WishlistModal = ({ open, onClose, items, onOpenProduct, onRemove })
         }}
       >
         <div>
-          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>Favoritos</span>
+          <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>{t("modal.eyebrow")}</span>
           <div id="wishlist-title" className="display" style={{ fontSize: 24, marginTop: 6 }}>
-            Tu lista de deseos
+            {t("modal.title")}
           </div>
         </div>
-        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("modal.close")} />
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", padding: "8px 26px 20px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
-            <p style={{ fontSize: 13 }}>Cargando tus favoritos…</p>
+            <p style={{ fontSize: 13 }}>{t("modal.loading")}</p>
           </div>
         ) : loadError ? (
           <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
-            <p style={{ fontSize: 13 }}>No pudimos cargar tus favoritos. Intenta de nuevo.</p>
+            <p style={{ fontSize: 13 }}>{t("modal.loadError")}</p>
           </div>
         ) : rows.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 8px", color: "var(--ink-soft)" }}>
             <Icon name="heart" size={26} />
-            <p style={{ fontSize: 13, marginTop: 10 }}>Todavía no guardas productos.</p>
+            <p style={{ fontSize: 13, marginTop: 10 }}>{t("modal.empty")}</p>
           </div>
         ) : (
           rows.map(({ item, product }) => (

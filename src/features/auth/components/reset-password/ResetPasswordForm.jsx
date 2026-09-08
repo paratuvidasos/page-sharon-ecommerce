@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthField } from "../AuthField";
 import { resetPassword, ApiError } from "@shared/api-client";
 
@@ -6,20 +7,22 @@ const PASSWORD_RE = /(?=.*[A-Za-z])(?=.*\d).{8,}/;
 
 const INITIAL_FORM = { password: "", confirmPassword: "" };
 
-const FIELDS = [
-  { name: "password", label: "Nueva contraseña", type: "password", placeholder: "Mínimo 8 caracteres", autoComplete: "new-password", full: true, helper: "Mínimo 8 caracteres, con una letra y un número." },
-  { name: "confirmPassword", label: "Confirmar nueva contraseña", type: "password", placeholder: "Repite tu nueva contraseña", autoComplete: "new-password", full: true },
-];
+function getFields(t) {
+  return [
+    { name: "password", label: t("resetPasswordForm.passwordLabel"), type: "password", placeholder: t("resetPasswordForm.passwordPlaceholder"), autoComplete: "new-password", full: true, helper: t("resetPasswordForm.passwordHelper") },
+    { name: "confirmPassword", label: t("resetPasswordForm.confirmPasswordLabel"), type: "password", placeholder: t("resetPasswordForm.confirmPasswordPlaceholder"), autoComplete: "new-password", full: true },
+  ];
+}
 
-function validateField(field, value, form) {
+function validateField(field, value, form, t) {
   switch (field) {
     case "password":
-      if (!value) return "Elige tu nueva contraseña.";
-      if (!PASSWORD_RE.test(value)) return "Necesita al menos 8 caracteres, con una letra y un número.";
+      if (!value) return t("resetPasswordForm.passwordRequired");
+      if (!PASSWORD_RE.test(value)) return t("resetPasswordForm.passwordInvalid");
       return "";
     case "confirmPassword":
-      if (!value) return "Confirma tu nueva contraseña.";
-      if (value !== form.password) return "Las contraseñas no coinciden todavía.";
+      if (!value) return t("resetPasswordForm.confirmPasswordRequired");
+      if (value !== form.password) return t("resetPasswordForm.confirmPasswordMismatch");
       return "";
     default:
       return "";
@@ -30,6 +33,8 @@ function validateField(field, value, form) {
 // política de seguridad que RegisterForm. Se monta solo cuando ResetPasswordModal
 // ya validó que el token del enlace es utilizable.
 export const ResetPasswordForm = forwardRef(({ token }, ref) => {
+  const { t } = useTranslation("auth");
+  const FIELDS = getFields(t);
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -53,9 +58,9 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
     setForm(nextForm);
     setErrors((prev) => {
       const next = { ...prev };
-      if (touched[field]) next[field] = validateField(field, value, nextForm);
+      if (touched[field]) next[field] = validateField(field, value, nextForm, t);
       if (field === "password" && touched.confirmPassword) {
-        next.confirmPassword = validateField("confirmPassword", nextForm.confirmPassword, nextForm);
+        next.confirmPassword = validateField("confirmPassword", nextForm.confirmPassword, nextForm, t);
       }
       return next;
     });
@@ -63,7 +68,7 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
 
   const handleBlur = (field) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field], form) }));
+    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field], form, t) }));
   };
 
   const invalidFields = FIELDS.filter(({ name }) => errors[name]);
@@ -72,7 +77,7 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
     submit: async () => {
       const nextErrors = {};
       FIELDS.forEach(({ name }) => {
-        nextErrors[name] = validateField(name, form[name], form);
+        nextErrors[name] = validateField(name, form[name], form, t);
       });
       setErrors(nextErrors);
       setTouched(Object.fromEntries(FIELDS.map(({ name }) => [name, true])));
@@ -80,7 +85,7 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
       const hasErrors = FIELDS.some(({ name }) => nextErrors[name]);
       if (hasErrors) {
         setShowSummary(true);
-        setSummaryToken((t) => t + 1);
+        setSummaryToken((prev) => prev + 1);
         return { ok: false };
       }
 
@@ -93,7 +98,7 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
         if (e instanceof ApiError && e.code === "PASSWORD_RESET_TOKEN_INVALID") {
           return { ok: false, tokenInvalid: true };
         }
-        setServerError("No pudimos actualizar tu contraseña. Intenta de nuevo en unos segundos.");
+        setServerError(t("resetPasswordForm.genericError"));
         return { ok: false };
       }
     },
@@ -116,7 +121,7 @@ export const ResetPasswordForm = forwardRef(({ token }, ref) => {
           }}
         >
           <div style={{ fontWeight: 600, fontSize: 13, color: "#7A3535", marginBottom: 8 }}>
-            Hay campos por revisar
+            {t("resetPasswordForm.summaryTitle")}
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {invalidFields.map(({ name, label }) => (

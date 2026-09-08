@@ -6,4 +6,4 @@ dist-ssr
 
 .DS_Store
 .claude
-CLAUDE.md
+docker-compose.yml

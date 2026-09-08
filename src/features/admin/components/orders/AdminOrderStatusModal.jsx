@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@shared/auth/AuthContext";
-import { setOrderStatus } from "@shared/api-client";
+import { setOrderStatus, getAdminOrder } from "@shared/api-client";
 import { ORDER_STATUSES } from "@features/orders/data/statuses";
 import { AdminFormSheet } from "../AdminFormSheet";
 
@@ -19,7 +19,7 @@ const fieldStyle = {
 const labelStyle = { fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 700, display: "block", marginBottom: 6 };
 
 export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
-  const { t } = useTranslation("admin");
+  const { t } = useTranslation(["admin", "orders"]);
   const { getAccessToken } = useAuth();
   const currentIsTransitionable = NEXT_STATUSES.some((s) => s.value === order.status);
   const [nextStatus, setNextStatus] = useState(currentIsTransitionable ? order.status : NEXT_STATUSES[0].value);
@@ -29,6 +29,26 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  // `order` llega como la fila liviana del listado (GET /admin/orders), que puede no
+  // traer `shipment` — se pide el detalle completo al abrir para precargar la guía ya
+  // guardada (si el pedido ya estaba SHIPPED) en vez de dejar los campos siempre en
+  // blanco, que era lo que pasaba antes sin importar si ya había datos de envío.
+  useEffect(() => {
+    let cancelled = false;
+    getAdminOrder(order.orderNumber, getAccessToken())
+      .then((data) => {
+        if (cancelled || !data.shipment) return;
+        setCarrierCode(data.shipment.carrierCode || "");
+        setCarrierName(data.shipment.carrierName || "");
+        setTrackingNumber(data.shipment.trackingNumber || "");
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order.orderNumber]);
 
   const needsCarrier = nextStatus === "SHIPPED";
   const needsReason = nextStatus === "CANCELLED" || nextStatus === "REFUNDED";
@@ -73,7 +93,7 @@ export const AdminOrderStatusModal = ({ order, onClose, onUpdated }) => {
             <label style={labelStyle}>{t("orders.statusModal.newStatus")}</label>
             <select value={nextStatus} onChange={(e) => setNextStatus(e.target.value)} style={fieldStyle}>
               {NEXT_STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s.value} value={s.value}>{t(`statusLabels.${s.value}`, { ns: "orders" })}</option>
               ))}
             </select>
           </div>

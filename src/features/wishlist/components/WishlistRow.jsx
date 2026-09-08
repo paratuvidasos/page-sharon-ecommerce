@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { IconButton } from "@ui/components/IconButton";
 import { ProductImage } from "@ui/ProductImage";
 import { formatCurrency } from "@shared/i18n/currency";
@@ -6,6 +7,7 @@ import { formatCurrency } from "@shared/i18n/currency";
 // el catálogo local (products.js) porque el backend de wishlist solo devuelve
 // productId + addedAt (el módulo catalog todavía no existe del lado del backend).
 export const WishlistRow = ({ product, onOpenProduct, onRemove }) => {
+  const { t } = useTranslation("wishlist");
   if (!product) return null;
 
   return (
@@ -49,14 +51,14 @@ export const WishlistRow = ({ product, onOpenProduct, onRemove }) => {
           whiteSpace: "nowrap",
         }}
       >
-        Añadir
+        {t("row.add")}
       </button>
       <IconButton
         icon="close"
         size={32}
         iconSize={16}
         onClick={() => onRemove(product)}
-        aria-label="Quitar de favoritos"
+        aria-label={t("row.remove")}
       />
     </div>
   );

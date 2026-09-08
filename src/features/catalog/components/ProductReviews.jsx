@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, Stars } from "@ui/Icon";
 import { useAuth } from "@shared/auth/AuthContext";
 import { listReviews, createReview, ApiError } from "@shared/api-client";
-
-const formatDate = (iso) => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
+import { formatDate } from "@shared/i18n/date";
 
 // [0021][BE] Reseñas: listar (público) + escribir (requiere sesión y haber comprado
 // el producto). `canReview` lo calcula el padre a partir de `orders` (ya vive en

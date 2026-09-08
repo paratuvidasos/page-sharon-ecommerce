@@ -110,15 +110,14 @@
       "help": { "title": "Help", "links": ["Shipping & delivery", "Returns", "Hair type guide", "Contact", "FAQ"] },
       "brand": { "title": "Sharon", "links": ["About us", "Ingredients", "Sustainability", "Professional program", "Journal / Blog"] }
     },
-    "copyright": "© 2026 Sharon Hair Co. · All rights reserved",
-    "securePayments": "Secure payments:"
+    "copyright": "© 2026 Sharon Hair Co. · All rights reserved"
   },
-  "campaignCarousel": {
-    "activeUntil": "Active until {{date}}",
-    "viewCampaign": "View campaign →",
-    "goToCampaign": "Go to campaign {{number}}",
-    "prevCampaign": "Previous campaign",
-    "nextCampaign": "Next campaign"
+  "welcomeBanner": {
+    "close": "Close",
+    "goToSlide": "Go to promotion {{number}}",
+    "ctaBuy": "Shop",
+    "ctaSubscribe": "Sign up",
+    "reopen": "View promotions"
   },
   "cartFab": {
     "ariaLabel": "View bag"

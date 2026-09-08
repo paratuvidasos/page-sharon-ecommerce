@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { useSignIn } from "@clerk/react/legacy";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
@@ -14,56 +15,53 @@ import FotoLogin from "@assets/img/sharon_img_4.jpg";
 
 const RESEND_COOLDOWN_S = 45;
 
-function getSuccessCopy(info) {
+function getSuccessCopy(info, t) {
   if (!info) return { title: "", body: null };
   if (info.mode === "forgot") {
     return {
-      title: "Revisa tu correo",
+      title: t("authModal.success.forgotTitle"),
       body: (
-        <>
-          Si <strong>{info.email}</strong> tiene una cuenta con nosotros, te enviamos un enlace para definir una
-          nueva contraseña. El enlace expira en 30 minutos.
-        </>
+        <Trans t={t} i18nKey="authModal.success.forgotBody" values={{ email: info.email }} components={{ strong: <strong /> }} />
       ),
     };
   }
   if (info.mode === "register") {
     return {
-      title: "Revisa tu correo",
+      title: t("authModal.success.registerTitle"),
       body: (
-        <>
-          Si <strong>{info.email}</strong> es válido, te enviamos un correo para verificar tu cuenta antes de
-          poder iniciar sesión.
-        </>
+        <Trans t={t} i18nKey="authModal.success.registerBody" values={{ email: info.email }} components={{ strong: <strong /> }} />
       ),
     };
   }
   return {
-    title: "¡Hola de nuevo!",
-    body: "Ya iniciaste sesión con tu cuenta de Sharon.",
+    title: t("authModal.success.loginTitle"),
+    body: t("authModal.success.loginBody"),
   };
 }
 
 // Contenido del panel de foto: distinto para registro y login (mismo shell de dos
 // paneles, ver diseño 3a/4b — "4b repite la estructura de dos paneles del registro
 // para que la pareja se lea como un solo sistema").
-const PHOTO_PANEL = {
-  register: {
-    src: FotoRegistro,
-    alt: "Hábitos Sharon",
-    tagline: <>Tus hábitos, guardados en un solo lugar.</>,
-    bullets: ["Direcciones y datos listos al pagar", "Historial de pedidos y reordenar", "-10% de bienvenida"],
-  },
-  login: {
-    src: FotoLogin,
-    alt: "Hábitos Sharon",
-    tagline: <>Tus hábitos siguen donde los dejaste.</>,
-    bullets: [],
-  },
-};
+function getPhotoPanel(t) {
+  return {
+    register: {
+      src: FotoRegistro,
+      alt: t("authModal.photoPanel.register.alt"),
+      tagline: t("authModal.photoPanel.register.tagline"),
+      bullets: t("authModal.photoPanel.register.bullets", { returnObjects: true }),
+    },
+    login: {
+      src: FotoLogin,
+      alt: t("authModal.photoPanel.login.alt"),
+      tagline: t("authModal.photoPanel.login.tagline"),
+      bullets: [],
+    },
+  };
+}
 
 const AuthPhotoPanel = ({ mode }) => {
-  const panel = PHOTO_PANEL[mode];
+  const { t } = useTranslation("auth");
+  const panel = getPhotoPanel(t)[mode];
   return (
     <div style={{ position: "relative", background: "var(--botanic-muted)", minHeight: 480 }} className="auth-photo">
       <img src={panel.src} alt={panel.alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -89,6 +87,7 @@ const AuthPhotoPanel = ({ mode }) => {
 };
 
 export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSuccess }) => {
+  const { t } = useTranslation("auth");
   const { signIn, isLoaded: clerkLoaded } = useSignIn();
   const [mode, setMode] = useState(initialMode);
   const [submitting, setSubmitting] = useState(false);
@@ -205,13 +204,13 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
         redirectUrlComplete: "/",
       });
     } catch {
-      setGoogleError("No pudimos conectar con Google. Intenta de nuevo.");
+      setGoogleError(t("authModal.googleGenericError"));
       setGoogleLoading(false);
     }
   };
 
   const busy = submitting || googleLoading || (mode === "login" && loginLocked);
-  const successCopy = success ? getSuccessCopy(successInfo) : null;
+  const successCopy = success ? getSuccessCopy(successInfo, t) : null;
 
   // Registro y login comparten el shell de dos paneles (diseño 3a/4b, ver
   // "Sharon Mejoras"): foto de marca a la izquierda + formulario a la derecha, con
@@ -231,13 +230,13 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
         }}
       >
         {submitting
-          ? mode === "register" ? "Creando cuenta…" : "Iniciando sesión…"
-          : <>{mode === "register" ? "Crear cuenta" : "Iniciar sesión"} <Icon name="arrow" size={16} /></>}
+          ? mode === "register" ? t("authModal.creatingAccount") : t("authModal.signingIn")
+          : <>{mode === "register" ? t("authModal.createAccountCta") : t("authModal.signInCta")} <Icon name="arrow" size={16} /></>}
       </Button>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "16px 0" }}>
         <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
-        <span className="eyebrow" style={{ fontSize: 9.5 }}>o</span>
+        <span className="eyebrow" style={{ fontSize: 9.5 }}>{t("authModal.or")}</span>
         <span style={{ flex: 1, height: 1, background: "var(--line)" }} />
       </div>
 
@@ -258,13 +257,15 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
           opacity: busy ? 0.6 : 1, cursor: busy ? "not-allowed" : "pointer",
         }}
       >
-        <Icon name="google" size={18} /> {googleLoading ? "Conectando con Google…" : "Continuar con Google"}
+        <Icon name="google" size={18} /> {googleLoading ? t("authModal.connectingGoogle") : t("authModal.continueWithGoogle")}
       </Button>
 
       <div style={{ fontSize: 11, color: "var(--ink-soft)", textAlign: "center", marginTop: 12 }}>
-        {mode === "register"
-          ? <>Al crear tu cuenta aceptas los <a href="#terminos">términos y condiciones</a>.</>
-          : <>Al iniciar sesión aceptas los <a href="#terminos">términos y condiciones</a>.</>}
+        <Trans
+          t={t}
+          i18nKey={mode === "register" ? "authModal.registerTermsNotice" : "authModal.loginTermsNotice"}
+          components={{ link: <a href="#terminos" /> }}
+        />
       </div>
     </>
   );
@@ -296,22 +297,22 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                 size={36}
                 iconSize={16}
                 onClick={close}
-                aria-label="Cerrar"
+                aria-label={t("authModal.closeAria")}
                 style={{ position: "absolute", right: 22, top: 22, background: "var(--cream-2)" }}
               />
 
               <div className="eyebrow" style={{ color: "var(--botanic-deep)" }}>
-                {mode === "register" ? "Crea tu cuenta" : "Inicia sesión"}
+                {mode === "register" ? t("authModal.createAccountEyebrow") : t("authModal.signInEyebrow")}
               </div>
               <div id="auth-modal-title" className="display" style={{ fontSize: 30, lineHeight: 1.08, margin: "8px 0 0" }}>
-                {mode === "register" ? (
-                  <>Empieza tus <span className="script" style={{ color: "var(--botanic-deep)" }}>hábitos</span></>
-                ) : (
-                  <>Vuelve a tus <span className="script" style={{ color: "var(--botanic-deep)" }}>hábitos</span></>
-                )}
+                <Trans
+                  t={t}
+                  i18nKey={mode === "register" ? "authModal.startHabitsHeading" : "authModal.backToHabitsHeading"}
+                  components={{ accent: <span className="script" style={{ color: "var(--botanic-deep)" }} /> }}
+                />
               </div>
 
-              <div style={{ display: "flex", gap: 24, margin: "18px 0 20px", borderBottom: "1px solid var(--line)" }} role="group" aria-label="Elige registrarte o iniciar sesión">
+              <div style={{ display: "flex", gap: 24, margin: "18px 0 20px", borderBottom: "1px solid var(--line)" }} role="group" aria-label={t("authModal.modeGroupAria")}>
                 <button
                   type="button"
                   disabled={submitting}
@@ -325,7 +326,7 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                     marginBottom: -1,
                   }}
                 >
-                  Crear cuenta
+                  {t("authModal.createAccountTab")}
                 </button>
                 <button
                   type="button"
@@ -340,7 +341,7 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                     marginBottom: -1,
                   }}
                 >
-                  Iniciar sesión
+                  {t("authModal.signInTab")}
                 </button>
               </div>
 
@@ -398,27 +399,27 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                       cursor: "pointer",
                     }}
                   >
-                    <Icon name="chev-l" size={14} /> Volver a iniciar sesión
+                    <Icon name="chev-l" size={14} /> {t("authModal.backToLogin")}
                   </button>
                 )}
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                   <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--botanic-deep)" }} />
                   <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em" }}>
-                    {success ? "" : "Recupera tu acceso"}
+                    {success ? "" : t("authModal.recoverAccess")}
                   </span>
                 </div>
                 <div id="auth-modal-title" className="display" style={{ fontSize: 26, lineHeight: 1.1 }}>
                   {success ? successCopy.title : (
-                    <>Recupera tu <span className="script" style={{ color: "var(--botanic-deep)" }}>acceso</span></>
+                    <Trans t={t} i18nKey="authModal.recoverAccessHeading" components={{ accent: <span className="script" style={{ color: "var(--botanic-deep)" }} /> }} />
                   )}
                 </div>
                 {!success && (
                   <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 380 }}>
-                    Escribe tu correo y te enviaremos un enlace para definir una nueva contraseña. Expira en 30 minutos.
+                    {t("authModal.forgotDescription")}
                   </p>
                 )}
               </div>
-              <IconButton icon="close" size={38} iconSize={20} onClick={close} aria-label="Cerrar" />
+              <IconButton icon="close" size={38} iconSize={20} onClick={close} aria-label={t("authModal.closeAria")} />
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -445,14 +446,14 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                     <div style={{ marginTop: 14 }}>
                       {resendStatus === "sent" ? (
                         <p style={{ fontSize: 12.5, color: "var(--botanic-deep)" }}>
-                          Correo reenviado, revisa tu bandeja de entrada.
-                          {resendCooldown > 0 && ` Puedes volver a intentarlo en ${resendCooldown}s.`}
+                          {t("authModal.resendEmailResent")}
+                          {resendCooldown > 0 && t("authModal.resendEmailCooldownSuffix", { seconds: resendCooldown })}
                         </p>
                       ) : (
                         <>
                           {resendStatus === "error" && (
                             <p role="alert" style={{ fontSize: 12.5, color: "#7A3535", marginBottom: 6 }}>
-                              No pudimos reenviar el correo. Intenta de nuevo.
+                              {t("authModal.resendEmailError")}
                             </p>
                           )}
                           <button
@@ -471,21 +472,21 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                             }}
                           >
                             {resendStatus === "sending"
-                              ? "Reenviando…"
+                              ? t("authModal.resendEmailSending")
                               : resendCooldown > 0
-                                ? `¿No te llegó el correo? Reenviar (${resendCooldown}s)`
-                                : "¿No te llegó el correo? Reenviar"}
+                                ? t("authModal.resendEmailWithCooldown", { seconds: resendCooldown })
+                                : t("authModal.resendEmail")}
                           </button>
                         </>
                       )}
                       <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>
-                        El enlace vence en 24 horas.
+                        {t("authModal.linkExpires")}
                       </p>
                     </div>
                   )}
 
                   <Button onClick={close} style={{ marginTop: 22 }}>
-                    Listo
+                    {t("authModal.done")}
                   </Button>
                 </div>
               ) : (
@@ -512,10 +513,10 @@ export const AuthModal = ({ open, onClose, initialMode = "register", onAuthSucce
                     cursor: busy ? "not-allowed" : "pointer",
                   }}
                 >
-                  {submitting ? "Enviando enlace…" : <>Enviar enlace <Icon name="arrow" size={16} /></>}
+                  {submitting ? t("authModal.sendingLink") : <>{t("authModal.sendLink")} <Icon name="arrow" size={16} /></>}
                 </Button>
                 <div style={{ textAlign: "center", color: "var(--ink-soft)", fontSize: 11, marginTop: 10 }}>
-                  Te enviaremos un correo con las instrucciones para continuar.
+                  {t("authModal.sendLinkNotice")}
                 </div>
               </div>
             )}

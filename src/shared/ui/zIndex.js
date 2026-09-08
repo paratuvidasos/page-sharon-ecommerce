@@ -34,4 +34,7 @@ export const Z = {
   // checkout ya no es modal: es una vista dedicada en /checkout (ver src/pages/CheckoutPage.jsx).
   verifyEmail: 121, // EmailVerificationModal (aterrizaje del enlace de verificación de correo)
   adminNav: 108, // AdminLayout, bottom sheet "Más" del nav inferior de admin en móvil
+  welcomeBanner: 122, // WelcomeBannerModal — modal de bienvenida exclusivo del home
+  // (ver HomePage.jsx), no vive en App.jsx porque es contenido de "/", no un modal
+  // global disparado desde Nav.
 };

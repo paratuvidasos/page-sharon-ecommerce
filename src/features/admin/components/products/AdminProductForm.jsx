@@ -10,6 +10,7 @@ import {
   createProductVariant,
   deleteProductVariant,
   uploadProductImages,
+  getProduct,
 } from "@shared/api-client";
 
 const fieldStyle = { width: "100%", boxSizing: "border-box", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 12, background: "#fff", fontSize: 14, fontFamily: "var(--sans)" };
@@ -69,6 +70,7 @@ export const AdminProductForm = ({ product, onClose, onSaved }) => {
   const [details, setDetails] = useState(emptyDetails(product));
   const [newVariant, setNewVariant] = useState(emptyVariant());
   const [variants, setVariants] = useState(product?.variants || []);
+  const [loadingVariants, setLoadingVariants] = useState(Boolean(product?.id));
   const [savedId, setSavedId] = useState(product?.id || null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -87,6 +89,39 @@ export const AdminProductForm = ({ product, onClose, onSaved }) => {
       .catch(() => setCategories([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // El listado GET /products (usado por AdminProducts) no trae variantes — solo
+  // GET /products/:slug las expone (ver comentario en ProductCard.jsx) — así que al
+  // editar un producto existente hay que pedir el detalle completo para poblar
+  // "Presentaciones" en vez de confiar en `product.variants`, que siempre llega vacío.
+  useEffect(() => {
+    if (!product?.slug) return;
+    let cancelled = false;
+    setLoadingVariants(true);
+    getProduct(product.slug)
+      .then((data) => {
+        if (cancelled) return;
+        setVariants(
+          (data.variants || []).map((v) => ({
+            id: v.id,
+            sku: v.sku,
+            size: v.size || "",
+            scent: v.scent || "",
+            color: v.color || "",
+          }))
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setError(t("products.form.errors.loadVariantsFailed"));
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingVariants(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.slug]);
 
   const submitDetails = async (e) => {
     e.preventDefault();
@@ -327,7 +362,8 @@ export const AdminProductForm = ({ product, onClose, onSaved }) => {
             <div className="stitch" style={{ margin: "24px 0" }} />
 
             <div className="eyebrow" style={{ fontSize: 10, marginBottom: 10 }}>{t("products.form.presentationsSection")}</div>
-            {variants.map((v) => (
+            {loadingVariants && <div style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{t("products.form.loadingVariants")}</div>}
+            {!loadingVariants && variants.map((v) => (
               <div key={v.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px dashed rgba(27,24,21,.16)" }}>
                 <span style={{ fontSize: 13 }}>{[v.size, v.color, v.scent].filter(Boolean).join(" · ") || t("products.form.presentationUnique")}</span>
                 <button type="button" onClick={() => removeVariant(v.id)} className="foc" style={{ background: "none", border: 0, cursor: "pointer" }}>

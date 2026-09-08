@@ -1,3 +1,4 @@
+import "@shared/i18n/i18n";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AuthField } from "@features/auth/components/AuthField";

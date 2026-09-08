@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { COUNTRIES } from "@shared/data/countries";
 
 const selectStyle = {
@@ -16,17 +17,18 @@ const selectStyle = {
 // con el input del número. El país vive en el formulario padre porque cambia junto
 // con la validación del teléfono.
 export const PhoneField = ({ countryCode, phone, error, touched, onCountryChange, onPhoneChange, onBlur }) => {
+  const { t } = useTranslation("profile");
   const country = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
   const hasError = Boolean(touched && error);
 
   return (
     <div>
       <label htmlFor="profile-phone" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-        Teléfono
+        {t("phoneField.label")}
       </label>
       <div style={{ display: "flex", gap: 8 }}>
         <select
-          aria-label="País"
+          aria-label={t("phoneField.countryAriaLabel")}
           value={countryCode}
           onChange={(e) => onCountryChange(e.target.value)}
           style={selectStyle}
@@ -67,7 +69,7 @@ export const PhoneField = ({ countryCode, phone, error, touched, onCountryChange
           </span>
         ) : (
           <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-            Formato: {country.dialCode} + {country.phoneDigits} dígitos.
+            {t("phoneField.format", { dialCode: country.dialCode, digits: country.phoneDigits })}
           </span>
         )}
       </div>

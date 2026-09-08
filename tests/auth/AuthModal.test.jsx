@@ -1,3 +1,4 @@
+import "@shared/i18n/i18n";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AuthModal } from "@features/auth/components/AuthModal";

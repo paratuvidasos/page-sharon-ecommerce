@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { Button } from "@ui/components/Button";
 import { getOrder, ApiError } from "@shared/api-client";
@@ -16,6 +17,7 @@ const POLL_TIMEOUT_MS = 30000;
 // del navegador y solo sirven de pista de UI — el estado real se confirma contra el
 // backend con polling corto sobre GET /orders/:orderNumber, tal como pide el handoff.
 export const CheckoutResultPage = ({ onOrderUpdated }) => {
+  const { t } = useTranslation("checkout");
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get("order");
   const boldTxStatus = searchParams.get("bold-tx-status");
@@ -103,43 +105,45 @@ export const CheckoutResultPage = ({ onOrderUpdated }) => {
         {(status === "loading" || status === "pending") && (
           <StatusBlock
             icon="spark"
-            title="Estamos confirmando tu pago…"
-            description="Esto puede tardar unos segundos. No cierres esta ventana."
+            title={t("checkoutResultPage.confirming")}
+            description={t("checkoutResultPage.dontClose")}
           />
         )}
 
         {status === "timeout" && (
           <StatusBlock
             icon="spark"
-            title="Tu pago puede tardar unos minutos más"
-            description="Te avisamos por correo apenas se confirme, o puedes comprobar de nuevo."
+            title={t("checkoutResultPage.timeoutTitle")}
+            description={t("checkoutResultPage.timeoutDescription")}
           >
-            <Button onClick={handleRetryPoll} style={{ marginTop: 20 }}>Comprobar de nuevo</Button>
+            <Button onClick={handleRetryPoll} style={{ marginTop: 20 }}>{t("checkoutResultPage.checkAgain")}</Button>
           </StatusBlock>
         )}
 
         {status === "not_found" && (
           <StatusBlock
             icon="close"
-            title="No encontramos ese pedido"
-            description="Revisa el enlace o contáctanos si el problema persiste."
+            title={t("checkoutResultPage.notFoundTitle")}
+            description={t("checkoutResultPage.notFoundDescription")}
           >
-            <Link to="/tienda"><Button style={{ marginTop: 20 }}>Ir a la tienda</Button></Link>
+            <Link to="/tienda"><Button style={{ marginTop: 20 }}>{t("checkoutResultPage.goToStore")}</Button></Link>
           </StatusBlock>
         )}
 
         {status === "paid" && order && (
           <StatusBlock
             icon="leaf"
-            title="¡Pedido confirmado!"
+            title={t("checkoutResultPage.paidTitle")}
             description={
-              <>
-                Tu pedido <strong>{order.orderNumber}</strong> quedó registrado por{" "}
-                <strong>{formatCurrency(order.total)}</strong>. Te avisamos por correo cuando cambie de estado.
-              </>
+              <Trans
+                t={t}
+                i18nKey="checkoutResultPage.paidDescription"
+                values={{ orderNumber: order.orderNumber, total: formatCurrency(order.total) }}
+                components={{ strong: <strong />, strong2: <strong /> }}
+              />
             }
           >
-            <Link to="/tienda"><Button style={{ marginTop: 20 }}>Seguir comprando</Button></Link>
+            <Link to="/tienda"><Button style={{ marginTop: 20 }}>{t("checkoutResultPage.keepShopping")}</Button></Link>
           </StatusBlock>
         )}
 
@@ -147,8 +151,8 @@ export const CheckoutResultPage = ({ onOrderUpdated }) => {
           <div>
             <StatusBlock
               icon="close"
-              title="No pudimos procesar tu pago"
-              description={order.paymentFailureMessage || "Intenta con otro método de pago."}
+              title={t("checkoutResultPage.failedTitle")}
+              description={order.paymentFailureMessage || t("checkoutResultPage.failedFallback")}
             />
             <div style={{ marginTop: 24 }}>
               <RetryPaymentPanel
@@ -163,7 +167,7 @@ export const CheckoutResultPage = ({ onOrderUpdated }) => {
 
         {boldTxStatus && status === "loading" && (
           <p style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 12 }}>
-            Bold reportó: {boldTxStatus}. Confirmando con nuestro servidor…
+            {t("checkoutResultPage.boldReported", { status: boldTxStatus })}
           </p>
         )}
       </div>

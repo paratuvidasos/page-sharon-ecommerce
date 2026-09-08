@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { IconButton } from "@ui/components/IconButton";
 import { useAuth } from "@shared/auth/AuthContext";
 import { ApiError } from "@shared/api-client";
@@ -11,6 +12,7 @@ const REASON_MAX = 500;
 // (mismo patrón que logout/logoutAll: el accessToken en memoria se maneja en un solo lugar),
 // así que este formulario solo junta los campos y expone submit() al modal que lo aloja.
 export const DeleteAccountForm = forwardRef((_props, ref) => {
+  const { t } = useTranslation("profile");
   const { deleteAccount } = useAuth();
   const [password, setPassword] = useState("");
   const [reason, setReason] = useState("");
@@ -26,7 +28,7 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
   useImperativeHandle(ref, () => ({
     submit: async () => {
       if (!password) {
-        setError("Ingresa tu contraseña para confirmar.");
+        setError(t("deleteAccount.form.passwordRequired"));
         return { ok: false };
       }
       setError("");
@@ -36,11 +38,11 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
         return { ok: true };
       } catch (e) {
         if (e instanceof ApiError && e.code === "INVALID_CREDENTIALS") {
-          setError("El correo o la contraseña son incorrectos.");
+          setError(t("deleteAccount.form.invalidCredentials"));
         } else if (e instanceof ApiError && e.code === "VALIDATION_ERROR") {
-          setError(e.message || "Revisa los datos ingresados.");
+          setError(e.message || t("deleteAccount.form.generic"));
         } else {
-          setError("No pudimos eliminar tu cuenta. Intenta de nuevo en unos segundos.");
+          setError(t("deleteAccount.form.generic"));
         }
         return { ok: false };
       } finally {
@@ -73,7 +75,7 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
 
       <div>
         <label htmlFor="delete-account-password" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Contraseña actual
+          {t("deleteAccount.form.passwordLabel")}
         </label>
         <div style={{ position: "relative" }}>
           <input
@@ -84,7 +86,7 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
               if (error) setError("");
             }}
             type={visible ? "text" : "password"}
-            placeholder="Confirma tu contraseña"
+            placeholder={t("deleteAccount.form.passwordPlaceholder")}
             autoComplete="current-password"
             disabled={submitting}
             aria-invalid={error ? "true" : undefined}
@@ -109,7 +111,7 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
             iconSize={16}
             disabled={submitting}
             onClick={() => setVisible((v) => !v)}
-            aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-label={visible ? t("deleteAccount.form.hidePassword") : t("deleteAccount.form.showPassword")}
             style={{ position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)" }}
           />
         </div>
@@ -117,13 +119,13 @@ export const DeleteAccountForm = forwardRef((_props, ref) => {
 
       <div style={{ marginTop: 16 }}>
         <label htmlFor="delete-account-reason" className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>
-          Motivo (opcional)
+          {t("deleteAccount.form.reasonLabel")}
         </label>
         <textarea
           id="delete-account-reason"
           value={reason}
           onChange={(e) => setReason(e.target.value.slice(0, REASON_MAX))}
-          placeholder="Cuéntanos por qué te vas, nos ayuda a mejorar"
+          placeholder={t("deleteAccount.form.reasonPlaceholder")}
           disabled={submitting}
           rows={3}
           style={{

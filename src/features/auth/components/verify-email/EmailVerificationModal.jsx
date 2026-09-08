@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -6,17 +7,21 @@ import { Modal } from "@ui/components/Modal";
 import { Z } from "@ui/zIndex";
 import { verifyEmail } from "@shared/api-client";
 
-const STATUS_COPY = {
-  checking: { eyebrow: "Verificando", title: "Un momento…", subtitle: "Estamos confirmando tu correo." },
-  invalid: { eyebrow: "Enlace no válido", title: "No pudimos verificar tu correo", subtitle: "El enlace puede estar incompleto, vencido o ya haberse usado." },
-  ready: { eyebrow: "Listo", title: "Correo verificado" },
-};
+function getStatusCopy(t) {
+  return {
+    checking: { eyebrow: t("verifyEmailModal.checkingEyebrow"), title: t("verifyEmailModal.checkingTitle"), subtitle: t("verifyEmailModal.checkingSubtitle") },
+    invalid: { eyebrow: t("verifyEmailModal.invalidEyebrow"), title: t("verifyEmailModal.invalidTitle"), subtitle: t("verifyEmailModal.invalidSubtitle") },
+    ready: { eyebrow: t("verifyEmailModal.readyEyebrow"), title: t("verifyEmailModal.readyTitle") },
+  };
+}
 
 // Modal de aterrizaje del enlace de verificación de correo (ej. sharon.com/?token=...).
 // Independiente de AuthModal: se abre directo desde App.jsx según la URL, llama a
 // verifyEmail(token) contra el backend real y muestra éxito o error. Mismo patrón que
 // ResetPasswordModal, pero sin formulario propio: el token no requiere ningún input.
 export const EmailVerificationModal = ({ open, onClose, token, onGoToLogin }) => {
+  const { t } = useTranslation("auth");
+  const STATUS_COPY = getStatusCopy(t);
   const [status, setStatus] = useState("checking");
   // El token es de un solo uso en el backend: si el efecto corre dos veces para el
   // mismo token (StrictMode en dev remonta el componente), la segunda llamada real
@@ -98,13 +103,13 @@ export const EmailVerificationModal = ({ open, onClose, token, onGoToLogin }) =>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 340 }}>{copy.subtitle}</p>
           )}
         </div>
-        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label="Cerrar" />
+        <IconButton icon="close" size={38} iconSize={20} onClick={onClose} aria-label={t("verifyEmailModal.closeAria")} />
       </div>
 
       <div style={{ padding: "24px 26px 28px" }}>
         {status === "checking" ? (
           <div style={{ textAlign: "center", padding: "20px 8px", fontSize: 13, color: "var(--ink-soft)" }}>
-            Verificando tu correo…
+            {t("verifyEmailModal.checkingBody")}
           </div>
         ) : status === "invalid" ? (
           <div style={{ textAlign: "center", padding: "4px 8px 8px" }}>
@@ -121,7 +126,7 @@ export const EmailVerificationModal = ({ open, onClose, token, onGoToLogin }) =>
             >
               <Icon name="close" size={26} color="#9C4A4A" />
             </div>
-            <Button onClick={onClose}>Entendido</Button>
+            <Button onClick={onClose}>{t("verifyEmailModal.invalidAcknowledge")}</Button>
           </div>
         ) : (
           <div style={{ textAlign: "center", padding: "4px 8px 8px" }}>
@@ -139,10 +144,10 @@ export const EmailVerificationModal = ({ open, onClose, token, onGoToLogin }) =>
               <Icon name="leaf" size={28} color="var(--botanic-deep)" />
             </div>
             <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>
-              Ya puedes iniciar sesión con tu cuenta.
+              {t("verifyEmailModal.readyBody")}
             </p>
             <Button onClick={onGoToLogin} style={{ marginTop: 22 }}>
-              Iniciar sesión
+              {t("verifyEmailModal.goToLogin")}
             </Button>
           </div>
         )}

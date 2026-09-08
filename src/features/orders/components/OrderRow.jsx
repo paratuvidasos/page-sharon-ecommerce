@@ -1,9 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@shared/i18n/currency";
+import { formatDate } from "@shared/i18n/date";
 import { getStatus } from "../data/statuses";
-
-const formatDate = (isoDate) =>
-  new Date(isoDate).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
 
 // Una fila del historial: fecha, número de orden, estado y total (los cuatro datos
 // que pide el AC), con un link a "Ver detalle" que el padre resuelve con onViewDetail.

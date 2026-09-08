@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthField } from "../AuthField";
 import { loginAccount, ApiError } from "@shared/api-client";
 
@@ -6,21 +7,23 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const INITIAL_FORM = { email: "", password: "" };
 
-const FIELDS = [
-  { name: "email", label: "Correo electrónico", type: "email", placeholder: "tucorreo@ejemplo.com", autoComplete: "email", full: true },
-  { name: "password", label: "Contraseña", type: "password", placeholder: "Tu contraseña", autoComplete: "current-password", full: true },
-];
+function getFields(t) {
+  return [
+    { name: "email", label: t("loginForm.emailLabel"), type: "email", placeholder: t("loginForm.emailPlaceholder"), autoComplete: "email", full: true },
+    { name: "password", label: t("loginForm.passwordLabel"), type: "password", placeholder: t("loginForm.passwordPlaceholder"), autoComplete: "current-password", full: true },
+  ];
+}
 
 const REMEMBERED_EMAIL_KEY = "sharon:rememberedEmail";
 
-function validateField(field, value) {
+function validateField(field, value, t) {
   switch (field) {
     case "email":
-      if (!value.trim()) return "Necesitamos tu correo para continuar.";
-      if (!EMAIL_RE.test(value.trim())) return "Ese correo no parece válido, revisa el formato.";
+      if (!value.trim()) return t("loginForm.emailRequired");
+      if (!EMAIL_RE.test(value.trim())) return t("loginForm.emailInvalid");
       return "";
     case "password":
-      if (!value) return "Ingresa tu contraseña.";
+      if (!value) return t("loginForm.passwordRequired");
       return "";
     default:
       return "";
@@ -33,6 +36,8 @@ function validateField(field, value) {
 // real del bloqueo la controla el backend, el cliente solo se desbloquea si el usuario
 // vuelve a editar el formulario para reintentar.
 export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) => {
+  const { t } = useTranslation("auth");
+  const FIELDS = getFields(t);
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -64,7 +69,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
     const value = e.target.value;
     const nextForm = { ...form, [field]: value };
     setForm(nextForm);
-    setErrors((prev) => (touched[field] ? { ...prev, [field]: validateField(field, value) } : prev));
+    setErrors((prev) => (touched[field] ? { ...prev, [field]: validateField(field, value, t) } : prev));
     if (accountLocked) {
       setAccountLocked(false);
       onLockChange?.(false);
@@ -73,7 +78,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
 
   const handleBlur = (field) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field]) }));
+    setErrors((prev) => ({ ...prev, [field]: validateField(field, form[field], t) }));
   };
 
   const invalidFields = FIELDS.filter(({ name }) => errors[name]);
@@ -84,7 +89,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
 
       const nextErrors = {};
       FIELDS.forEach(({ name }) => {
-        nextErrors[name] = validateField(name, form[name]);
+        nextErrors[name] = validateField(name, form[name], t);
       });
       setErrors(nextErrors);
       setTouched(Object.fromEntries(FIELDS.map(({ name }) => [name, true])));
@@ -92,7 +97,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
       const hasErrors = FIELDS.some(({ name }) => nextErrors[name]);
       if (hasErrors) {
         setShowSummary(true);
-        setSummaryToken((t) => t + 1);
+        setSummaryToken((prev) => prev + 1);
         return { ok: false };
       }
 
@@ -124,7 +129,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
         } else if (e instanceof ApiError && (e.code === "INVALID_CREDENTIALS" || e.code === "ACCOUNT_INACTIVE")) {
           setServerError(e.message);
         } else {
-          setServerError("No pudimos iniciar tu sesión. Intenta de nuevo en unos segundos.");
+          setServerError(t("loginForm.genericError"));
         }
         return { ok: false };
       }
@@ -148,7 +153,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
           }}
         >
           <div style={{ fontWeight: 600, fontSize: 13, color: "#7A3535", marginBottom: 8 }}>
-            Hay campos por revisar
+            {t("loginForm.summaryTitle")}
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {invalidFields.map(({ name, label }) => (
@@ -213,7 +218,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
             onChange={(e) => setRememberMe(e.target.checked)}
             style={{ accentColor: "var(--botanic-deep)", width: 16, height: 16 }}
           />
-          Recordarme en este dispositivo
+          {t("loginForm.rememberMe")}
         </label>
 
         <button
@@ -229,7 +234,7 @@ export const LoginForm = forwardRef(({ onLockChange, onForgotPassword }, ref) =>
             cursor: "pointer",
           }}
         >
-          ¿Olvidaste tu contraseña?
+          {t("loginForm.forgotPassword")}
         </button>
       </div>
     </div>

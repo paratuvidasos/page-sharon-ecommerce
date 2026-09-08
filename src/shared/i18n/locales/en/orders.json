@@ -10,6 +10,14 @@
     "CANCELLED": "Cancelled",
     "REFUNDED": "Refunded"
   },
+  "trackingStatusLabels": {
+    "PENDING": "Preparing shipment",
+    "IN_TRANSIT": "In transit",
+    "OUT_FOR_DELIVERY": "Out for delivery",
+    "DELIVERED": "Delivered",
+    "EXCEPTION": "There was an issue with the shipment",
+    "UNKNOWN": "No updates yet"
+  },
   "history": {
     "eyebrow": "Your account",
     "title": "Order history",
@@ -32,6 +40,9 @@
     "trackShipment": "Track shipment",
     "shippedOn": "Shipped on {{date}}",
     "deliveredOn": "Delivered on {{date}}",
-    "tracking": "Order tracking"
+    "tracking": "Order tracking",
+    "realTimeTracking": "Shipment tracking",
+    "lastSyncedAt": "Updated on {{date}}",
+    "notSyncedYet": "We're confirming the status with the carrier"
   }
 }

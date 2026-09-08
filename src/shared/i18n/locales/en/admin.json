@@ -152,7 +152,51 @@
     "tableHead": {
       "name": "Name",
       "email": "Email",
-      "role": "Role"
+      "jobTitle": "Title",
+      "role": "Role",
+      "status": "Status"
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "EMPLOYEE": "Employee"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended",
+      "DELETED": "Deleted"
+    },
+    "searchPlaceholder": "Search by name or email…",
+    "search": "Search",
+    "newEmployee": "New employee",
+    "loading": "Loading employees…",
+    "error": "Couldn't load employees.",
+    "empty": "No employees created yet.",
+    "editAria": "Edit employee",
+    "deleteAria": "Delete employee",
+    "confirmDelete": "Delete \"{{name}}\"'s access? This cannot be undone.",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "form": {
+      "eyebrow": "Employees",
+      "editTitle": "Edit employee",
+      "newTitle": "New employee",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "roleLabel": "Access role",
+      "jobTitleLabel": "Job title",
+      "jobTitlePlaceholder": "e.g. Store manager",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "requiredNameError": "First and last name are required.",
+      "requiredCreateError": "Email and a password of at least 8 characters are required.",
+      "emailExistsError": "That email is already registered.",
+      "saveErrorGeneric": "Couldn't save the employee."
     }
   },
   "banners": {
@@ -170,7 +214,25 @@
     "cancel": "Cancel",
     "uploadErrorGeneric": "Couldn't upload the image.",
     "requiredFieldsError": "Image and title are required.",
+    "requiredPlacementError": "Select at least one placement.",
     "saveErrorGeneric": "Couldn't save the banner.",
+    "category": {
+      "EVENTO": "Event",
+      "KIT": "Kit",
+      "PROMOCION": "Promotion",
+      "LANZAMIENTO": "Launch",
+      "COLECCION": "Collection",
+      "GENERAL": "General"
+    },
+    "actionType": {
+      "COMPRAR": "Shop",
+      "INSCRIPCION": "Sign up",
+      "MAS_INFORMACION": "More information"
+    },
+    "placement": {
+      "WELCOME_MODAL": "Welcome modal",
+      "HOME_SECTION": "Home section"
+    },
     "form": {
       "eyebrow": "Banners",
       "editTitle": "Edit banner",
@@ -180,6 +242,11 @@
       "uploadButton": "Upload image",
       "titleLabel": "Title",
       "linkLabel": "Link (optional)",
+      "categoryLabel": "Category",
+      "actionTypeLabel": "Action type",
+      "placementsLabel": "Placement",
+      "placementWelcomeModal": "Welcome modal (shown when entering the site)",
+      "placementHomeSection": "Home section (permanent carousel)",
       "startsAt": "Starts",
       "endsAt": "Ends",
       "activeLabel": "Active",
@@ -302,6 +369,7 @@
       "presentationSection": "Variant",
       "presentationsSection": "Variants",
       "presentationUnique": "Single variant",
+      "loadingVariants": "Loading variants…",
       "addImages": "Add images",
       "removeImageAria": "Remove image",
       "uploading": "Uploading…",
@@ -321,7 +389,8 @@
         "removeImageFailed": "Couldn't remove the image.",
         "createVariantFailed": "Couldn't create the variant.",
         "removeVariantFailed": "Couldn't remove the variant.",
-        "lastVariant": "You can't remove the product's last variant."
+        "lastVariant": "You can't remove the product's last variant.",
+        "loadVariantsFailed": "Couldn't load the product's variants."
       }
     }
   },

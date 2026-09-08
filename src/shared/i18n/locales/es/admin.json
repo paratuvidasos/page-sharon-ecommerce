@@ -152,7 +152,51 @@
     "tableHead": {
       "name": "Nombre",
       "email": "Correo",
-      "role": "Rol"
+      "jobTitle": "Puesto",
+      "role": "Rol",
+      "status": "Estado"
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "EMPLOYEE": "Empleado"
+    },
+    "status": {
+      "ACTIVE": "Activo",
+      "INACTIVE": "Inactivo",
+      "SUSPENDED": "Suspendido",
+      "DELETED": "Eliminado"
+    },
+    "searchPlaceholder": "Buscar por nombre o correo…",
+    "search": "Buscar",
+    "newEmployee": "Nuevo empleado",
+    "loading": "Cargando empleados…",
+    "error": "No se pudieron cargar los empleados.",
+    "empty": "Todavía no hay empleados creados.",
+    "editAria": "Editar empleado",
+    "deleteAria": "Eliminar empleado",
+    "confirmDelete": "¿Eliminar el acceso de \"{{name}}\"? No se puede deshacer.",
+    "delete": "Eliminar",
+    "cancel": "Cancelar",
+    "form": {
+      "eyebrow": "Empleados",
+      "editTitle": "Editar empleado",
+      "newTitle": "Nuevo empleado",
+      "firstNameLabel": "Nombre",
+      "lastNameLabel": "Apellido",
+      "emailLabel": "Correo",
+      "passwordLabel": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "roleLabel": "Rol de acceso",
+      "jobTitleLabel": "Puesto",
+      "jobTitlePlaceholder": "Ej. Gerente de tienda",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "requiredNameError": "Nombre y apellido son obligatorios.",
+      "requiredCreateError": "Correo y una contraseña de al menos 8 caracteres son obligatorios.",
+      "emailExistsError": "Ese correo ya está registrado.",
+      "saveErrorGeneric": "No se pudo guardar el empleado."
     }
   },
   "banners": {
@@ -170,7 +214,25 @@
     "cancel": "Cancelar",
     "uploadErrorGeneric": "No se pudo subir la imagen.",
     "requiredFieldsError": "La imagen y el título son obligatorios.",
+    "requiredPlacementError": "Selecciona al menos una ubicación.",
     "saveErrorGeneric": "No se pudo guardar el banner.",
+    "category": {
+      "EVENTO": "Evento",
+      "KIT": "Kit",
+      "PROMOCION": "Promoción",
+      "LANZAMIENTO": "Lanzamiento",
+      "COLECCION": "Colección",
+      "GENERAL": "General"
+    },
+    "actionType": {
+      "COMPRAR": "Comprar",
+      "INSCRIPCION": "Inscripción",
+      "MAS_INFORMACION": "Más información"
+    },
+    "placement": {
+      "WELCOME_MODAL": "Modal de bienvenida",
+      "HOME_SECTION": "Sección del home"
+    },
     "form": {
       "eyebrow": "Banners",
       "editTitle": "Editar banner",
@@ -180,6 +242,11 @@
       "uploadButton": "Subir imagen",
       "titleLabel": "Título",
       "linkLabel": "Link (opcional)",
+      "categoryLabel": "Categoría",
+      "actionTypeLabel": "Tipo de acción",
+      "placementsLabel": "Ubicación",
+      "placementWelcomeModal": "Modal de bienvenida (aparece al entrar al sitio)",
+      "placementHomeSection": "Sección del home (carrusel permanente)",
       "startsAt": "Desde",
       "endsAt": "Hasta",
       "activeLabel": "Activo",
@@ -302,6 +369,7 @@
       "presentationSection": "Presentación",
       "presentationsSection": "Presentaciones",
       "presentationUnique": "Presentación única",
+      "loadingVariants": "Cargando presentaciones…",
       "addImages": "Agregar imágenes",
       "removeImageAria": "Quitar imagen",
       "uploading": "Subiendo…",
@@ -321,7 +389,8 @@
         "removeImageFailed": "No se pudo quitar la imagen.",
         "createVariantFailed": "No se pudo crear la variante.",
         "removeVariantFailed": "No se pudo eliminar la variante.",
-        "lastVariant": "No se puede eliminar la última variante del producto."
+        "lastVariant": "No se puede eliminar la última variante del producto.",
+        "loadVariantsFailed": "No se pudieron cargar las presentaciones del producto."
       }
     }
   },

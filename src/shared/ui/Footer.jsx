@@ -1,8 +1,23 @@
 import { useTranslation } from "react-i18next";
 import { Icon } from "./Icon";
-import { Newsletter } from "./Newsletter";
+
+// Un ícono por link, posicional respecto al array de `footer.columns.<key>.links`
+// en los locales (ver home.json) — si se agrega/quita/reordena un link ahí, hay que
+// actualizar el array acá también para que sigan alineados.
+const COLUMN_ICONS = {
+  shop: ["grid", "drop", "layers", "spark", "sun", "box"],
+  help: ["truck", "arrow", "search", "megaphone", "check"],
+  brand: ["team", "leaf", "leaf-deco", "star", "pencil"],
+};
 
 const COLUMN_KEYS = ["shop", "help", "brand"];
+
+const SOCIAL_LINKS = [
+  ["ig", "Instagram"],
+  ["tt", "TikTok"],
+  ["pin", "Pinterest"],
+  ["fb", "Facebook"],
+];
 
 export const Footer = () => {
   const { t } = useTranslation("home");
@@ -10,11 +25,13 @@ export const Footer = () => {
     key,
     title: t(`footer.columns.${key}.title`),
     links: t(`footer.columns.${key}.links`, { returnObjects: true }),
+    icons: COLUMN_ICONS[key],
   }));
 
-  // Footer de ancho completo (no flotante, sin radio) — misma paleta oscura de
-  // Testimonials pero como cierre de página clásico, con la newsletter compacta
-  // integrada arriba en vez de vivir aparte.
+  // Footer de ancho completo, mismo tono oscuro que Testimonials como cierre de
+  // página. Layout minimalista (referencia: "webtics") — columnas con ícono+texto
+  // por link, línea punteada delgada y copyright chico, sin newsletter ni badges de
+  // pago acá (la newsletter ya vive en OfferBanner vía NewsletterInline).
   return (
     <footer style={{
       background: "linear-gradient(180deg, var(--ink) 0%, #2A241E 100%)",
@@ -30,40 +47,44 @@ export const Footer = () => {
       }} />
 
       <div className="wrap" style={{ position: "relative" }}>
-        <Newsletter compact />
-
-        <div className="stitch" style={{ margin: "40px 0", opacity: 0.35, filter: "invert(1)" }} />
-
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr repeat(3, 1fr)", gap: 50 }} className="foot-grid">
           <div>
-            <div className="script" style={{ fontSize: 48, lineHeight: 1, marginBottom: 18 }}>Sharon</div>
-            <p style={{ color: "rgba(255,255,255,.65)", fontSize: 14, lineHeight: 1.65, maxWidth: 320, marginBottom: 24 }}>
+            <div className="script" style={{ fontSize: 40, lineHeight: 1, marginBottom: 14 }}>Sharon</div>
+            <p style={{ color: "rgba(255,255,255,.6)", fontSize: 14, lineHeight: 1.6, maxWidth: 300, marginBottom: 16 }}>
               {t("footer.description")}
             </p>
-            <div style={{ display: "flex", gap: 10 }}>
-              {[["ig", "Instagram"], ["tt", "TikTok"], ["pin", "Pinterest"], ["fb", "Facebook"]].map(([k, label]) => (
-                <a key={k} href="#" aria-label={label} style={{
-                  width: 40, height: 40, borderRadius: 999, border: "1px solid rgba(255,255,255,.2)",
-                  display: "grid", placeItems: "center", color: "var(--cream)",
-                  transition: "background .25s, color .25s"
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--cream)"; e.currentTarget.style.color = "var(--ink)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--cream)"; }}>
-                  <Icon name={k} size={16} />
-                </a>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, fontSize: 13.5 }}>
+              {SOCIAL_LINKS.map(([k, label], i) => (
+                <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <a
+                    href="#"
+                    style={{ color: "rgba(255,255,255,.75)", transition: "color .2s" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "var(--botanic)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,.75)"; }}
+                  >
+                    {label}
+                  </a>
+                  {i < SOCIAL_LINKS.length - 1 && <span aria-hidden="true" style={{ color: "rgba(255,255,255,.35)" }}>·</span>}
+                </span>
               ))}
             </div>
           </div>
 
-          {cols.map(c => (
+          {cols.map((c) => (
             <div key={c.key}>
-              <div className="eyebrow" style={{ color: "var(--gold-soft)", marginBottom: 18 }}>{c.title}</div>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-                {c.links.map(l => (
+              <div className="eyebrow" style={{ color: "var(--gold-soft)", marginBottom: 16 }}>{c.title}</div>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+                {c.links.map((l, i) => (
                   <li key={l}>
-                    <a href="#" style={{ color: "rgba(255,255,255,.78)", fontSize: 14, transition: "color .2s" }}
-                       onMouseEnter={e => e.currentTarget.style.color = "var(--botanic)"}
-                       onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,.78)"}>{l}</a>
+                    <a
+                      href="#"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 9, color: "rgba(255,255,255,.72)", fontSize: 14, transition: "color .2s" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = "var(--botanic)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,.72)"; }}
+                    >
+                      <Icon name={c.icons[i]} size={15} />
+                      {l}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -71,31 +92,17 @@ export const Footer = () => {
           ))}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginTop: 60, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.55)", fontSize: 12 }}>
-          <div>{t("footer.copyright")}</div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ marginRight: 6 }}>{t("footer.securePayments")}</span>
-            {["VISA", "MC", "AMEX", "PAYPAL", "APPLE"].map(t => (
-              <span key={t} style={{
-                padding: "5px 9px", borderRadius: 6, border: "1px solid rgba(255,255,255,.15)",
-                fontFamily: "var(--mono)", fontSize: 10, letterSpacing: ".08em"
-              }}>{t}</span>
-            ))}
-          </div>
-        </div>
+        <div className="stitch" style={{ margin: "50px 0 24px", opacity: 0.3, filter: "invert(1)" }} />
+
+        <div style={{ color: "rgba(255,255,255,.5)", fontSize: 12.5 }}>{t("footer.copyright")}</div>
       </div>
 
       <style>{`
-        .nl-inline form{ flex: 1; justify-content: flex-end; }
         @media (max-width: 900px){
           .foot-grid{grid-template-columns: 1fr 1fr !important; gap: 36px !important}
         }
         @media (max-width: 560px){
           .foot-grid{grid-template-columns: 1fr !important}
-        }
-        @media (max-width: 640px){
-          .nl-inline{ flex-direction: column; align-items: flex-start !important; }
-          .nl-inline form{ justify-content: flex-start; width: 100%; }
         }
       `}</style>
     </footer>

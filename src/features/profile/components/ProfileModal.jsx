@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Icon } from "@ui/Icon";
 import { IconButton } from "@ui/components/IconButton";
 import { Button } from "@ui/components/Button";
@@ -31,6 +32,7 @@ const linkBtnStyle = {
 // desplegable de la cuenta (ver AccountMenu.jsx / App.jsx), no hace falta pasar por
 // "Editar perfil" para verlo.
 export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, onSave, addresses, setAddresses, onLogout, onLogoutAll, onOpenDeleteAccount }) => {
+  const { t } = useTranslation("profile");
   const [submitting, setSubmitting] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
   const [formKey, setFormKey] = useState(0);
@@ -127,16 +129,16 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--terracotta)" }} />
-              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em", color: "var(--terracotta-deep)" }}>Tu cuenta</span>
+              <span className="eyebrow" style={{ fontSize: 10, letterSpacing: ".14em", color: "var(--terracotta-deep)" }}>{t("modal.eyebrow")}</span>
             </div>
             <div id="profile-modal-title" className="display" style={{ fontSize: 24, lineHeight: 1.15 }}>
-              Editar perfil
+              {t("modal.title")}
             </div>
             <p style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 8, maxWidth: 360 }}>
-              Actualiza tus datos. Los cambios se guardan de inmediato en tu cuenta.
+              {t("modal.subtitle")}
             </p>
           </div>
-          <IconButton icon="close" size={38} iconSize={20} onClick={close} aria-label="Cerrar" />
+          <IconButton icon="close" size={38} iconSize={20} onClick={close} aria-label={t("modal.close")} />
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 26px" }}>
@@ -153,29 +155,29 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
                 color: "var(--botanic-deep)",
               }}
             >
-              Cambios guardados.
+              {t("modal.savedBanner")}
             </div>
           )}
           {profileReady ? (
             <ProfileForm key={`profile-${formKey}`} ref={formRef} initialValues={user} />
           ) : (
             <div style={{ padding: "30px 0", textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
-              Cargando tu perfil…
+              {t("modal.loading")}
             </div>
           )}
 
           <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
-                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 4 }}>Envíos</span>
+                <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 4 }}>{t("modal.shipping.eyebrow")}</span>
                 <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
                   {addresses.length === 0
-                    ? "Sin direcciones guardadas"
-                    : `${addresses.length} ${addresses.length === 1 ? "dirección guardada" : "direcciones guardadas"}`}
+                    ? t("modal.shipping.noAddresses")
+                    : t("modal.shipping.addressCount", { count: addresses.length })}
                 </div>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => setAddressBookOpen(true)}>
-                Gestionar direcciones
+                {t("modal.shipping.manage")}
               </Button>
             </div>
           </div>
@@ -187,7 +189,7 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
           )}
 
           <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
-            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>Sesión</span>
+            <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10 }}>{t("modal.session.eyebrow")}</span>
             {confirmingLogoutAll ? (
               <div
                 style={{
@@ -198,11 +200,11 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
                 }}
               >
                 <p style={{ fontSize: 12.5, color: "#7A3535" }}>
-                  ¿Cerrar sesión en todos tus dispositivos? Tendrás que iniciar sesión de nuevo en cada uno.
+                  {t("modal.session.confirmLogoutAll")}
                 </p>
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                   <Button type="button" size="sm" onClick={handleLogoutAll} disabled={loggingOutAll}>
-                    {loggingOutAll ? "Cerrando…" : "Sí, cerrar todas"}
+                    {loggingOutAll ? t("modal.session.loggingOutAll") : t("modal.session.confirmYes")}
                   </Button>
                   <Button
                     type="button"
@@ -211,14 +213,14 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
                     onClick={() => setConfirmingLogoutAll(false)}
                     disabled={loggingOutAll}
                   >
-                    Cancelar
+                    {t("modal.session.confirmCancel")}
                   </Button>
                 </div>
               </div>
             ) : (
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                 <button type="button" onClick={handleLogout} disabled={loggingOut} style={linkBtnStyle}>
-                  {loggingOut ? "Cerrando…" : "Cerrar sesión"}
+                  {loggingOut ? t("modal.session.loggingOut") : t("modal.session.logout")}
                 </button>
                 <button
                   type="button"
@@ -226,7 +228,7 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
                   disabled={loggingOut}
                   style={{ ...linkBtnStyle, color: "#9C4A4A" }}
                 >
-                  Cerrar sesión en todos los dispositivos
+                  {t("modal.session.logoutAll")}
                 </button>
               </div>
             )}
@@ -234,21 +236,20 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
 
           <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line)" }}>
             <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 10, color: "#9C4A4A" }}>
-              Zona de peligro
+              {t("modal.danger.eyebrow")}
             </span>
             {hasPassword === false ? (
               <>
                 <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 8, lineHeight: 1.5 }}>
-                  Necesitas crear una contraseña antes de poder eliminar tu cuenta (tu cuenta llegó
-                  por Google y hoy no tiene ninguna con la que confirmar el borrado).
+                  {t("modal.danger.needsPasswordNotice")}
                 </p>
                 <button type="button" onClick={scrollToCreatePassword} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
-                  Crear contraseña
+                  {t("modal.danger.createPassword")}
                 </button>
               </>
             ) : (
               <button type="button" onClick={onOpenDeleteAccount} style={{ ...linkBtnStyle, color: "#9C4A4A" }}>
-                Eliminar mi cuenta
+                {t("modal.danger.deleteAccount")}
               </button>
             )}
           </div>
@@ -265,7 +266,7 @@ export const ProfileModal = ({ open, onClose, user, profileReady, hasPassword, o
               cursor: submitting || !profileReady ? "not-allowed" : "pointer",
             }}
           >
-            {submitting ? "Guardando…" : <>Guardar cambios <Icon name="arrow" size={16} /></>}
+            {submitting ? t("modal.submitting") : <>{t("modal.submit")} <Icon name="arrow" size={16} /></>}
           </Button>
         </div>
       </Modal>

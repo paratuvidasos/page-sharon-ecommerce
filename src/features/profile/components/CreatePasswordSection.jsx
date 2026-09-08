@@ -1,4 +1,5 @@
 import { forwardRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@ui/components/Button";
 import { setPassword as setPasswordRequest, ApiError } from "@shared/api-client";
 import { useAuth } from "@shared/auth/AuthContext";
@@ -23,6 +24,7 @@ const inputStyle = (invalid) => ({
 // de contraseña normal. Se muestra en ProfileModal y también es el destino al que
 // apunta el bloqueo de "Eliminar mi cuenta" (DELETE /accounts/me exige password).
 export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
+  const { t } = useTranslation("profile");
   const { getAccessToken, markPasswordCreated } = useAuth();
   const [password, setPasswordValue] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,13 +36,13 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
 
   const validate = (field, value, nextPassword = password) => {
     if (field === "password") {
-      if (!value) return "Elige una contraseña.";
-      if (!PASSWORD_RE.test(value)) return "Necesita al menos 8 caracteres, con una letra y un número.";
+      if (!value) return t("createPassword.errors.passwordRequired");
+      if (!PASSWORD_RE.test(value)) return t("createPassword.errors.passwordInvalid");
       return "";
     }
     if (field === "confirmPassword") {
-      if (!value) return "Confirma tu contraseña.";
-      if (value !== nextPassword) return "Las contraseñas no coinciden todavía.";
+      if (!value) return t("createPassword.errors.confirmRequired");
+      if (value !== nextPassword) return t("createPassword.errors.confirmMismatch");
       return "";
     }
     return "";
@@ -93,7 +95,7 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
         markPasswordCreated();
         setSuccess(true);
       } else {
-        setServerError("No pudimos crear tu contraseña. Intenta de nuevo en unos segundos.");
+        setServerError(t("createPassword.errors.generic"));
       }
     } finally {
       setSubmitting(false);
@@ -102,14 +104,13 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
 
   return (
     <div ref={ref}>
-      <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>Seguridad</span>
+      <span className="eyebrow" style={{ fontSize: 10, display: "block", marginBottom: 6 }}>{t("createPassword.eyebrow")}</span>
       <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 12, lineHeight: 1.5 }}>
-        Tu cuenta llegó a través de Google y todavía no tiene una contraseña propia. Crea una
-        para poder iniciar sesión con tu correo o eliminar tu cuenta más adelante.
+        {t("createPassword.description")}
       </p>
 
       {success ? (
-        <p style={{ fontSize: 12.5, color: "var(--botanic-deep)" }}>Contraseña creada correctamente.</p>
+        <p style={{ fontSize: 12.5, color: "var(--botanic-deep)" }}>{t("createPassword.success")}</p>
       ) : (
         <>
           {serverError && (
@@ -124,7 +125,7 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
                 value={password}
                 onChange={handlePasswordChange}
                 onBlur={handleBlur("password")}
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t("createPassword.passwordPlaceholder")}
                 autoComplete="new-password"
                 aria-invalid={touched.password && errors.password ? "true" : undefined}
                 style={inputStyle(touched.password && errors.password)}
@@ -141,7 +142,7 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
                 value={confirmPassword}
                 onChange={handleConfirmChange}
                 onBlur={handleBlur("confirmPassword")}
-                placeholder="Repite la contraseña"
+                placeholder={t("createPassword.confirmPlaceholder")}
                 autoComplete="new-password"
                 aria-invalid={touched.confirmPassword && errors.confirmPassword ? "true" : undefined}
                 style={inputStyle(touched.confirmPassword && errors.confirmPassword)}
@@ -154,7 +155,7 @@ export const CreatePasswordSection = forwardRef(({ onCreated }, ref) => {
             </div>
           </div>
           <Button type="button" size="sm" onClick={handleSubmit} disabled={submitting} style={{ marginTop: 4 }}>
-            {submitting ? "Creando…" : "Crear contraseña"}
+            {submitting ? t("createPassword.submitting") : t("createPassword.submit")}
           </Button>
         </>
       )}
