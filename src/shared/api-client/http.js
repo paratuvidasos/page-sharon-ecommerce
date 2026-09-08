@@ -1,8 +1,7 @@
-// Único punto de llamadas HTTP al backend (ver CLAUDE.md > Reglas de arquitectura #1).
-// Ningún componente hace fetch directo a la API — todo pasa por request() o por
-// las funciones tipadas de cada recurso (ej. accounts.js).
-
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+const rawBaseUrl =
+  (typeof window !== "undefined" && window.__ENV__?.VITE_API_BASE_URL) ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3000/api/v1";
 export const BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 
 export class ApiError extends Error {
