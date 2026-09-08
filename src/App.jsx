@@ -236,7 +236,7 @@ function App() {
   const refreshOrders = () => {
     if (!user) return;
     listOrders({ limit: 100 }, getAccessToken())
-      .then((res) => setOrders(res.items))
+      .then((res) => setOrders(Array.isArray(res?.items) ? res.items : []))
       .catch(() => {});
   };
   useEffect(() => {
@@ -247,7 +247,7 @@ function App() {
     let cancelled = false;
     listOrders({ limit: 100 }, getAccessToken())
       .then((res) => {
-        if (!cancelled) setOrders(res.items);
+        if (!cancelled) setOrders(Array.isArray(res?.items) ? res.items : []);
       })
       .catch(() => {
         if (!cancelled) setOrders([]);
@@ -283,7 +283,7 @@ function App() {
     let cancelled = false;
     listWishlist({ limit: 100 }, getAccessToken())
       .then((res) => {
-        if (!cancelled) setWishlist(res.items);
+        if (!cancelled) setWishlist(Array.isArray(res?.items) ? res.items : []);
       })
       .catch(() => {
         if (!cancelled) setWishlist([]);

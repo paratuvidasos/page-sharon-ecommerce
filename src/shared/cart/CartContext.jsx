@@ -37,16 +37,20 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(EMPTY_CART);
   const [loading, setLoading] = useState(true);
 
+  const updateCartState = (next) => {
+    setCart(next && Array.isArray(next.items) ? next : EMPTY_CART);
+  };
+
   useEffect(() => {
     if (status === "loading") return;
     let cancelled = false;
     setLoading(true);
     getCart(getAccessToken())
       .then((next) => {
-        if (!cancelled) setCart(next);
+        if (!cancelled) updateCartState(next);
       })
       .catch(() => {
-        if (!cancelled) setCart(EMPTY_CART);
+        if (!cancelled) updateCartState(EMPTY_CART);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -60,7 +64,7 @@ export function CartProvider({ children }) {
     async (variantId, quantity = 1) => {
       try {
         const next = await addCartItem({ variantId, quantity }, getAccessToken());
-        setCart(next);
+        updateCartState(next);
         return { ok: true };
       } catch (e) {
         return toResult(e);
@@ -73,7 +77,7 @@ export function CartProvider({ children }) {
     async (itemId, quantity) => {
       try {
         const next = await updateCartItem(itemId, { quantity }, getAccessToken());
-        setCart(next);
+        updateCartState(next);
         return { ok: true };
       } catch (e) {
         return toResult(e);
@@ -86,7 +90,7 @@ export function CartProvider({ children }) {
     async (itemId) => {
       try {
         const next = await removeCartItem(itemId, getAccessToken());
-        setCart(next);
+        updateCartState(next);
         return { ok: true };
       } catch (e) {
         return toResult(e);
@@ -98,7 +102,7 @@ export function CartProvider({ children }) {
   const clear = useCallback(async () => {
     try {
       const next = await clearCart(getAccessToken());
-      setCart(next);
+      updateCartState(next);
       return { ok: true };
     } catch (e) {
       return toResult(e);
@@ -109,7 +113,7 @@ export function CartProvider({ children }) {
     async (code) => {
       try {
         const next = await applyCouponRequest(code, getAccessToken());
-        setCart(next);
+        updateCartState(next);
         return { ok: true };
       } catch (e) {
         return toResult(e);
@@ -121,21 +125,17 @@ export function CartProvider({ children }) {
   const removeCoupon = useCallback(async () => {
     try {
       const next = await removeCouponRequest(getAccessToken());
-      setCart(next);
+      updateCartState(next);
       return { ok: true };
     } catch (e) {
       return toResult(e);
     }
   }, [getAccessToken]);
 
-  // Recarga el carrito contra el backend sin mutarlo (a diferencia de add/update/remove,
-  // que ya devuelven el carrito actualizado). Se usa tras un error de checkout como
-  // CHECKOUT_PRICE_CHANGED / CHECKOUT_ITEM_UNAVAILABLE, cuando lo que cambió fue el
-  // catálogo (precio/stock) y no una acción del usuario sobre su propio carrito.
   const refreshCart = useCallback(async () => {
     try {
       const next = await getCart(getAccessToken());
-      setCart(next);
+      updateCartState(next);
       return { ok: true };
     } catch (e) {
       return toResult(e);
@@ -145,17 +145,17 @@ export function CartProvider({ children }) {
   const mergeGuestCart = useCallback(async (accessToken) => {
     try {
       const next = await mergeCart(accessToken);
-      setCart(next);
+      updateCartState(next);
     } catch {
-      // Silencioso: si el merge falla, el carrito de la cuenta sigue siendo el
-      // que ya trajo el GET /cart disparado por el cambio de status a authenticated.
+      // Silencioso
     }
   }, []);
 
-  const itemCount = cart.items.reduce((sum, it) => sum + it.quantity, 0);
+  const safeItems = Array.isArray(cart?.items) ? cart.items : [];
+  const itemCount = safeItems.reduce((sum, it) => sum + (it.quantity || 0), 0);
 
   const value = {
-    cart,
+    cart: cart || EMPTY_CART,
     loading,
     itemCount,
     addItem,
