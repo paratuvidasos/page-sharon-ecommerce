@@ -3,26 +3,26 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Declarar los argumentos que vienen desde Dokploy / Docker build
+# Argumentos opcionales de build
 ARG VITE_API_BASE_URL
 ARG VITE_CLERK_PUBLISHABLE_KEY
 
-# Convertirlos en variables de entorno para la compilación de Vite
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 
-# Copiamos dependencias e instalamos
 COPY package*.json ./
 RUN npm install
 
-# Copiamos código y construimos (Vite ya tendrá acceso a las variables)
 COPY . .
 RUN npm run build
 
 # Etapa 2: Servidor de Producción (Nginx)
 FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html
 
+COPY --from=build /app/dist .
+
+# Configuración Nginx para SPA (React Router)
 RUN echo 'server { \
     listen 80; \
     location / { \
@@ -32,5 +32,11 @@ RUN echo 'server { \
     } \
     }' > /etc/nginx/conf.d/default.conf
 
+# Script de inicio que inyecta las variables de entorno de runtime en config.js
+RUN echo '#!/bin/sh' > /docker-entrypoint.d/40-env-config.sh && \
+    echo 'echo "window.__ENV__ = { VITE_API_BASE_URL: \"${VITE_API_BASE_URL}\", VITE_CLERK_PUBLISHABLE_KEY: \"${VITE_CLERK_PUBLISHABLE_KEY}\" };" > /usr/share/nginx/html/config.js' >> /docker-entrypoint.d/40-env-config.sh && \
+    chmod +x /docker-entrypoint.d/40-env-config.sh
+
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
