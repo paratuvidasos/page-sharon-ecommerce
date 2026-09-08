@@ -50,7 +50,7 @@ export const Products = ({ onWish, wishlistIds, onOpenProduct }) => {
     let cancelled = false;
     listCategories({ limit: 100 })
       .then((res) => {
-        if (!cancelled) setCategories(res.items);
+        if (!cancelled) setCategories(Array.isArray(res?.items) ? res.items : []);
       })
       .catch(() => {
         if (!cancelled) setCategories([]);
@@ -92,7 +92,7 @@ export const Products = ({ onWish, wishlistIds, onOpenProduct }) => {
     })
       .then((res) => {
         if (cancelled) return;
-        setProducts(res.items.map(normalizeProduct));
+        setProducts(Array.isArray(res?.items) ? res.items.map(normalizeProduct) : []);
         setStatus("ready");
       })
       .catch(() => {
